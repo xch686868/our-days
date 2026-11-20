@@ -205,6 +205,10 @@ svg{display:block}
 .like.on{color:#D6335E}
 .c1{background:var(--n1)}.c2{background:var(--n2)}.c3{background:var(--n3)}.c4{background:var(--n4)}
 
+.inapp{background:var(--rose);color:#fff;padding:calc(var(--sat) + 10px) max(18px,var(--sar)) 10px max(18px,var(--sal));display:flex;flex-direction:column;gap:2px;font-size:14px;line-height:1.5}
+.inapp b{font-size:15px}
+.install .btn.sm{display:inline-block}
+
 /* ---------- top chips ---------- */
 .chips{display:flex;gap:8px;margin:-4px 0 16px;overflow-x:auto;scrollbar-width:none;padding:2px}
 .chips::-webkit-scrollbar{display:none}
@@ -744,16 +748,35 @@ function homePage(){
   p.append(st);
   return p;
 }
+const UA = navigator.userAgent;
+const IS_ANDROID = /android/i.test(UA);
+const IS_IOS = !IS_ANDROID && (/iphone|ipad|ipod/i.test(UA) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+const IN_APP = /MicroMessenger|\bQQ\/|Weibo|DingTalk|AlipayClient|Lark|Feishu/i.test(UA);
+const IS_STANDALONE = () => window.navigator.standalone || matchMedia('(display-mode: standalone)').matches;
+// 安卓 Chrome / Edge 等支持一键安装
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); S.bip = e; if (S.room) render(); });
+window.addEventListener('appinstalled', () => { S.bip = null; lsSet('od-hide-install', true); toast('装好啦，去桌面找粉色爱心图标'); if (S.room) render(); });
 function installCard(){
-  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  const standalone = window.navigator.standalone || matchMedia('(display-mode: standalone)').matches;
-  if (!isIOS || standalone || lsGet('od-hide-install', false)) return null;
+  if (IN_APP || IS_STANDALONE() || lsGet('od-hide-install', false) || !(IS_IOS || IS_ANDROID)) return null;
+  const hide = () => { lsSet('od-hide-install', true); c.remove(); };
+  let body;
+  if (IS_IOS) body = h('p', null, '用 Safari 打开，点底部的分享按钮 ', h('span', {class: 'share', html: I.share, style: {display: 'inline-block'}}), '，再选「添加到主屏幕」。');
+  else if (S.bip) body = h('div', null, h('p', {text: '点一下就能装到手机桌面，以后从桌面图标打开。'}),
+    h('button', {class: 'btn sm', style: {marginTop: '8px'}, text: '安装到桌面', onclick: async () => { try { S.bip.prompt(); const r = await S.bip.userChoice; if (r && r.outcome === 'accepted') hide(); } catch {} S.bip = null; }}));
+  else body = h('p', {text: '点浏览器的菜单（右上角 ⋮ 或底部 ≡），选「添加到桌面」或「添加到主屏幕」。手机自带浏览器找不到这一项的话，换 Chrome 或 Edge 打开。'});
   const c = h('div', {class: 'card install'},
     h('img', {class: 'ic', src: 'icons/icon-192.png', alt: ''}),
-    h('div', null, h('b', {text: '放到桌面，像 App 一样打开'}),
-      h('p', null, '用 Safari 打开，点底部的分享按钮 ', h('span', {class: 'share', html: I.share, style: {display: 'inline-block'}}), '，再选「添加到主屏幕」。')),
-    h('button', {class: 'x', 'aria-label': '不再提示', text: '×', onclick: () => { lsSet('od-hide-install', true); c.remove(); }}));
+    h('div', null, h('b', {text: '放到桌面，像 App 一样打开'}), body),
+    h('button', {class: 'x', 'aria-label': '不再提示', text: '×', onclick: hide}));
   return c;
+}
+// 在微信、QQ 里打开时没法放到桌面，提示换到浏览器
+function inAppBanner(){
+  if (!IN_APP) return;
+  const b = h('div', {class: 'inapp'},
+    h('b', {text: '请换到浏览器里打开'}),
+    h('span', {text: IS_IOS ? '点右上角 ··· ，选「在 Safari 中打开」，才能放到桌面、长期保存。' : '点右上角 ··· ，选「在浏览器打开」，才能放到桌面、长期保存。'}));
+  document.body.insertBefore(b, document.body.firstChild);
 }
 
 /* moods */
@@ -1312,6 +1335,7 @@ function waitingPage(){
 
 /* =============== boot =============== */
 (function boot(){
+  inAppBanner();
   const u = readUrl();
   const savedRoom = lsGet('od-room', null);
   const room = u.room || savedRoom;
