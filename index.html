@@ -1305,35 +1305,38 @@ function prizeSheet(){
 
 /* =============== 约会盲盒转盘 =============== */
 const DATE_IDEAS = [
-  ['🍜', '探一家新店', '找一家两个人都没去过、评价不错的店，好好吃一顿'],
-  ['🥞', '早午餐约会', '睡个懒觉，然后找家咖啡店慢慢吃早午餐'],
+  ['🍜', '探一家新店', '找一家两个人都没去过、评价不错的小店，好好吃一顿'],
+  ['🥞', '早午餐约会', '周末睡个懒觉，找家咖啡店慢慢吃早午餐'],
   ['🍰', '甜品下午茶', '找一家好看的甜品店，各点一份换着吃'],
-  ['🍲', '在家做顿饭', '一起去超市买菜，回家合作做一桌菜'],
-  ['🏮', '逛夜市小吃', '晚上去夜市或小吃街，边走边吃'],
-  ['🧺', '公园野餐', '带点吃的喝的和一块垫子，找片草地坐一下午'],
+  ['🍳', '一起做顿饭', '一起去超市买菜，回家合作做两三个菜'],
+  ['🍲', '在家吃火锅', '买点肉和菜，在家煮一锅火锅慢慢聊'],
+  ['🏮', '居酒屋小酌', '找家安静的小居酒屋，点几串烤串喝一杯'],
+  ['🍙', '便利店夜宵', '晚上散步去便利店，各挑一样对方没吃过的'],
+  ['📖', '咖啡馆学习', '找家安静的咖啡馆，各自写论文，写完一起去吃饭'],
+  ['🏛️', '图书馆自习', '一起去图书馆自习半天，中午一起吃学食'],
+  ['🔬', '讲讲研究', '找个地方坐下，互相用大白话讲讲自己在研究什么'],
+  ['🎓', '校园散步', '在对方学校或者自己学校慢慢走一圈，看看平时的路'],
+  ['🧺', '公园野餐', '带点三明治和饮料，找片草地坐一下午'],
   ['🌇', '看一场日落', '查好日落时间，找个视野好的地方一起看'],
-  ['🚲', '骑车兜风', '租两辆自行车，沿着河边或公园骑一圈'],
   ['🌊', '去水边走走', '去海边、湖边或河边散步吹风'],
+  ['🚲', '骑车兜风', '骑车沿着河边或者没去过的路骑一圈'],
   ['⛰️', '爬一座小山', '挑一座不太累的小山，爬到山顶拍张合照'],
+  ['⛩️', '神社寺庙散步', '去附近的神社或寺庙走走，求个御守'],
   ['🎬', '看一场电影', '选一部两个人都想看的电影，买好爆米花'],
-  ['🖼️', '逛展览', '去美术馆、博物馆或者最近的展览逛逛'],
+  ['🖼️', '逛展览', '去美术馆、博物馆或者学生半价的展览逛逛'],
   ['📚', '书店约会', '一起逛书店，各给对方挑一本书当礼物'],
-  ['🎤', '听一场演出', '找一场 live、音乐会或者脱口秀一起去'],
-  ['🎳', '保龄球/台球', '去打几局，输的人请喝饮料'],
-  ['🕹️', '电玩城', '去电玩城抓娃娃、打游戏，玩个痛快'],
-  ['🔐', '密室逃脱', '选一个不太吓人的主题，一起解谜'],
-  ['📸', '拍一组合照', '去拍大头贴或者找个好看的地方拍一组照片'],
+  ['👕', '逛古着二手店', '去逛古着店或二手店，给对方挑一件'],
+  ['📷', '拍照散步', '选一条好看的街，边走边给对方拍照'],
   ['🛋️', '窝家看剧', '准备零食，一起追一部剧或看一部老电影'],
-  ['🧩', '一起拼图', '买一盒拼图或乐高，两个人合作拼完'],
-  ['🚆', '附近一日游', '坐车去附近的城市或小镇玩一天'],
-  ['♨️', '泡温泉', '找个温泉或者汤屋，好好放松一下'],
+  ['🧩', '一起拼图', '买一盒拼图或小乐高，两个人合作拼完'],
   ['🚶', '城市漫步', '选一个没去过的街区，随便走走、随便逛逛'],
-  ['🛍️', '逛街购物', '一起逛街，互相给对方挑一件衣服'],
-  ['☕', '咖啡馆发呆', '找家安静的咖啡馆，各自看书或聊聊天'],
-  ['🌸', '赏季节限定', '去看当季的花、红叶、灯光秀或者祭典'],
+  ['🚆', '附近一日游', '坐电车去附近的小城或小镇玩一天'],
+  ['♨️', '泡个温泉', '找个温泉或钱汤，好好放松一下'],
+  ['🌸', '赏季节限定', '去看当季的花、红叶、灯光秀、花火大会或祭典'],
 ];
 const WHEEL_COLORS = ['#FFE3EA', '#FFF0D6', '#DDF4EC', '#DCEBFF', '#FFE3EA', '#FFF0D6', '#DDF4EC', '#DCEBFF'];
-function dateIdeas(){ return DATE_IDEAS.map(x => ({ic: x[0], t: x[1], d: x[2]})).concat(Store.all('dateidea').map(x => ({ic: x.ic || '💗', t: x.t, d: x.d || '', custom: x.id}))); }
+function hiddenIdeas(){ return (Store.get('datecfg') || {}).hidden || []; }
+function dateIdeas(){ const hid = hiddenIdeas(); return DATE_IDEAS.filter(x => !hid.includes(x[1])).map(x => ({ic: x[0], t: x[1], d: x[2]})).concat(Store.all('dateidea').map(x => ({ic: x.ic || '💗', t: x.t, d: x.d || '', custom: x.id}))); }
 function newWheelSet(){ const all = dateIdeas().slice(); for (let i = all.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [all[i], all[j]] = [all[j], all[i]]; } S.wheelSet = all.slice(0, 8);
   if (S.wheelForce){ const f = S.wheelForce; S.wheelForce = null; if (!S.wheelSet.some(x => x.t === f.t)) S.wheelSet[Math.floor(Math.random() * 8)] = f; }
   S.wheelRot = S.wheelRot || 0; }
@@ -1397,7 +1400,11 @@ function dateResult(it){
       h('button', {class: 'btn block', text: '就它了，加进约会计划', onclick: () => {
         Store.put('dp_' + uid(), 'dateplan', {ic: it.ic, t: it.t, d: it.d, by: S.me, at: Date.now()});
         closeSheet(); toast('加进计划了，' + nameOf(other(S.me)) + ' 也能看到'); haptic(); }}),
-      h('button', {class: 'btn block ghost', text: '再转一次', onclick: closeSheet}))));
+      h('button', {class: 'btn block ghost', text: '再转一次', onclick: closeSheet}),
+      h('button', {class: 'btn block ghost', style: {color: 'var(--muted)', fontWeight: 500, fontSize: '14px'}, text: '我们不喜欢这个，以后别出现', onclick: () => {
+        if (it.custom) Store.remove(it.custom);
+        else Store.put('datecfg', 'datecfg', {hidden: hiddenIdeas().concat(it.t), by: S.me, at: Date.now()});
+        S.wheelSet = null; closeSheet(); render(); toast('好，以后不转到它了'); }}))));
 }
 function ideaSheet(){
   const t = h('input', {class: 'input', type: 'text', maxlength: '10', placeholder: '点子名字，比如：去吃那家烤肉'});
@@ -1406,13 +1413,15 @@ function ideaSheet(){
   const list = mine.length ? h('div', {class: 'card', style: {padding: 0, marginTop: '18px'}}, mine.map(x => h('div', {class: 'plan'},
     h('span', {class: 'ic', text: x.ic || '💗'}), h('div', {class: 'tx'}, h('div', {class: 't', text: x.t}), x.d ? h('div', {class: 'd', text: x.d}) : null),
     h('button', {class: 'more', 'aria-label': '删掉', html: I.more, onclick: () => { Store.remove(x.id); closeSheet(); toast('删掉了'); }})))) : null;
+  const hid = hiddenIdeas();
+  const restore = hid.length ? h('button', {class: 'btn block ghost', style: {marginTop: '12px'}, text: '恢复 ' + hid.length + ' 个被隐藏的点子', onclick: () => { Store.remove('datecfg'); S.wheelSet = null; closeSheet(); toast('都恢复了'); }}) : null;
   openSheet('加一个我们的点子', h('div', null, h('p', {class: 'shint', style: {textAlign: 'left', margin: '0 0 12px'}, text: '加进去的点子会和默认的一起出现在转盘上，两个人都能看到。'}),
     t, h('div', {style: {height: '10px'}}), d, h('div', {style: {height: '16px'}}),
     h('button', {class: 'btn block', text: '加到转盘', onclick: () => {
       if (!t.value.trim()){ toast('给点子起个名字'); return; }
       const idea = {ic: '💗', t: t.value.trim(), d: d.value.trim(), by: S.me, at: Date.now()};
       S.wheelSet = null; S.wheelForce = idea; Store.put('di_' + uid(), 'dateidea', idea); closeSheet(); toast('加好了，转盘换了一批');
-    }}), list));
+    }}), list, restore));
 }
 
 function placesView(p){
