@@ -286,6 +286,27 @@ svg{display:block}
 .burst i{position:absolute;top:-30px;font-style:normal;font-size:22px;animation:fallDown 2.6s ease-in forwards}
 @keyframes fallDown{to{transform:translateY(110vh) rotate(var(--rot,180deg));opacity:.2}}
 
+/* ---------- date wheel ---------- */
+.wheelbox{position:relative;width:min(100%,330px);aspect-ratio:1;margin:4px auto 14px}
+.wheel{width:100%;height:100%;border-radius:50%;box-shadow:var(--shadow),0 0 0 6px var(--card);transition:transform 4.2s cubic-bezier(.12,.75,.12,1)}
+.wheel svg{width:100%;height:100%;display:block}
+.wheelbox .pin{position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:24px solid var(--rose);filter:drop-shadow(0 2px 3px rgba(0,0,0,.2));z-index:2}
+.wheelbox .hub{position:absolute;left:50%;top:50%;width:76px;height:76px;margin:-38px 0 0 -38px;border-radius:50%;background:var(--rose);color:#fff;font-family:var(--f-title);font-weight:700;font-size:17px;box-shadow:0 4px 14px rgba(232,70,111,.35),0 0 0 5px var(--card);z-index:2}
+.wheelbox .hub:disabled{opacity:.85}
+.wrow{display:flex;gap:10px;margin-bottom:18px}
+.wrow .btn{flex:1}
+.plan{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-top:.5px solid var(--line)}
+.plan:first-child{border-top:0}
+.plan .ic{font-size:22px;line-height:1.2;flex:none}
+.plan .tx{flex:1;min-width:0}
+.plan .t{font-weight:700;font-size:16px;overflow-wrap:anywhere}
+.plan .d{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.plan.done .t{color:var(--muted);text-decoration:line-through}
+.dresult{text-align:center;padding:6px 0 4px}
+.dresult .ic{font-size:44px;line-height:1.2}
+.dresult .t{font-family:var(--f-title);font-weight:700;font-size:26px;margin:6px 0 4px}
+.dresult .d{color:var(--ink2);font-size:15px;margin-bottom:18px}
+
 /* ---------- places ---------- */
 .pstats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .pstats .card{padding:14px 16px}
@@ -638,7 +659,7 @@ const markSeen = k => lsSet('od-seen-' + k + '-' + S.room, Date.now());
 function newLetters(){ const s = seenAt('letters'); return Store.all('letter').filter(l => (l.to === S.me && (l.at || 0) > s) || (l.from === S.me && ((l.openedAt || 0) > s || (l.hugAt || 0) > s))).length; }
 function newCoupons(){ const s = seenAt('coupons'); return Store.all('coupon').filter(c => (c.to === S.me && (c.at || 0) > s) || (c.from === S.me && (c.usedAt || 0) > s)).length; }
 function unreadNotes(){ const s = seenAt('notes'); return Store.all('note').filter(n => n.from && n.from !== S.me && (n.at || 0) > s).length; }
-function badgeFor(k){ return k === 'letters' ? newLetters() : k === 'together' ? newCoupons() + newScratch() : k === 'us' ? unreadNotes() : 0; }
+function badgeFor(k){ return k === 'letters' ? newLetters() : k === 'together' ? newCoupons() + newScratch() + newDatePlans() : k === 'us' ? unreadNotes() : 0; }
 function renderTabs(){
   const box = $('#tabs'); box.textContent = '';
   TABS.forEach(([k, label, off, on]) => {
@@ -680,7 +701,7 @@ function render(){
 }
 // 正在打字时不刷新页面，等输入框失去焦点再刷新
 function typingInPage(){ const a = document.activeElement; return a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA') && $('#root').contains(a); }
-Store.listeners.push(() => { if (typingInPage() || S.scratching){ S.dirty = true; renderTabs(); } else render(); });
+Store.listeners.push(() => { if (typingInPage() || S.busy){ S.dirty = true; renderTabs(); } else render(); });
 $('#root').addEventListener('focusout', () => setTimeout(() => { if (S.dirty && !typingInPage()){ S.dirty = false; render(); } }, 0));
 
 function renderSync(el){
@@ -1109,11 +1130,12 @@ function togetherPage(){
   const s = seenAt('coupons');
   const todos = Store.all('todo'), places = Store.all('place');
   const sub = S.togetherSeg === 'wish' ? (todos.length ? '一起完成了 ' + todos.filter(x => x.done).length + ' 个心愿' : '想和 TA 一起做的事')
-    : S.togetherSeg === 'places' ? '一起走过的地方' : S.togetherSeg === 'scratch' ? '每天一张，看看今天手气' : '送给对方的小特权';
-  pageHead(p, '一起', sub, [['wish', '心愿清单'], ['places', '去过的地方'], ['coupons', '爱的小券', Store.all('coupon').some(c => (c.to === S.me && (c.at || 0) > s) || (c.from === S.me && (c.usedAt || 0) > s))], ['scratch', '刮刮乐', newScratch() > 0 || !(Store.get(todayCardId()) || {}).scratchedAt]], 'togetherSeg');
+    : S.togetherSeg === 'places' ? '一起走过的地方' : S.togetherSeg === 'scratch' ? '每天一张，看看今天手气' : S.togetherSeg === 'wheel' ? '不知道去哪？转一下' : '送给对方的小特权';
+  pageHead(p, '一起', sub, [['wish', '心愿清单'], ['places', '去过的地方'], ['coupons', '爱的小券', Store.all('coupon').some(c => (c.to === S.me && (c.at || 0) > s) || (c.from === S.me && (c.usedAt || 0) > s))], ['scratch', '刮刮乐', newScratch() > 0 || !(Store.get(todayCardId()) || {}).scratchedAt], ['wheel', '约会转盘', newDatePlans() > 0]], 'togetherSeg');
   if (S.togetherSeg === 'wish') todoView(p);
   else if (S.togetherSeg === 'places') placesView(p);
   else if (S.togetherSeg === 'scratch'){ scratchView(p); seenLater('scratch'); }
+  else if (S.togetherSeg === 'wheel'){ wheelView(p); seenLater('wheel'); }
   else { couponsView(p); seenLater('coupons'); }
   return p;
 }
@@ -1214,13 +1236,13 @@ function scratchCard(card){
     toast(drawn.tier <= 1 ? '哇！' + SCRATCH_TIERS[drawn.tier][0] + '！' : '中了' + SCRATCH_TIERS[drawn.tier][0]);
     setTimeout(() => {
       const d = Object.assign({}, drawn); delete d.id; d.scratchedAt = Date.now();
-      S.scratching = false; Store.put(cardId, 'scratch', d);
+      S.busy = false; Store.put(cardId, 'scratch', d);
       if (S.dirty){ S.dirty = false; render(); }
     }, 650);
   };
   cv.addEventListener('pointerdown', e => {
     if (done || !ctx) return;
-    S.scratching = true;
+    S.busy = true;
     if (!drawn){
       const t = drawTier();
       drawn = {who: S.me, day: dayKey(), tier: t, prize: prizeNames()[t], at: Date.now()}; cardId = todayCardId();
@@ -1279,6 +1301,118 @@ function prizeSheet(){
       closeSheet(); toast('奖品改好了');
     }}),
     h('button', {class: 'btn block ghost', style: {marginTop: '8px'}, text: '恢复默认', onclick: () => { Store.remove('scratchcfg'); closeSheet(); toast('恢复成默认奖品了'); }})));
+}
+
+/* =============== 约会盲盒转盘 =============== */
+const DATE_IDEAS = [
+  ['🍜', '探一家新店', '找一家两个人都没去过、评价不错的店，好好吃一顿'],
+  ['🥞', '早午餐约会', '睡个懒觉，然后找家咖啡店慢慢吃早午餐'],
+  ['🍰', '甜品下午茶', '找一家好看的甜品店，各点一份换着吃'],
+  ['🍲', '在家做顿饭', '一起去超市买菜，回家合作做一桌菜'],
+  ['🏮', '逛夜市小吃', '晚上去夜市或小吃街，边走边吃'],
+  ['🧺', '公园野餐', '带点吃的喝的和一块垫子，找片草地坐一下午'],
+  ['🌇', '看一场日落', '查好日落时间，找个视野好的地方一起看'],
+  ['🚲', '骑车兜风', '租两辆自行车，沿着河边或公园骑一圈'],
+  ['🌊', '去水边走走', '去海边、湖边或河边散步吹风'],
+  ['⛰️', '爬一座小山', '挑一座不太累的小山，爬到山顶拍张合照'],
+  ['🎬', '看一场电影', '选一部两个人都想看的电影，买好爆米花'],
+  ['🖼️', '逛展览', '去美术馆、博物馆或者最近的展览逛逛'],
+  ['📚', '书店约会', '一起逛书店，各给对方挑一本书当礼物'],
+  ['🎤', '听一场演出', '找一场 live、音乐会或者脱口秀一起去'],
+  ['🎳', '保龄球/台球', '去打几局，输的人请喝饮料'],
+  ['🕹️', '电玩城', '去电玩城抓娃娃、打游戏，玩个痛快'],
+  ['🔐', '密室逃脱', '选一个不太吓人的主题，一起解谜'],
+  ['📸', '拍一组合照', '去拍大头贴或者找个好看的地方拍一组照片'],
+  ['🛋️', '窝家看剧', '准备零食，一起追一部剧或看一部老电影'],
+  ['🧩', '一起拼图', '买一盒拼图或乐高，两个人合作拼完'],
+  ['🚆', '附近一日游', '坐车去附近的城市或小镇玩一天'],
+  ['♨️', '泡温泉', '找个温泉或者汤屋，好好放松一下'],
+  ['🚶', '城市漫步', '选一个没去过的街区，随便走走、随便逛逛'],
+  ['🛍️', '逛街购物', '一起逛街，互相给对方挑一件衣服'],
+  ['☕', '咖啡馆发呆', '找家安静的咖啡馆，各自看书或聊聊天'],
+  ['🌸', '赏季节限定', '去看当季的花、红叶、灯光秀或者祭典'],
+];
+const WHEEL_COLORS = ['#FFE3EA', '#FFF0D6', '#DDF4EC', '#DCEBFF', '#FFE3EA', '#FFF0D6', '#DDF4EC', '#DCEBFF'];
+function dateIdeas(){ return DATE_IDEAS.map(x => ({ic: x[0], t: x[1], d: x[2]})).concat(Store.all('dateidea').map(x => ({ic: x.ic || '💗', t: x.t, d: x.d || '', custom: x.id}))); }
+function newWheelSet(){ const all = dateIdeas().slice(); for (let i = all.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [all[i], all[j]] = [all[j], all[i]]; } S.wheelSet = all.slice(0, 8);
+  if (S.wheelForce){ const f = S.wheelForce; S.wheelForce = null; if (!S.wheelSet.some(x => x.t === f.t)) S.wheelSet[Math.floor(Math.random() * 8)] = f; }
+  S.wheelRot = S.wheelRot || 0; }
+function newDatePlans(){ const s = seenAt('wheel'); return Store.all('dateplan').filter(x => x.by && x.by !== S.me && (((x.at || 0) > s) || ((x.doneAt || 0) > s && x.doneBy !== S.me))).length; }
+function wheelSvg(set){
+  const n = set.length, R = 160, c = 160; let out = '<svg viewBox="0 0 320 320">';
+  set.forEach((it, i) => {
+    const a0 = (i / n) * 2 * Math.PI - Math.PI / 2 - Math.PI / n, a1 = a0 + 2 * Math.PI / n;
+    const p = a => (c + R * Math.cos(a)).toFixed(2) + ' ' + (c + R * Math.sin(a)).toFixed(2);
+    out += '<path d="M' + c + ' ' + c + ' L' + p(a0) + ' A' + R + ' ' + R + ' 0 0 1 ' + p(a1) + ' Z" fill="' + WHEEL_COLORS[i % WHEEL_COLORS.length] + '" stroke="#fff" stroke-width="2"/>';
+    const mid = (i / n) * 360;
+    const esc = t => t.replace(/[&<>"]/g, ch => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[ch]));
+    out += '<g transform="rotate(' + mid + ' 160 160)"><text x="160" y="40" text-anchor="middle" font-size="22">' + esc(it.ic) + '</text>' +
+      '<text x="160" y="66" text-anchor="middle" font-size="13" font-weight="700" fill="#5E4652">' + esc(it.t.length > 6 ? it.t.slice(0, 6) : it.t) + '</text></g>';
+  });
+  return out + '</svg>';
+}
+function wheelView(p){
+  if (!S.wheelSet) newWheelSet();
+  const wheel = h('div', {class: 'wheel', html: wheelSvg(S.wheelSet)});
+  wheel.style.transform = 'rotate(' + (S.wheelRot || 0) + 'deg)';
+  const hub = h('button', {class: 'hub', text: '转！'});
+  hub.onclick = () => {
+    if (S.busy) return;
+    S.busy = true; hub.disabled = true; haptic();
+    const n = S.wheelSet.length, k = Math.floor(Math.random() * n);
+    const cur = ((S.wheelRot || 0) % 360 + 360) % 360;
+    const want = (360 - k * 360 / n) % 360;
+    const jitter = (Math.random() - .5) * (360 / n) * .6;
+    S.wheelRot = (S.wheelRot || 0) + 360 * 5 + ((want - cur + 360) % 360) + jitter;
+    wheel.style.transform = 'rotate(' + S.wheelRot + 'deg)';
+    let fired = false;
+    const end = () => { if (fired) return; fired = true; S.busy = false; hub.disabled = false; if (S.dirty){ S.dirty = false; render(); } dateResult(S.wheelSet[k]); };
+    wheel.addEventListener('transitionend', end, {once: true}); setTimeout(end, 4600);
+  };
+  p.append(h('div', {class: 'wheelbox'}, h('div', {class: 'pin'}), wheel, hub));
+  p.append(h('div', {class: 'wrow'},
+    h('button', {class: 'btn ghost', text: '换一批', onclick: () => { if (S.busy) return; newWheelSet(); render(); }}),
+    h('button', {class: 'btn ghost', text: '加我们的点子', onclick: ideaSheet})));
+  const plans = Store.all('dateplan');
+  const todo = plans.filter(x => !x.doneAt).sort((a, b) => (b.at || 0) - (a.at || 0));
+  const done = plans.filter(x => x.doneAt).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0));
+  p.append(h('div', {class: 'label', text: '约会计划 · ' + todo.length + ' 个待约'}));
+  if (!todo.length) p.append(h('div', {class: 'card empty', style: {marginTop: '10px'}}, h('div', {text: '转一下，把想去的加进计划里'})));
+  else p.append(h('div', {class: 'card', style: {marginTop: '10px', padding: 0}}, todo.map(x => h('div', {class: 'plan'},
+    h('span', {class: 'ic', text: x.ic || '💗'}),
+    h('div', {class: 'tx'}, h('div', {class: 't', text: x.t}), h('div', {class: 'd', text: (x.d ? x.d + ' · ' : '') + nameOf(x.by) + ' 转到的 · ' + ago(x.at)})),
+    h('button', {class: 'btn sm', text: '约过了', onclick: () => { const d = Object.assign({}, x); delete d.id; d.doneAt = Date.now(); d.doneBy = S.me; Store.put(x.id, 'dateplan', d); burst(false); toast('又一起完成了一次约会'); haptic(); }}),
+    h('button', {class: 'more', 'aria-label': '删掉', html: I.more, onclick: () => confirmSheet('不约「' + x.t + '」了？', '删掉', () => Store.remove(x.id))})))));
+  if (done.length){
+    p.append(h('div', {class: 'label', style: {marginTop: '18px'}, text: '约过的 · ' + done.length + ' 次'}));
+    p.append(h('div', {class: 'card', style: {marginTop: '10px', padding: 0}}, done.slice(0, 30).map(x => h('div', {class: 'plan done'},
+      h('span', {class: 'ic', text: x.ic || '💗'}),
+      h('div', {class: 'tx'}, h('div', {class: 't', text: x.t}), h('div', {class: 'd', text: fmtMD(new Date(x.doneAt)) + ' 约过'}))))));
+  }
+}
+function dateResult(it){
+  openSheet(null, h('div', {class: 'dresult'},
+    h('div', {class: 'ic', text: it.ic}), h('div', {class: 't', text: it.t}), h('div', {class: 'd', text: it.d}),
+    h('div', {class: 'actions'},
+      h('button', {class: 'btn block', text: '就它了，加进约会计划', onclick: () => {
+        Store.put('dp_' + uid(), 'dateplan', {ic: it.ic, t: it.t, d: it.d, by: S.me, at: Date.now()});
+        closeSheet(); toast('加进计划了，' + nameOf(other(S.me)) + ' 也能看到'); haptic(); }}),
+      h('button', {class: 'btn block ghost', text: '再转一次', onclick: closeSheet}))));
+}
+function ideaSheet(){
+  const t = h('input', {class: 'input', type: 'text', maxlength: '10', placeholder: '点子名字，比如：去吃那家烤肉'});
+  const d = h('input', {class: 'input', type: 'text', maxlength: '40', placeholder: '具体怎么约（选填）'});
+  const mine = Store.all('dateidea');
+  const list = mine.length ? h('div', {class: 'card', style: {padding: 0, marginTop: '18px'}}, mine.map(x => h('div', {class: 'plan'},
+    h('span', {class: 'ic', text: x.ic || '💗'}), h('div', {class: 'tx'}, h('div', {class: 't', text: x.t}), x.d ? h('div', {class: 'd', text: x.d}) : null),
+    h('button', {class: 'more', 'aria-label': '删掉', html: I.more, onclick: () => { Store.remove(x.id); closeSheet(); toast('删掉了'); }})))) : null;
+  openSheet('加一个我们的点子', h('div', null, h('p', {class: 'shint', style: {textAlign: 'left', margin: '0 0 12px'}, text: '加进去的点子会和默认的一起出现在转盘上，两个人都能看到。'}),
+    t, h('div', {style: {height: '10px'}}), d, h('div', {style: {height: '16px'}}),
+    h('button', {class: 'btn block', text: '加到转盘', onclick: () => {
+      if (!t.value.trim()){ toast('给点子起个名字'); return; }
+      const idea = {ic: '💗', t: t.value.trim(), d: d.value.trim(), by: S.me, at: Date.now()};
+      S.wheelSet = null; S.wheelForce = idea; Store.put('di_' + uid(), 'dateidea', idea); closeSheet(); toast('加好了，转盘换了一批');
+    }}), list));
 }
 
 function placesView(p){
