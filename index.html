@@ -269,6 +269,23 @@ svg{display:block}
 .ticket.used .t{color:var(--muted)}
 .btn.sm{padding:7px 14px;font-size:13px}
 
+/* ---------- scratch cards ---------- */
+.scard{position:relative;border-radius:20px;overflow:hidden;box-shadow:var(--shadow);background:linear-gradient(150deg,var(--gold-soft),var(--rose-soft));aspect-ratio:16/10;margin-bottom:10px;user-select:none;-webkit-user-select:none}
+.scard .prize{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:18px;text-align:center}
+.scard .tier{font-family:var(--f-title);font-weight:700;font-size:15px;letter-spacing:.2em;color:var(--rose);background:var(--card);border-radius:999px;padding:3px 14px}
+.scard .pz{font-family:var(--f-title);font-weight:700;font-size:26px;line-height:1.3;color:var(--ink);overflow-wrap:anywhere}
+.scard .by{font-size:13px;color:var(--ink2)}
+.scard canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;transition:opacity .45s}
+.scard.t1{background:linear-gradient(150deg,#FFE8A3,#FFC2D1)}
+.scard.t1 .tier{background:var(--gold);color:#fff}
+.shint{font-size:13px;color:var(--muted);text-align:center;margin:0 0 18px}
+.odds{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;margin-bottom:12px}
+.odds b{font-family:var(--f-title);font-size:14px;color:var(--rose);white-space:nowrap}
+.odds span{font-size:13px;color:var(--muted);text-align:right;white-space:nowrap}
+.burst{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}
+.burst i{position:absolute;top:-30px;font-style:normal;font-size:22px;animation:fallDown 2.6s ease-in forwards}
+@keyframes fallDown{to{transform:translateY(110vh) rotate(var(--rot,180deg));opacity:.2}}
+
 /* ---------- places ---------- */
 .pstats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .pstats .card{padding:14px 16px}
@@ -621,7 +638,7 @@ const markSeen = k => lsSet('od-seen-' + k + '-' + S.room, Date.now());
 function newLetters(){ const s = seenAt('letters'); return Store.all('letter').filter(l => (l.to === S.me && (l.at || 0) > s) || (l.from === S.me && ((l.openedAt || 0) > s || (l.hugAt || 0) > s))).length; }
 function newCoupons(){ const s = seenAt('coupons'); return Store.all('coupon').filter(c => (c.to === S.me && (c.at || 0) > s) || (c.from === S.me && (c.usedAt || 0) > s)).length; }
 function unreadNotes(){ const s = seenAt('notes'); return Store.all('note').filter(n => n.from && n.from !== S.me && (n.at || 0) > s).length; }
-function badgeFor(k){ return k === 'letters' ? newLetters() : k === 'together' ? newCoupons() : k === 'us' ? unreadNotes() : 0; }
+function badgeFor(k){ return k === 'letters' ? newLetters() : k === 'together' ? newCoupons() + newScratch() : k === 'us' ? unreadNotes() : 0; }
 function renderTabs(){
   const box = $('#tabs'); box.textContent = '';
   TABS.forEach(([k, label, off, on]) => {
@@ -663,7 +680,7 @@ function render(){
 }
 // 正在打字时不刷新页面，等输入框失去焦点再刷新
 function typingInPage(){ const a = document.activeElement; return a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA') && $('#root').contains(a); }
-Store.listeners.push(() => { if (typingInPage()){ S.dirty = true; renderTabs(); } else render(); });
+Store.listeners.push(() => { if (typingInPage() || S.scratching){ S.dirty = true; renderTabs(); } else render(); });
 $('#root').addEventListener('focusout', () => setTimeout(() => { if (S.dirty && !typingInPage()){ S.dirty = false; render(); } }, 0));
 
 function renderSync(el){
@@ -734,6 +751,10 @@ function homePage(){
   if (myCoupons.length) st.append(h('button', {class: 'card mini', onclick: () => go('together', 'coupons')},
     h('div', {class: 'head'}, h('span', {text: '我的爱的小券'}), h('span', {text: myCoupons.length + ' 张可以用'})),
     h('div', {style: {fontFamily: 'var(--f-title)', fontWeight: 700, fontSize: '17px', textAlign: 'left'}, text: myCoupons.slice(0, 3).map(c => c.title).join(' · ')})));
+  const sc = Store.get(todayCardId());
+  if (!sc || !sc.scratchedAt) st.append(h('button', {class: 'card mini', onclick: () => go('together', 'scratch')},
+    h('div', {class: 'head'}, h('span', {text: '今天的刮刮乐'}), h('span', {text: '还没刮'})),
+    h('div', {style: {fontFamily: 'var(--f-title)', fontWeight: 700, fontSize: '17px', textAlign: 'left'}, text: '刮一张，看看今天 ' + nameOf(other(S.me)) + ' 要请你什么'})));
   const tc = h('button', {class: 'card mini', onclick: () => go('together', 'wish')},
     h('div', {class: 'head'}, h('span', {text: '一起的心愿'}), h('span', {class: 'tnum', text: todos.length ? done + ' / ' + todos.length : '还没开始'})),
     h('div', {class: 'bar'}, h('i', {style: {width: (todos.length ? Math.round(done / todos.length * 100) : 0) + '%'}})),
@@ -1088,10 +1109,11 @@ function togetherPage(){
   const s = seenAt('coupons');
   const todos = Store.all('todo'), places = Store.all('place');
   const sub = S.togetherSeg === 'wish' ? (todos.length ? '一起完成了 ' + todos.filter(x => x.done).length + ' 个心愿' : '想和 TA 一起做的事')
-    : S.togetherSeg === 'places' ? '一起走过的地方' : '送给对方的小特权';
-  pageHead(p, '一起', sub, [['wish', '心愿清单'], ['places', '去过的地方'], ['coupons', '爱的小券', Store.all('coupon').some(c => (c.to === S.me && (c.at || 0) > s) || (c.from === S.me && (c.usedAt || 0) > s))]], 'togetherSeg');
+    : S.togetherSeg === 'places' ? '一起走过的地方' : S.togetherSeg === 'scratch' ? '每天一张，看看今天手气' : '送给对方的小特权';
+  pageHead(p, '一起', sub, [['wish', '心愿清单'], ['places', '去过的地方'], ['coupons', '爱的小券', Store.all('coupon').some(c => (c.to === S.me && (c.at || 0) > s) || (c.from === S.me && (c.usedAt || 0) > s))], ['scratch', '刮刮乐', newScratch() > 0 || !(Store.get(todayCardId()) || {}).scratchedAt]], 'togetherSeg');
   if (S.togetherSeg === 'wish') todoView(p);
   else if (S.togetherSeg === 'places') placesView(p);
+  else if (S.togetherSeg === 'scratch'){ scratchView(p); seenLater('scratch'); }
   else { couponsView(p); seenLater('coupons'); }
   return p;
 }
@@ -1135,6 +1157,128 @@ function couponSheet(){
       Store.put('c_' + uid(), 'coupon', {from: S.me, to: other(S.me), title: title.value.trim(), note: note.value.trim(), at: Date.now()});
       closeSheet(); S.couponSeg = 'gave'; toast('送出去啦'); haptic();
     }})));
+}
+
+/* =============== 刮刮乐：每人每天一张，奖品由对方兑现 =============== */
+const SCRATCH_TIERS = [['一等奖', '许一个愿望，必须实现', 2], ['二等奖', '一顿大餐', 8], ['三等奖', '一杯奶茶，甜度你定', 20], ['四等奖', '一个抱抱 + 一个亲亲', 30], ['五等奖', '一块钱红包', 40]];
+const dayKey = (d = new Date()) => d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+function prizeNames(){ const c = Store.get('scratchcfg'); return SCRATCH_TIERS.map((t, i) => (c && c.names && c.names[i]) || t[1]); }
+function drawTier(){ let r = Math.random() * 100; for (let i = 0; i < SCRATCH_TIERS.length; i++){ r -= SCRATCH_TIERS[i][2]; if (r < 0) return i; } return SCRATCH_TIERS.length - 1; }
+const todayCardId = () => 'sc_' + S.me + '_' + dayKey();
+function newScratch(){ const s = seenAt('scratch'); return Store.all('scratch').filter(c => c.who !== S.me && (((c.scratchedAt || 0) > s) || ((c.redeemedAt || 0) > s))).length; }
+function burst(big){
+  const box = h('div', {class: 'burst'}); const set = big ? ['🎉', '💖', '✨', '🎊', '💝'] : ['💗', '✨', '🌸'];
+  for (let i = 0; i < (big ? 46 : 22); i++){
+    const e = h('i', {text: set[i % set.length]});
+    e.style.left = Math.random() * 100 + 'vw'; e.style.animationDelay = Math.random() * .7 + 's'; e.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+    box.append(e);
+  }
+  document.body.append(box); setTimeout(() => box.remove(), 3600);
+}
+function scratchCard(card){
+  const tier = card ? card.tier : null;
+  const box = h('div', {class: 'scard' + (tier === 0 ? ' t1' : '')});
+  const prize = h('div', {class: 'prize'});
+  const fillPrize = c => { prize.textContent = ''; prize.append(h('div', {class: 'tier', text: SCRATCH_TIERS[c.tier][0]}), h('div', {class: 'pz', text: c.prize}), h('div', {class: 'by', text: nameOf(other(c.who)) + ' 请客'})); box.classList.toggle('t1', c.tier === 0); };
+  if (card) fillPrize(card);
+  box.append(prize);
+  if (card && card.scratchedAt) return box;
+  const cv = h('canvas'); box.append(cv);
+  let ctx, w, hgt, drawn = card, cardId = card ? card.id : null, moves = 0, done = false, last = null;
+  const paint = () => {
+    const r = box.getBoundingClientRect(); if (!r.width) return;
+    const dpr = window.devicePixelRatio || 1; w = r.width; hgt = r.height;
+    cv.width = Math.round(w * dpr); cv.height = Math.round(hgt * dpr);
+    ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
+    const g = ctx.createLinearGradient(0, 0, w, hgt); g.addColorStop(0, '#C9CDD3'); g.addColorStop(.5, '#EEF0F3'); g.addColorStop(1, '#B9BEC6');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, hgt);
+    ctx.fillStyle = 'rgba(255,255,255,.35)';
+    for (let i = 0; i < 90; i++){ ctx.beginPath(); ctx.arc(Math.random() * w, Math.random() * hgt, Math.random() * 1.6 + .4, 0, 7); ctx.fill(); }
+    ctx.fillStyle = '#7A808A'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = '700 24px ' + getComputedStyle(document.body).getPropertyValue('--f-title');
+    ctx.fillText('刮开有惊喜', w / 2, hgt / 2 - 10);
+    ctx.font = '500 13px ' + getComputedStyle(document.body).getPropertyValue('--f-ui');
+    ctx.fillText('用手指刮这里', w / 2, hgt / 2 + 20);
+    ctx.globalCompositeOperation = 'destination-out'; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = 34;
+  };
+  requestAnimationFrame(paint);
+  const pt = e => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  const cleared = () => {
+    const d = ctx.getImageData(0, 0, cv.width, cv.height).data; let n = 0, k = 0;
+    for (let i = 3; i < d.length; i += 4 * 37){ k++; if (d[i] < 40) n++; }
+    return n / k;
+  };
+  const finish = () => {
+    if (done) return; done = true; cv.style.opacity = '0'; haptic();
+    burst(drawn.tier <= 1);
+    toast(drawn.tier <= 1 ? '哇！' + SCRATCH_TIERS[drawn.tier][0] + '！' : '中了' + SCRATCH_TIERS[drawn.tier][0]);
+    setTimeout(() => {
+      const d = Object.assign({}, drawn); delete d.id; d.scratchedAt = Date.now();
+      S.scratching = false; Store.put(cardId, 'scratch', d);
+      if (S.dirty){ S.dirty = false; render(); }
+    }, 650);
+  };
+  cv.addEventListener('pointerdown', e => {
+    if (done || !ctx) return;
+    S.scratching = true;
+    if (!drawn){
+      const t = drawTier();
+      drawn = {who: S.me, day: dayKey(), tier: t, prize: prizeNames()[t], at: Date.now()}; cardId = todayCardId();
+      Store.put(cardId, 'scratch', drawn); fillPrize(drawn);
+    }
+    cv.setPointerCapture(e.pointerId); last = pt(e);
+    ctx.beginPath(); ctx.arc(last[0], last[1], 17, 0, 7); ctx.fill();
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!last || done) return;
+    const p = pt(e); ctx.beginPath(); ctx.moveTo(last[0], last[1]); ctx.lineTo(p[0], p[1]); ctx.stroke(); last = p;
+    if (++moves % 12 === 0 && cleared() > .5) finish();
+  });
+  const up = () => { if (!last) return; last = null; if (!done && cleared() > .5) finish(); };
+  cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+  return box;
+}
+function scratchView(p){
+  const mine = Store.get(todayCardId());
+  const today = mine ? Object.assign({id: todayCardId()}, mine) : null;
+  p.append(h('div', {class: 'label', text: today && today.scratchedAt ? '今天的刮刮乐 · 已刮开' : '今天的刮刮乐'}));
+  p.append(scratchCard(today));
+  p.append(h('p', {class: 'shint', text: today && today.scratchedAt ? '明天还能再刮一张，奖品找 ' + nameOf(other(S.me)) + ' 兑现' : '每人每天一张，刮开一半就揭晓，奖品由 ' + nameOf(other(S.me)) + ' 兑现'}));
+  if (!S.scratchSeg) S.scratchSeg = 'mine';
+  const all = Store.all('scratch').filter(c => c.scratchedAt);
+  const mineList = all.filter(c => c.who === S.me).sort((a, b) => (!!a.redeemedAt - !!b.redeemedAt) || (b.scratchedAt || 0) - (a.scratchedAt || 0));
+  const theirs = all.filter(c => c.who !== S.me).sort((a, b) => (!!a.redeemedAt - !!b.redeemedAt) || (b.scratchedAt || 0) - (a.scratchedAt || 0));
+  p.append(h('div', {class: 'seg', role: 'group'},
+    h('button', {'aria-pressed': String(S.scratchSeg === 'mine'), text: '我的奖品 ' + mineList.filter(c => !c.redeemedAt).length, onclick: () => { S.scratchSeg = 'mine'; render(); }}),
+    h('button', {'aria-pressed': String(S.scratchSeg === 'theirs'), text: nameOf(other(S.me)) + ' 的奖品 ' + theirs.filter(c => !c.redeemedAt).length, onclick: () => { S.scratchSeg = 'theirs'; render(); }})));
+  const list = S.scratchSeg === 'mine' ? mineList : theirs;
+  if (!list.length) p.append(h('div', {class: 'card empty'}, h('span', {html: I.ticket, style: {display: 'contents'}}), h('div', {text: S.scratchSeg === 'mine' ? '还没有奖品，先刮一张试试手气' : nameOf(other(S.me)) + ' 还没刮过，提醒 TA 一下？'})));
+  else {
+    const box = h('div', {class: 'tickets'});
+    list.forEach(c => {
+      const used = !!c.redeemedAt, my = c.who === S.me;
+      const row = h('div', {class: 'row'}, h('span', {class: 's', text: used ? (my ? '已在 ' : nameOf(c.who) + ' 在 ') + fmtMD(new Date(c.redeemedAt)) + ' 兑奖' : fmtMD(new Date(c.scratchedAt)) + ' 刮中 · ' + (my ? nameOf(other(c.who)) + ' 请客' : '你来请客')}));
+      if (my && !used) row.append(h('button', {class: 'btn sm', text: '兑奖', onclick: () => confirmSheet('现在兑奖「' + c.prize + '」？' + nameOf(other(S.me)) + ' 会看到，要兑现哦', '兑奖', () => {
+        const d = Object.assign({}, c); delete d.id; d.redeemedAt = Date.now(); Store.put(c.id, 'scratch', d); toast('已兑奖，等 ' + nameOf(other(S.me)) + ' 兑现'); haptic(); })}));
+      box.append(h('div', {class: 'ticket' + (used ? ' used' : '')},
+        h('div', {class: 'l'}, h('span', {html: I.ticket, style: {display: 'contents'}}), used ? '已兑奖' : SCRATCH_TIERS[c.tier][0]),
+        h('div', {class: 'r'}, h('div', {class: 't', text: c.prize}), row)));
+    });
+    p.append(box);
+  }
+  p.append(h('button', {class: 'btn block ghost', style: {marginTop: '16px'}, text: '看看奖品和中奖概率', onclick: prizeSheet}));
+}
+function prizeSheet(){
+  const names = prizeNames();
+  const inputs = SCRATCH_TIERS.map((t, i) => h('input', {class: 'input', type: 'text', maxlength: '20', value: names[i], 'aria-label': t[0]}));
+  const grid = h('div', {class: 'odds'});
+  SCRATCH_TIERS.forEach((t, i) => grid.append(h('b', {text: t[0]}), inputs[i], h('span', {text: t[2] + '%'})));
+  openSheet('刮刮乐奖品', h('div', null, h('p', {class: 'shint', style: {textAlign: 'left', margin: '0 0 12px'}, text: '奖品名字两个人都能改，改了以后新刮的卡按新名字算。右边是中奖概率。'}), grid,
+    h('button', {class: 'btn block', text: '保存', onclick: () => {
+      Store.put('scratchcfg', 'scratchcfg', {names: inputs.map((x, i) => x.value.trim() || SCRATCH_TIERS[i][1]), by: S.me, at: Date.now()});
+      closeSheet(); toast('奖品改好了');
+    }}),
+    h('button', {class: 'btn block ghost', style: {marginTop: '8px'}, text: '恢复默认', onclick: () => { Store.remove('scratchcfg'); closeSheet(); toast('恢复成默认奖品了'); }})));
 }
 
 function placesView(p){
