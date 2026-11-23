@@ -293,6 +293,35 @@ svg{display:block}
 .wheelbox .pin{position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:24px solid var(--rose);filter:drop-shadow(0 2px 3px rgba(0,0,0,.2));z-index:2}
 .wheelbox .hub{position:absolute;left:50%;top:50%;width:76px;height:76px;margin:-38px 0 0 -38px;border-radius:50%;background:var(--rose);color:#fff;font-family:var(--f-title);font-weight:700;font-size:17px;box-shadow:0 4px 14px rgba(232,70,111,.35),0 0 0 5px var(--card);z-index:2}
 .wheelbox .hub:disabled{opacity:.85}
+.dlv{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:-4px 0 12px}
+.dlv button{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 0;border-radius:14px;background:var(--fill);font-weight:700;font-size:15px;color:var(--ink2)}
+.dlv button span{font-size:17px}
+.dlv button[aria-pressed="true"].lv1{background:linear-gradient(135deg,#FFB3C7,#FF8FAB);color:#fff}
+.dlv button[aria-pressed="true"].lv2{background:linear-gradient(135deg,#B57BFF,#E8466F);color:#fff}
+.dlv button[aria-pressed="true"].lv3{background:linear-gradient(135deg,#FF5E62,#B3123E);color:#fff}
+.dturn{display:flex;align-items:center;justify-content:space-between;margin:0 4px 12px;font-size:15px;color:var(--ink2)}
+.dturn b{color:var(--rose);font-weight:700}
+.dbox{border-radius:24px;padding:18px 16px 14px;color:#fff;box-shadow:var(--shadow)}
+.dbox.lv1{background:linear-gradient(160deg,#FF9DB5 0%,#FF7A9C 100%)}
+.dbox.lv2{background:linear-gradient(160deg,#9B5DE5 0%,#E8466F 100%)}
+.dbox.lv3{background:linear-gradient(160deg,#E8344E 0%,#7A0B2C 100%)}
+.dice3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.die{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);border-radius:18px;padding:12px 6px;min-height:104px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}
+.die .k{font-size:12px;opacity:.8;font-weight:600}
+.die .v{font-family:var(--f-title);font-size:17px;font-weight:700;line-height:1.3}
+.die.rolling{animation:dshake .18s infinite}
+@keyframes dshake{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg) translateY(-2px)}75%{transform:rotate(6deg) translateY(2px)}}
+.dsent{margin:16px 4px 16px;text-align:center;font-size:16px;font-weight:600;line-height:1.5}
+.dcard{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-radius:20px;min-height:170px;padding:18px;display:flex;flex-direction:column;justify-content:center;gap:12px;text-align:center;margin-bottom:16px}
+.dcard .tag{align-self:center;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:rgba(255,255,255,.22)}
+.dcard .t{font-family:var(--f-title);font-size:20px;font-weight:700;line-height:1.45}
+.dcard.show{animation:dflip .45s ease}
+.dcard.rolling{animation:dshake .18s infinite}
+@keyframes dflip{from{transform:rotateY(90deg);opacity:.3}to{transform:none;opacity:1}}
+.dgo{background:#fff;color:var(--rose)}
+.dbox.lv3 .dgo{color:#B3123E}
+.dskip{display:block;margin:10px auto 0;color:rgba(255,255,255,.85);font-size:14px;font-weight:500}
+.dnote{margin:14px 8px 0;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.6}
 .wrow{display:flex;gap:10px;margin-bottom:18px}
 .wrow .btn{flex:1}
 .plan{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-top:.5px solid var(--line)}
@@ -1123,6 +1152,117 @@ function readLetter(l, asWriter){
   openSheet(null, h('div', null, paper, acts));
 }
 
+/* =============== 亲密骰子（只在本机玩，不上传） =============== */
+// 每一项: [内容, 档位]  档位 1 甜蜜 / 2 暧昧 / 3 大胆；选哪档就抽这一档和以下的，本档出现得更多。
+const DICE_LEVELS = [['1', '甜蜜', '💗'], ['2', '暧昧', '🌙'], ['3', '大胆', '🔥']];
+const DICE_ACT = [
+  ['亲一下', 1], ['轻轻摸摸', 1], ['蹭一蹭', 1], ['捏一捏', 1], ['啄一口', 1], ['轻轻拍拍', 1],
+  ['慢慢地亲', 2], ['轻轻吹气', 2], ['轻轻咬一下', 2], ['用指尖画圈', 2], ['用鼻尖蹭', 2], ['嘴唇贴着不动', 2], ['边亲边说情话', 2],
+  ['舔一下', 3], ['种一颗草莓', 3], ['用舌尖画圈', 3], ['一路吻下去', 3], ['用冰块划过', 3], ['又亲又咬', 3], ['用嘴唇慢慢扫过', 3]];
+const DICE_PART = [
+  ['额头', 1], ['脸颊', 1], ['手背', 1], ['鼻尖', 1], ['手心', 1], ['发顶', 1],
+  ['耳朵', 2], ['脖子', 2], ['锁骨', 2], ['嘴唇', 2], ['后颈', 2], ['手腕内侧', 2], ['肩膀', 2],
+  ['腰', 3], ['后背', 3], ['大腿内侧', 3], ['小腹', 3], ['胸口', 3], ['耳垂', 3], ['腰窝', 3], ['脚踝', 3]];
+const DICE_WAY = [
+  ['3 秒', 1], ['数到 10', 1], ['看着对方的眼睛', 1], ['笑着', 1],
+  ['闭上眼睛', 2], ['慢慢地，20 秒', 2], ['不许出声', 2], ['先贴着耳朵说句情话', 2],
+  ['蒙上对方的眼睛', 3], ['对方双手不许动', 3], ['只准用嘴', 3], ['关掉灯', 3], ['整整一分钟', 3], ['节奏由对方指挥', 3]];
+const DICE_DARE = [
+  ['给对方一个 10 秒的拥抱，谁先松手谁输', 1], ['十指相扣，对视 30 秒不许笑', 1], ['说出对方今天最好看的三个地方', 1],
+  ['公主抱或者背起对方走 5 步', 1], ['给对方按摩肩膀 2 分钟', 1], ['在对方手心写一个字，让 TA 猜', 1], ['学对方撒娇的样子', 1],
+  ['贴着对方耳朵，慢慢说一句情话', 2], ['坐到对方腿上，聊 1 分钟天', 2], ['用嘴喂对方吃一口东西', 2],
+  ['对方闭眼，你亲 TA 一个地方，让 TA 猜是哪里', 2], ['帮对方解开一颗扣子，然后停下', 2], ['从背后抱住对方，下巴放在 TA 肩上 1 分钟', 2],
+  ['用最撩人的语气叫对方的名字', 2], ['亲对方的脖子，直到 TA 说「停」', 2], ['给对方一个 30 秒的深吻', 2], ['用手指沿着对方的嘴唇慢慢描一圈', 2],
+  ['蒙上对方的眼睛，亲 TA 身上任意三个地方', 3], ['脱掉自己身上的一件衣服（饰品不算）', 3], ['只用嘴，帮对方脱掉一件衣服', 3],
+  ['把对方抵在墙上，亲 30 秒', 3], ['跨坐在对方身上对视 1 分钟，谁先笑谁再抽一张', 3], ['用冰块从对方的脖子慢慢划到锁骨', 3],
+  ['在对方身上种一颗草莓，位置 TA 来选', 3], ['接下来 5 分钟，你的手只能听对方指挥', 3], ['给对方跳一段 30 秒的贴身舞', 3],
+  ['嘴对嘴喂对方一颗葡萄，不许用手', 3], ['换上对方的上衣，在 TA 面前走一圈', 3], ['今晚的主导权交给对方', 3], ['让对方在你身上写一个字，你来猜', 3]];
+const DICE_TRUTH = [
+  ['第一次对我心动是什么时候？', 1], ['最喜欢我身上哪个地方？', 1], ['最想和我一起去哪里？', 1],
+  ['我做过最让你感动的一件事是什么？', 1], ['第一次见我时，你心里在想什么？', 1], ['你为我吃过醋吗？是哪一次？', 1],
+  ['我们第一次接吻，你是什么感觉？', 2], ['你最喜欢我怎么亲你？', 2], ['我穿什么衣服的时候你最心动？', 2],
+  ['哪个瞬间你最想亲我，但是忍住了？', 2], ['你最想让我对你做的一件小事是什么？', 2], ['你身上哪里最怕痒、最敏感？', 2], ['想我的时候，你一般在干什么？', 2],
+  ['你最难忘的是我们在一起的哪一晚？', 3], ['你有没有一个还没告诉过我的小幻想？', 3], ['你觉得我什么时候最性感？', 3],
+  ['你更喜欢主动，还是被我主动？', 3], ['你最想让我穿什么给你看？', 3], ['有没有特别想要我，却没说出口的时候？', 3],
+  ['你喜欢开着灯，还是关着灯？', 3], ['你最想和我在哪里试一次？', 3]];
+
+function diceLevel(){ if (!S.diceLv){ try { S.diceLv = localStorage.getItem('od_dice_lv') || '2'; } catch { S.diceLv = '2'; } } return +S.diceLv; }
+function dicePick(list){
+  const lv = diceLevel();
+  const pool = [];
+  list.forEach(([t, l]) => { if (l <= lv) for (let i = 0; i < (l === lv ? 3 : 1); i++) pool.push(t); });
+  if (!S.diceLast) S.diceLast = new Map();
+  let t;
+  for (let i = 0; i < 6; i++){ t = pool[Math.floor(Math.random() * pool.length)]; if (t !== S.diceLast.get(list)) break; }
+  return t;
+}
+function diceTurn(){ if (!S.diceTurn) S.diceTurn = S.me; return S.diceTurn; }
+
+function diceView(p){
+  const lv = diceLevel();
+  if (!S.diceMode) S.diceMode = 'dice';
+  // 档位
+  const lvRow = h('div', {class: 'dlv'});
+  DICE_LEVELS.forEach(([k, label, ic]) => lvRow.append(h('button', {'aria-pressed': String(S.diceLv === k), class: 'lv' + k, onclick: () => {
+    S.diceLv = k; S.diceRes = null; try { localStorage.setItem('od_dice_lv', k); } catch {} haptic(); render(); }}, h('span', {text: ic}), label)));
+  p.append(lvRow);
+  // 玩法
+  const mode = h('div', {class: 'seg', style: {gridTemplateColumns: '1fr 1fr 1fr'}});
+  [['dice', '摇骰子'], ['dare', '挑战卡'], ['truth', '真心话']].forEach(([k, label]) => mode.append(h('button', {'aria-pressed': String(S.diceMode === k), onclick: () => { S.diceMode = k; S.diceRes = null; render(); }}, label)));
+  p.append(mode);
+
+  const who = diceTurn();
+  const turn = h('div', {class: 'dturn'},
+    h('span', null, '这一轮：', h('b', {text: nameOf(who)}), S.diceMode === 'truth' ? ' 来回答' : ' 来做'),
+    h('button', {class: 'btn sm ghost', text: '换人', onclick: () => { S.diceTurn = other(who); render(); }}));
+  p.append(turn);
+
+  const box = h('div', {class: 'dbox lv' + lv});
+  const res = S.diceRes && S.diceRes.mode === S.diceMode ? S.diceRes : null;
+  let dice = [];
+  if (S.diceMode === 'dice'){
+    const names = ['怎么做', '哪里', '怎样'];
+    const vals = res ? res.v : ['？', '？', '？'];
+    dice = vals.map((v, i) => h('div', {class: 'die'}, h('div', {class: 'k', text: names[i]}), h('div', {class: 'v', text: v})));
+    box.append(h('div', {class: 'dice3'}, dice));
+    box.append(h('div', {class: 'dsent', text: res ? nameOf(who) + '：' + res.v[2] + '，在对方的' + res.v[1] + '上' + res.v[0] : '摇一下，看看这一轮做什么'}));
+  } else {
+    const card = h('div', {class: 'dcard' + (res ? ' show' : '')},
+      h('div', {class: 'tag', text: S.diceMode === 'dare' ? '挑战' : '真心话'}),
+      h('div', {class: 't', text: res ? res.v : (S.diceMode === 'dare' ? '抽一张挑战，做到才算过关' : '抽一个问题，要说真心话哦')}));
+    dice = [card];
+    box.append(card);
+  }
+  const go = h('button', {class: 'btn block dgo', text: S.diceMode === 'dice' ? (res ? '再摇一次' : '摇一摇') : (res ? '再抽一张' : '抽一张')});
+  go.onclick = (e, skip) => {
+    if (S.busy) return;
+    S.busy = true; go.disabled = true; haptic();
+    const mode = S.diceMode;
+    const lists = mode === 'dice' ? [DICE_ACT, DICE_PART, DICE_WAY] : [mode === 'dare' ? DICE_DARE : DICE_TRUTH];
+    const picked = lists.map(dicePick);
+    lists.forEach((l, i) => S.diceLast.set(l, picked[i]));
+    const final = mode === 'dice' ? picked : picked[0];
+    if (res && !skip) S.diceTurn = other(who);  // 下一轮换另一个人
+    const t0 = Date.now();
+    dice.forEach(d => d.classList.add('rolling'));
+    const tick = setInterval(() => {
+      const el = Date.now() - t0;
+      if (mode === 'dice') dice.forEach((d, i) => { if (el < 650 + i * 280) d.querySelector('.v').textContent = dicePick(lists[i]); else { d.classList.remove('rolling'); d.querySelector('.v').textContent = picked[i]; } });
+      else dice[0].querySelector('.t').textContent = dicePick(lists[0]);
+      if (el > 650 + 2 * 280 || mode !== 'dice' && el > 700){
+        clearInterval(tick); S.busy = false;
+        S.diceRes = {mode, v: final};
+        if (navigator.vibrate) try { navigator.vibrate([10, 40, 18]); } catch {}
+        render();
+      }
+    }, 70);
+  };
+  box.append(go);
+  if (res) box.append(h('button', {class: 'dskip', text: '这个不想要，换一个', onclick: () => go.onclick(null, true)}));
+  p.append(box);
+  p.append(h('p', {class: 'dnote', text: '只在这台手机上玩，内容不会上传。两个人都开心才好玩，谁不想做都可以直接换一个 💗'}));
+}
+
 /* =============== together: 心愿 / 去过的地方 / 爱的小券 =============== */
 function togetherPage(){
   const p = h('div', {class: 'page'});
@@ -1130,12 +1270,13 @@ function togetherPage(){
   const s = seenAt('coupons');
   const todos = Store.all('todo'), places = Store.all('place');
   const sub = S.togetherSeg === 'wish' ? (todos.length ? '一起完成了 ' + todos.filter(x => x.done).length + ' 个心愿' : '想和 TA 一起做的事')
-    : S.togetherSeg === 'places' ? '一起走过的地方' : S.togetherSeg === 'scratch' ? '每天一张，看看今天手气' : S.togetherSeg === 'wheel' ? '不知道去哪？转一下' : '送给对方的小特权';
-  pageHead(p, '一起', sub, [['wish', '心愿清单'], ['places', '去过的地方'], ['coupons', '爱的小券', Store.all('coupon').some(c => (c.to === S.me && (c.at || 0) > s) || (c.from === S.me && (c.usedAt || 0) > s))], ['scratch', '刮刮乐', newScratch() > 0 || !(Store.get(todayCardId()) || {}).scratchedAt], ['wheel', '约会转盘', newDatePlans() > 0]], 'togetherSeg');
+    : S.togetherSeg === 'places' ? '一起走过的地方' : S.togetherSeg === 'scratch' ? '每天一张，看看今天手气' : S.togetherSeg === 'wheel' ? '不知道去哪？转一下' : S.togetherSeg === 'dice' ? '只属于我们俩的小游戏' : '送给对方的小特权';
+  pageHead(p, '一起', sub, [['wish', '心愿清单'], ['places', '去过的地方'], ['coupons', '爱的小券', Store.all('coupon').some(c => (c.to === S.me && (c.at || 0) > s) || (c.from === S.me && (c.usedAt || 0) > s))], ['scratch', '刮刮乐', newScratch() > 0 || !(Store.get(todayCardId()) || {}).scratchedAt], ['wheel', '约会转盘', newDatePlans() > 0], ['dice', '亲密骰子']], 'togetherSeg');
   if (S.togetherSeg === 'wish') todoView(p);
   else if (S.togetherSeg === 'places') placesView(p);
   else if (S.togetherSeg === 'scratch'){ scratchView(p); seenLater('scratch'); }
   else if (S.togetherSeg === 'wheel'){ wheelView(p); seenLater('wheel'); }
+  else if (S.togetherSeg === 'dice') diceView(p);
   else { couponsView(p); seenLater('coupons'); }
   return p;
 }
