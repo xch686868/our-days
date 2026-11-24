@@ -343,6 +343,10 @@ svg{display:block}
 .die.win{background:rgba(255,255,255,.36);border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.5)}
 .dopt{display:block;width:100%;text-align:left;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:16px;padding:12px 14px;color:#fff;font-size:15px;line-height:1.5;font-weight:600;margin-top:8px}
 .dopt:active{background:rgba(255,255,255,.3)}
+.dpts{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:14px;font-size:14px;font-weight:600}
+.dpts b{font-family:var(--f-title);font-size:22px;min-width:36px;text-align:center;background:rgba(255,255,255,.2);border-radius:10px;padding:2px 8px}
+.dpts b.w{background:#fff;color:#B3123E}
+.dpts i{font-style:normal;opacity:.8}
 .dnote{margin:14px 8px 0;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.6}
 .plock{padding:28px 16px 22px;text-align:center}
 .plock .ic{font-size:40px;line-height:1}
@@ -1198,13 +1202,13 @@ const DICE_ACT = [
   ['轻轻摸', 1], ['用指尖慢慢划', 1], ['揉一揉', 1], ['用手心贴着', 1], ['轻轻挠', 1], ['用手背蹭', 1], ['一下一下轻轻拍', 1],
   ['轻轻亲一下', 2], ['慢慢地亲', 2], ['连着啄三下', 2], ['嘴唇贴着停 5 秒', 2], ['亲完再轻轻吹口气', 2], ['边亲边说一句情话', 2],
   ['隔着衣服慢慢摸', 3], ['一边亲一边摸', 3], ['用嘴唇慢慢扫过', 3], ['轻轻咬一下', 3], ['种一颗草莓', 3], ['用舌尖画圈', 3], ['贴近了慢慢吹气', 3],
-  ['用舌头慢慢舔', 4], ['含住吮吸', 4], ['用手揉捏', 4], ['咬住用牙齿磨', 4], ['用指尖打圈', 4], ['边亲边用手', 4], ['用手慢慢弄', 4],
+  ['用舌头慢慢舔', 4], ['含住吮吸', 4], ['用手揉捏', 4], ['咬住用牙齿磨', 4], ['用指尖打圈', 4], ['边亲边用手', 4], ['用手慢慢弄', 4], [{m: '用手指揉', f: '用手上下套弄'}, 4],
   ['用玩具轻轻贴着', 4], ['用玩具开最大档', 4], ['一边用玩具一边亲', 4], ['咬住用力扯', 4], ['用力咬', 4], ['用力捏住拧', 4], ['用指甲掐', 4]];
 const DICE_PART = [
   ['脸颊', 1], ['头发', 1], ['耳垂', 1], ['后颈', 1], ['肩膀', 1], ['手心', 1], ['手臂内侧', 1], ['后背', 1], ['腰', 1],
   ['额头', 2], ['眼睛', 2], ['鼻尖', 2], ['脸颊', 2], ['嘴唇', 2], ['耳朵', 2], ['脖子', 2], ['锁骨', 2], ['手腕内侧', 2], ['后颈', 2],
   ['耳垂', 3], ['脖子', 3], ['锁骨', 3], ['胸口', 3], ['腰', 3], ['小腹', 3], ['后背', 3], ['大腿内侧', 3], ['腰窝', 3],
-  ['乳头', 4], ['左边乳头', 4], ['右边乳头', 4], ['两边乳头', 4], ['私处', 4], ['私处最敏感的那一点', 4]];
+  ['乳头', 4], ['左边乳头', 4], ['右边乳头', 4], ['两边乳头', 4], ['私处', 4], [{m: '阴蒂', f: '龟头'}, 4]];
 const DICE_WAY = [
   ['闭上眼睛', 1], ['看着对方的眼睛', 1], ['数到 20', 1], ['不许笑', 1], ['慢慢地', 1], ['先说一句情话', 1],
   ['闭上眼睛', 2], ['不许用手', 2], ['先看着对方的眼睛 5 秒', 2], ['关上灯', 2], ['捧着对方的脸', 2], ['不许出声', 2],
@@ -1212,32 +1216,32 @@ const DICE_WAY = [
   ['两个人都脱光', 4], ['用丝巾绑住对方的手', 4], ['对着镜子', 4], ['直到对方求饶', 4], ['慢慢来，不许急', 4], ['对方不许出声', 4], ['蒙上对方的眼睛', 4]];
 // 摇出来不合理的搭配，重新摇：[怎么做, 哪里, 怎样]，写了的都对上才算不合理
 const DICE_BAD = [
-  [/玩具/, /乳头/], [/咬|扯|拧|掐|捏/, /私处/], [/拍/, /脸颊|耳垂/], [/手背/, /手心/], [null, /后背|后颈/, /看着对方的眼睛/],
+  [/玩具/, /乳头/], [/咬|扯|拧|掐|捏/, /私处|阴蒂|龟头/], [/套弄/, /乳头/], [/拍/, /脸颊|耳垂/], [/手背/, /手心/], [null, /后背|后颈/, /看着.的眼睛/],
   [/吹/, /眼睛/], [null, /后颈|锁骨|手腕/, /捧着/], [/草莓/, /耳垂/], [/隔着衣服/, /耳垂|脖子|锁骨/]];
 function diceBad(v){ return DICE_BAD.some(r => r.every((re, i) => !re || re.test(v[i]))); }
 const DICE_DARE = [
   ['十指相扣，对视 30 秒，谁先笑谁输', 1], ['从背后抱住对方 1 分钟，下巴放在 TA 肩上', 1], ['闭上眼睛，只用手摸对方的脸，猜 TA 现在是什么表情', 1],
   ['在对方手心写一个字，让 TA 猜', 1], ['在对方后背上写一句话，让 TA 猜', 1], ['用手指慢慢梳对方的头发 1 分钟', 1],
   ['让对方躺在你腿上，摸 TA 的头发 2 分钟', 1], ['闭上眼睛，让对方牵着你在房间里走一圈', 1], ['用指尖从对方的手腕慢慢划到肩膀', 1],
-  ['给对方一个 10 秒的拥抱，谁先松手谁输', 1], ['公主抱或者背起对方走 5 步', 1],
+  ['给对方一个 10 秒的拥抱，谁先松手谁输', 1], [{m: '把她公主抱起来，走 5 步', f: '跳到他背上，让他背着你走 5 步'}, 1],
   ['给对方一个 30 秒的吻，谁先离开谁输', 2], ['对方闭上眼睛，你亲 TA 一个地方，让 TA 猜是哪里', 2], ['从额头开始一路亲到嘴唇，中间至少停 5 个地方', 2],
   ['嘴对嘴喂对方一颗葡萄，不许用手', 2], ['亲对方的脖子，直到 TA 说「停」', 2], ['双手背在身后，只用嘴亲对方 1 分钟', 2],
-  ['给对方一个 1 分钟的深吻', 2], ['坐到对方腿上，亲 1 分钟', 2], ['轮流亲对方的脸，每人亲 5 下，不许亲同一个地方', 2], ['轻轻亲一下对方的眼皮，再亲一下鼻尖', 2],
+  ['给对方一个 1 分钟的深吻', 2], ['坐到对方腿上，亲 1 分钟', 2], ['两个人轮流亲彼此的脸，每人亲 5 下，不许亲同一个地方', 2], ['轻轻亲一下对方的眼皮，再亲一下鼻尖', 2],
   ['只用嘴，帮对方脱掉一件衣服', 3], ['蒙上对方的眼睛，亲 TA 身上任意三个地方，让 TA 猜', 3], ['把对方抵在墙上，亲 30 秒', 3],
   ['跨坐在对方腿上，对视 1 分钟，不许亲', 3], ['用冰块从对方的脖子慢慢划到锁骨，再用嘴亲回去', 3], ['贴着对方的耳朵，说出今晚你想对 TA 做的一件事', 3],
   ['在对方身上种一颗草莓，位置 TA 来选', 3], ['接下来 5 分钟，你的手只能听对方指挥', 3], ['隔着衣服慢慢摸对方 1 分钟，不许脱', 3],
   ['给对方跳一段 30 秒的贴身舞', 3], ['两个人轮流各脱一件，直到有一个人喊停', 3], ['从脖子一路亲到小腹，慢慢来，不许快', 3],
   ['用领带或丝巾绑住对方的手腕，然后亲 TA 1 分钟', 3], ['让对方双手举过头顶不许放下，你隔着衣服摸 TA 2 分钟', 3],
   ['蒙上对方的眼睛，用指尖在 TA 身上慢慢划，让 TA 猜你划在哪里', 3], ['让对方趴在你腿上，用手掌轻轻打 TA 的屁股 5 下，TA 要大声数出来', 3],
-  ['用嘴含住对方的私处，舔 2 分钟，TA 不许碰你', 4], ['让对方用嘴舔你的私处 2 分钟，你不许出声', 4], ['69：两个人同时用嘴，谁先停下谁输', 4],
-  ['用手弄对方的私处，快到的时候停下，重复两次', 4], ['用手弄对方的私处 3 分钟，快慢都听 TA 的', 4], ['用手弄对方的私处，直到 TA 到一次，中途不许停', 4],
-  ['一边用手弄对方的私处，一边贴着 TA 耳朵说情话', 4], ['把玩具贴在对方的私处，从最低档开始，每 30 秒调高一档', 4], ['把玩具按在对方私处最敏感的那一点，停 1 分钟，TA 不许躲', 4],
-  ['用玩具贴着对方的私处，同时咬住 TA 的乳头', 4], ['手和玩具一起弄对方的私处，直到 TA 到一次', 4], ['蒙上对方的眼睛，轮流用手、嘴、玩具弄 TA 的私处，让 TA 猜是哪一个', 4],
-  ['用力咬对方的乳头，一直咬到 TA 喊停', 4], ['一边用力咬对方的乳头，一边用手弄 TA 的私处', 4], ['两个人轮流用力咬对方的乳头，谁先叫出声谁输', 4],
+  [{m: '用舌头舔她的阴蒂 2 分钟，她不许碰你', f: '用嘴含住他的私处上下吞吐 2 分钟，他不许碰你'}, 4], [{m: '让她用嘴含住你的私处 2 分钟，你不许出声', f: '让他用舌头舔你的阴蒂 2 分钟，你不许出声'}, 4], ['69：两个人同时用嘴，谁先停下谁输', 4],
+  [{m: '用手指揉她的阴蒂，她快到的时候停下，重复两次', f: '握住他的私处上下套弄，他快到的时候停下，重复两次'}, 4], [{m: '用手指弄她的私处 3 分钟，快慢都听她的', f: '用手帮他撸 3 分钟，快慢都听他的'}, 4], [{m: '用手指弄她，直到她到一次，中途不许停', f: '用手帮他撸，直到他射出来，中途不许停'}, 4],
+  ['一边用手弄对方的私处，一边贴着 TA 耳朵说情话', 4], [{m: '把玩具贴在她的阴蒂上，从最低档开始，每 30 秒调高一档', f: '把玩具贴在他的龟头下面，从最低档开始，每 30 秒调高一档'}, 4], [{m: '把玩具按在她的阴蒂上停 1 分钟，她不许躲', f: '把玩具按在他的龟头上停 1 分钟，他不许躲'}, 4],
+  [{m: '用玩具贴着她的阴蒂，同时咬住她的乳头', f: '一边用手帮他撸，一边咬住他的乳头'}, 4], [{m: '手指和玩具一起弄她，直到她到一次', f: '一只手帮他撸，一只手拿玩具贴着他，直到他射出来'}, 4], ['蒙上对方的眼睛，轮流用手、嘴、玩具弄 TA 的私处，让 TA 猜是哪一个', 4],
+  ['用力咬对方的乳头，一直咬到 TA 喊停', 4], ['一边用力咬对方的乳头，一边用手弄 TA 的私处', 4], ['两个人轮流用力咬彼此的乳头，谁先叫出声谁输', 4],
   ['捏住对方的两边乳头用力拧，数到 20，TA 不许躲', 4], ['咬住对方的乳头往外扯，扯到 TA 求饶', 4], ['先舔再用力咬，两边乳头各来 30 秒', 4],
-  ['把对方按住，咬着 TA 的乳头不松口，数到 20', 4], ['骑在对方身上，你来动 3 分钟，节奏你说了算', 4], ['后入，保持 2 分钟不许停', 4],
+  ['把对方按住，咬着 TA 的乳头不松口，数到 20', 4], [{m: '让她骑在你身上，你托着她的腰，3 分钟里节奏你说了算', f: '骑在他身上，你来动 3 分钟，节奏你说了算'}, 4], [{m: '从后面进入她，保持 2 分钟不许停', f: '趴好让他从后面进入，2 分钟里你不许躲'}, 4],
   ['做的时候一直用力掐对方的乳头，直到 TA 喊停', 4], ['今晚没得到对方允许，你不许到', 4],
-  ['用丝巾把对方的双手绑在床头，用玩具弄 TA 的私处，直到 TA 到一次或者喊暂停词', 4], ['让对方跪在床上，用手掌打 TA 的屁股 10 下，每下 TA 都要说「谢谢」', 4],
+  [{m: '用丝巾把她的双手绑在床头，用玩具贴着她的阴蒂，直到她到一次或者喊暂停词', f: '用丝巾把他的双手绑在床头，用手帮他撸，直到他射出来或者喊暂停词'}, 4], ['让对方跪在床上，用手掌打 TA 的屁股 10 下，每下 TA 都要说「谢谢」', 4],
   ['绑住对方的双手再蒙上眼睛，轮流用手和嘴弄 TA 的乳头和私处', 4], ['绑住对方的手，一边咬 TA 的乳头，一边用手弄 TA 的私处，TA 不许挣开', 4],
   ['让对方趴好，一边用手掌打 TA 的屁股，一边用手弄 TA 的私处', 4]];
 const DICE_TRUTH = [
@@ -1257,15 +1261,15 @@ const DICE_TRUTH = [
   ['有没有哪次你其实还想要，但没说出口？', 4], ['你想听我在床上说什么？', 4], ['你想被我绑起来，还是绑我？', 4], ['打屁股的时候，你喜欢轻一点还是重一点？', 4]];
 // 「今晚怎么做」：只在限制级出现。一句话 = 先前戏，再姿势，规则
 const NIGHT_POSE = [['传教士', 4], ['女上位', 4], ['后入', 4], ['侧躺从背后', 4], ['坐着面对面', 4], ['站着抵着墙', 4], ['趴着', 4], ['在床边', 4], ['反向女上位', 4], ['让对方挑', 4]];
-const NIGHT_FORE = [['69', 4], ['你先用嘴帮对方', 4], ['对方先用嘴帮你', 4], ['用手弄对方的私处', 4], ['玩具贴着私处，从最低档开始', 4], ['手和玩具一起弄私处', 4], ['轮流用力咬乳头', 4], ['一边咬乳头，一边用手弄私处', 4]];
-const NIGHT_RULE = [['不许出声', 4], ['对着镜子', 4], ['蒙上对方的眼睛', 4], ['全程你来主导', 4], ['全程对方主导', 4], ['快到的时候停下两次', 4], ['开着灯', 4], ['绑住对方的手', 4], ['中途换一次姿势', 4], ['到之前要先求对方同意', 4], ['玩具全程贴着私处不许关', 4], ['开始前，先让对方到一次', 4], ['中途用力咬对方乳头三次', 4], ['一边做一边拧对方的乳头', 4], ['中途用手掌打对方的屁股 10 下', 4]];
+const NIGHT_FORE = [['69', 4], [{m: '你先舔她', f: '你先用嘴帮他'}, 4], [{m: '她先用嘴帮你', f: '他先舔你'}, 4], [{m: '你用手指弄她', f: '你用手帮他撸'}, 4], [{m: '玩具贴着她的阴蒂，从最低档开始', f: '他拿玩具贴着你的阴蒂，从最低档开始'}, 4], [{m: '手指和玩具一起弄她', f: '你帮他撸，他拿玩具弄你'}, 4], ['轮流用力咬乳头', 4], [{m: '一边咬她的乳头，一边用手指弄她', f: '一边咬他的乳头，一边帮他撸'}, 4]];
+const NIGHT_RULE = [['不许出声', 4], ['对着镜子', 4], ['蒙上对方的眼睛', 4], ['全程你来主导', 4], ['全程对方主导', 4], ['快到的时候停下两次', 4], ['开着灯', 4], ['绑住对方的手', 4], ['中途换一次姿势', 4], ['到之前要先求对方同意', 4], [{m: '玩具全程贴着她的阴蒂不许关', f: '玩具全程贴着你的阴蒂不许关'}, 4], ['开始前，先让对方到一次', 4], ['中途用力咬对方乳头三次', 4], ['一边做一边拧对方的乳头', 4], ['中途用手掌打对方的屁股 10 下', 4]];
 // 今晚不合理的搭配：[前戏, 姿势, 规则]
-const NIGHT_BAD = [[null, /趴着|侧躺/, /镜子/], [null, /传教士|侧躺|坐着面对面|站着|让对方挑/, /打对方的屁股/], [null, /让对方挑/, /全程你来主导/], [/对方先用嘴帮你/, null, /先让对方到一次/], [null, /站着/, /绑住对方的手/]];
+const NIGHT_BAD = [[null, /趴着|侧躺/, /镜子/], [null, /传教士|侧躺|坐着面对面|站着|让.挑/, /打.的屁股/], [null, /让.挑/, /全程你来主导/], [/先用嘴帮你|先舔你/, null, /先让.到一次/], [null, /站着/, /绑住对方的手/]];
 function nightBad(v){ return NIGHT_BAD.some(r => r.every((re, i) => !re || re.test(v[i]))); }
 // 「比大小」：两个人各摇一个，点数大的从三张命令里挑一张，输的人照做。{w} = 赢的人
 const DICE_CMD = [
   ['从背后抱住{w} 1 分钟，不许松手', 1], ['让{w}躺在你腿上，摸 TA 的头发 2 分钟', 1], ['牵着{w}的手，夸 TA 三句，不许重复', 1],
-  ['用指尖在{w}的后背上写「我爱你」，写三遍', 1], ['公主抱或者背起{w}走 5 步', 1], ['闭上眼睛，让{w}随便摸你的脸 30 秒，不许笑', 1],
+  ['用指尖在{w}的后背上写「我爱你」，写三遍', 1], [{m: '把{w}公主抱起来，走 5 步', f: '让{w}坐着，你坐到他腿上抱住他 1 分钟'}, 1], ['闭上眼睛，让{w}随便摸你的脸 30 秒，不许笑', 1],
   ['和{w}十指扣住，直到 TA 说可以松开', 1], ['给{w}一个 20 秒的熊抱', 1], ['帮{w}把头发理顺，再整理一下衣领', 1], ['捧着{w}的手，用指尖在 TA 手心画 10 个圈', 1],
   ['亲{w}的额头、鼻尖、嘴唇，每个地方停 3 秒', 2], ['给{w}一个吻，{w}说停才能停', 2], ['双手背在身后，只用嘴亲{w} 1 分钟', 2],
   ['亲{w}的脖子，直到 TA 说「停」', 2], ['{w}指哪里你就亲哪里，连亲 5 个地方（只限露在外面的）', 2], ['坐到{w}腿上，给 TA 一个深吻', 2],
@@ -1274,11 +1278,11 @@ const DICE_CMD = [
   ['蒙上眼睛，{w}碰你哪里你就说出是哪里，说错一次让 TA 轻轻打一下屁股', 3], ['双手举过头顶不许放下，让{w}隔着衣服随便摸 2 分钟', 3],
   ['趴在{w}腿上，让 TA 用手掌轻轻打你的屁股 5 下，你要大声数出来', 3], ['跨坐在{w}腿上，贴着 TA 的耳朵说今晚你想要什么', 3],
   ['给{w}跳一段 30 秒的贴身舞', 3], ['在{w}指定的地方种一颗草莓（衣服能遮住的地方）', 3], ['从{w}的脖子一路亲到小腹，慢慢来，不许快', 3],
-  ['用嘴帮{w} 2 分钟，TA 没说停不许停', 4], ['用手弄{w}的私处，直到 TA 到一次', 4], ['躺好，让{w}用玩具弄你的私处 2 分钟，不许躲、不许出声', 4],
+  [{m: '用舌头舔{w}的阴蒂 2 分钟，她没说停不许停', f: '用嘴含住{w}的私处 2 分钟，他没说停不许停'}, 4], [{m: '用手指弄{w}，直到她到一次', f: '用手帮{w}撸，直到他射出来'}, 4], [{m: '躺好，让{w}用手帮你撸 2 分钟，不许躲、不许出声', f: '躺好，让{w}用玩具贴着你的阴蒂 2 分钟，不许躲、不许出声'}, 4],
   ['让{w}把你的双手绑在床头，接下来 10 分钟 TA 想怎么弄你都行，喊暂停词才停', 4], ['跪在床上，让{w}用手掌打你的屁股 10 下，每下都要说「谢谢」', 4],
   ['让{w}绑住你的手再蒙上眼睛，TA 轮流用手、嘴、玩具弄你，你猜是哪一个', 4], ['让{w}用力咬你的乳头，咬到 TA 满意为止', 4],
   ['今晚没有{w}的允许，你不许到', 4], ['摆一个{w}指定的姿势，保持 1 分钟不许动', 4], ['开口求{w}，求到 TA 满意才给你', 4],
-  ['躺好别动，让{w}一边用玩具贴着你的私处，一边咬你的乳头', 4], ['换成{w}喜欢的姿势，快慢都由 TA 说了算', 4]];
+  [{m: '躺好别动，让{w}一边帮你撸，一边咬你的乳头', f: '躺好别动，让{w}一边用玩具贴着你的阴蒂，一边咬你的乳头'}, 4], ['换成{w}喜欢的姿势，快慢都由 TA 说了算', 4]];
 function diceCmds(lv, n){
   const all = DICE_CMD.filter(x => x[1] === lv).map(x => x[0]);
   for (let i = all.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [all[i], all[j]] = [all[j], all[i]]; }
@@ -1315,7 +1319,7 @@ function duelView(lv){
     box.append(h('div', {class: 'dsent', text: '平了！再摇一次'}));
     box.append(h('button', {class: 'btn block dgo', text: '再摇一次', onclick: roll}));
   } else {
-    const W = nameOf(d.win), L = nameOf(other(d.win)), fill = t => t.replace(/\{w\}/g, W);
+    const W = nameOf(d.win), L = nameOf(other(d.win)), fill = t => gtext(t, other(d.win)).replace(/\{w\}/g, W);
     if (d.pick == null){
       box.append(h('div', {class: 'dsent', text: W + ' 赢了！挑一张，让 ' + L + ' 去做'}));
       d.opts.forEach((t, i) => box.append(h('button', {class: 'dopt', text: fill(t), onclick: () => { d.pick = i; haptic(); render(); }})));
@@ -1350,6 +1354,22 @@ function dicePick(list){
   return t;
 }
 function diceTurn(){ if (!S.diceTurn) S.diceTurn = S.me; return S.diceTurn; }
+// 谁是男生：只存这台手机；名字里有「大宝宝 / 小宝宝」就自动认出来
+function diceMale(){
+  if (S.diceMaleId === undefined){
+    let v = ''; try { v = localStorage.getItem('od_dice_male') || ''; } catch {}
+    if (!v){ const i = info(); if (/大宝宝/.test(i.nameA || '') || /小宝宝/.test(i.nameB || '')) v = 'A'; else if (/大宝宝/.test(i.nameB || '') || /小宝宝/.test(i.nameA || '')) v = 'B'; }
+    S.diceMaleId = v;
+  }
+  return S.diceMaleId;
+}
+function setDiceMale(id){ S.diceMaleId = id; try { localStorage.setItem('od_dice_male', id); } catch {} }
+const pron = id => id === diceMale() ? '他' : '她';
+// 把内容换成「做的人」视角：男女不同的取对应版本，「对方 / TA」换成 他 / 她
+function gtext(t, actor){
+  if (t && typeof t === 'object') t = t[actor === diceMale() ? 'm' : 'f'];
+  return String(t).replace(/对方| ?TA ?/g, pron(other(actor)));
+}
 
 /* ---------- 小锁：亲密骰子要输密码，只存这台手机 ---------- */
 const PIN_KEY = 'od_dice_pin';
@@ -1411,7 +1431,9 @@ function lockView(p){
 function diceView(p){
   const lv = diceLevel();
   if (!S.diceMode) S.diceMode = 'dice';
+  const male = diceMale();
   p.append(h('div', {class: 'dlock'},
+    male ? h('button', {class: 'btn sm ghost', style: {marginRight: 'auto'}, text: '♂ 男生：' + nameOf(male), onclick: () => { setDiceMale(other(male)); S.diceRes = null; S.duel = null; toast('改成 ' + nameOf(other(male)) + ' 是男生'); render(); }}) : null,
     h('button', {class: 'btn sm ghost', text: '改密码', onclick: () => { diceLock(); S.pinChange = true; render(); }}),
     h('button', {class: 'btn sm ghost', text: '🔒 锁上', onclick: () => { diceLock(); haptic(); render(); }})));
   // 档位
@@ -1432,13 +1454,21 @@ function diceView(p){
   modes.forEach(([k, label]) => mode.append(h('button', {'aria-pressed': String(S.diceMode === k), onclick: () => { S.diceMode = k; S.diceRes = null; render(); }}, label)));
   p.append(mode);
   const note = h('p', {class: 'dnote', text: (lv >= 3 ? '绑的时候别太紧，能塞进两根手指；' : '') + (lv >= 3 ? '用力的玩法先约好一个暂停词，一喊就停。' : '') + '只在这台手机上玩，内容不会上传。两个人都开心才好玩，谁不想做都可以直接换一个 💗'});
+  if (!male){
+    p.append(h('div', {class: 'card plock'}, h('div', {class: 'tt', text: '先告诉我，谁是男生？'}),
+      h('div', {class: 'ss', text: '有些玩法男生女生不一样，选一次就记住了'}),
+      h('div', {class: 'wrow', style: {marginBottom: 0}}, ['A', 'B'].map(k => h('button', {class: 'btn', text: nameOf(k), onclick: () => { setDiceMale(k); render(); }})))));
+    return;
+  }
   if (S.diceMode === 'duel'){ p.append(duelView(lv), note); return; }
 
+  const rollMode = S.diceMode === 'dice' || S.diceMode === 'night';
   const who = diceTurn();
-  const turn = h('div', {class: 'dturn'},
-    h('span', null, '这一轮：', h('b', {text: nameOf(who)}), S.diceMode === 'truth' ? ' 来回答' : ' 来做'),
-    h('button', {class: 'btn sm ghost', text: '换人', onclick: () => { S.diceTurn = other(who); render(); }}));
-  p.append(turn);
+  p.append(rollMode
+    ? h('div', {class: 'dturn'}, h('span', null, '两个人一起摇，', h('b', {text: '点数小的听点数大的'})))
+    : h('div', {class: 'dturn'},
+      h('span', null, '这一轮：', h('b', {text: nameOf(who)}), S.diceMode === 'truth' ? ' 来回答' : ' 来做'),
+      h('button', {class: 'btn sm ghost', text: '换人', onclick: () => { S.diceTurn = other(who); render(); }})));
 
   const box = h('div', {class: 'dbox lv' + lv});
   const res = S.diceRes && S.diceRes.mode === S.diceMode ? S.diceRes : null;
@@ -1449,9 +1479,13 @@ function diceView(p){
     const vals = res ? res.v : ['？', '？', '？'];
     dice = vals.map((v, i) => h('div', {class: 'die'}, h('div', {class: 'k', text: names[i]}), h('div', {class: 'v', text: v})));
     box.append(h('div', {class: 'dice3'}, dice));
+    const pts = res ? res.pts : null, win = res ? other(res.actor) : null;
+    const ptA = h('b', {class: pts && win === 'A' ? 'w' : '', text: pts ? String(pts.A) : '？'}), ptB = h('b', {class: pts && win === 'B' ? 'w' : '', text: pts ? String(pts.B) : '？'});
+    box.append(h('div', {class: 'dpts'}, h('span', {text: nameOf('A')}), ptA, h('i', {text: ':'}), ptB, h('span', {text: nameOf('B')})));
+    box.ptA = ptA; box.ptB = ptB;
     box.append(h('div', {class: 'dsent', text: !res ? (night ? '摇一下，看看今晚怎么安排' : '摇一下，看看这一轮做什么')
-      : night ? '今晚先「' + res.v[0] + '」，姿势「' + res.v[1] + '」，规则「' + res.v[2] + '」'
-      : nameOf(who) + '：' + res.v[2] + '，在对方的' + res.v[1] + '上' + res.v[0]}));
+      : nameOf(res.actor) + ' 听 ' + nameOf(win) + ' 的：' + (night ? '今晚先「' + res.v[0] + '」，姿势「' + res.v[1] + '」，规则「' + res.v[2] + '」'
+      : res.v[2] + '，在' + pron(win) + '的' + res.v[1] + '上' + res.v[0])}));
   } else {
     const card = h('div', {class: 'dcard' + (res ? ' show' : '')},
       h('div', {class: 'tag', text: S.diceMode === 'dare' ? '挑战' : '真心话'}),
@@ -1466,22 +1500,29 @@ function diceView(p){
     const mode = S.diceMode;
     const rolls = mode === 'dice' || mode === 'night';
     const lists = mode === 'dice' ? [DICE_ACT, DICE_PART, DICE_WAY] : mode === 'night' ? [NIGHT_FORE, NIGHT_POSE, NIGHT_RULE] : [Object.assign(diceList(mode), {mode})];
-    const picked = lists.map(dicePick);
+    // 摇骰子 / 今晚：两个人同时摇点数，点数小的来做；挑战卡 / 真心话按轮换
+    if (!rolls && res && !skip) S.diceTurn = other(who);  // 下一轮换另一个人
+    let pts = null, actor = diceTurn();
+    if (rolls){ let a, b; do { a = 1 + Math.floor(Math.random() * 6); b = 1 + Math.floor(Math.random() * 6); } while (a === b); pts = {A: a, B: b}; actor = a < b ? 'A' : 'B'; }
+    const raw = lists.map(dicePick);
+    const conv = () => raw.map(t => gtext(t, actor));
+    let picked = conv();
     // 摇出不合理的搭配就重摇
     const isBad = mode === 'dice' ? diceBad : mode === 'night' ? nightBad : null;
-    for (let i = 0; isBad && i < 40 && isBad(picked); i++) lists.forEach((l, j) => { picked[j] = dicePick(l); });
-    lists.forEach((l, i) => S.diceLast.set(l.mode || l, picked[i]));
+    for (let i = 0; isBad && i < 40 && isBad(picked); i++){ lists.forEach((l, j) => { raw[j] = dicePick(l); }); picked = conv(); }
+    lists.forEach((l, i) => S.diceLast.set(l.mode || l, raw[i]));
     const final = rolls ? picked : picked[0];
-    if (res && !skip) S.diceTurn = other(who);  // 下一轮换另一个人
     const t0 = Date.now();
     dice.forEach(d => d.classList.add('rolling'));
     const tick = setInterval(() => {
       const el = Date.now() - t0;
-      if (rolls) dice.forEach((d, i) => { if (el < 650 + i * 280) d.querySelector('.v').textContent = dicePick(lists[i]); else { d.classList.remove('rolling'); d.querySelector('.v').textContent = picked[i]; } });
-      else dice[0].querySelector('.t').textContent = dicePick(lists[0]);
+      if (rolls){
+        dice.forEach((d, i) => { if (el < 650 + i * 280) d.querySelector('.v').textContent = gtext(dicePick(lists[i]), actor); else { d.classList.remove('rolling'); d.querySelector('.v').textContent = picked[i]; } });
+        box.ptA.textContent = String(1 + Math.floor(Math.random() * 6)); box.ptB.textContent = String(1 + Math.floor(Math.random() * 6));
+      } else dice[0].querySelector('.t').textContent = gtext(dicePick(lists[0]), actor);
       if (el > 650 + 2 * 280 || !rolls && el > 700){
         clearInterval(tick); S.busy = false;
-        S.diceRes = {mode, v: final};
+        S.diceRes = {mode, v: final, pts, actor};
         if (navigator.vibrate) try { navigator.vibrate([10, 40, 18]); } catch {}
         render();
       }
