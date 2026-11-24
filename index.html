@@ -338,6 +338,21 @@ svg{display:block}
 .dmine li button{flex:none;color:var(--muted);font-size:18px;line-height:1;padding:0 4px}
 .dskip{display:block;margin:10px auto 0;color:rgba(255,255,255,.85);font-size:14px;font-weight:500}
 .dnote{margin:14px 8px 0;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.6}
+.plock{padding:28px 16px 22px;text-align:center}
+.plock .ic{font-size:40px;line-height:1}
+.plock .tt{font-family:var(--f-title);font-size:20px;font-weight:700;margin-top:10px}
+.plock .ss{font-size:13px;color:var(--muted);margin:6px 0 20px;min-height:18px;line-height:1.5}
+.plock .ss.err{color:var(--rose);font-weight:600}
+.pdots{display:flex;justify-content:center;gap:18px;margin-bottom:24px}
+.pdots i{width:14px;height:14px;border-radius:50%;border:2px solid var(--rose);display:block;transition:background .12s}
+.pdots i.on{background:var(--rose)}
+.pdots.err{animation:dshake .18s 3}
+.ppad{display:grid;grid-template-columns:repeat(3,70px);gap:12px 24px;justify-content:center}
+.ppad button{height:70px;border-radius:50%;background:var(--fill);font-size:26px;font-weight:600;color:var(--ink)}
+.ppad button:active{opacity:.6}
+.ppad button.ghost{background:none;font-size:15px;color:var(--muted)}
+.pforgot{display:block;margin:18px auto 0;font-size:13px;color:var(--muted)}
+.dlock{display:flex;justify-content:flex-end;gap:8px;margin:-6px 0 10px}
 .wrow{display:flex;gap:10px;margin-bottom:18px}
 .wrow .btn{flex:1}
 .plan{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-top:.5px solid var(--line)}
@@ -740,6 +755,7 @@ function render(){
   $('#tabbar').hidden = false;
   renderTabs();
   root.textContent = '';
+  if (S.diceOpen && !(S.tab === 'together' && S.togetherSeg === 'dice')) diceLock();  // 离开就锁上
   const page = {home: homePage, letters: lettersPage, dates: datesPage, together: togetherPage, us: usPage}[S.tab] || homePage;
   const el = page(); if (S.anim){ el.classList.add('enter'); S.anim = false; }
   root.append(el);
@@ -1248,9 +1264,69 @@ function dicePick(list){
 }
 function diceTurn(){ if (!S.diceTurn) S.diceTurn = S.me; return S.diceTurn; }
 
+/* ---------- 小锁：亲密骰子要输密码，只存这台手机 ---------- */
+const PIN_KEY = 'od_dice_pin';
+async function pinHash(pin){
+  const txt = 'our-days-dice:' + pin;
+  try { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(txt)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
+  catch { let x = 5381; for (const c of txt) x = (x * 33 + c.charCodeAt(0)) >>> 0; return 'h' + x.toString(16); }
+}
+function pinSaved(){ try { return localStorage.getItem(PIN_KEY) || ''; } catch { return ''; } }
+function diceLock(){ S.diceOpen = false; S.pinIn = ''; S.pinFirst = null; S.pinChange = false; S.pinErr = false; }
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && S.diceOpen){ diceLock(); if (S.tab === 'together' && S.togetherSeg === 'dice') render(); }
+});
+function lockView(p){
+  const saved = pinSaved();
+  const step = saved && !S.pinChange ? 'enter' : (S.pinFirst ? 'set2' : 'set1');
+  if (!S.pinIn) S.pinIn = '';
+  const title = step === 'enter' ? '输入密码' : step === 'set1' ? (S.pinChange ? '输入新密码' : '先设一个 4 位密码') : '再输一次，确认一下';
+  const sub = S.pinErr ? (step === 'enter' ? '密码不对，再试一次' : '两次不一样，重新设一次')
+    : step === 'enter' ? '离开这一页或者切到后台，会自动锁上' : '密码只存在这台手机上，每台手机各设各的';
+  const press = async k => {
+    if (S.pinBusy) return;
+    if (k === 'del'){ S.pinIn = S.pinIn.slice(0, -1); render(); return; }
+    if (S.pinIn.length >= 4) return;
+    S.pinIn += k; S.pinErr = false; haptic();
+    if (S.pinIn.length < 4){ render(); return; }
+    S.pinBusy = true; render();
+    const hs = await pinHash(S.pinIn);
+    await new Promise(r => setTimeout(r, 150));
+    S.pinBusy = false; S.pinIn = '';
+    if (step === 'set1') S.pinFirst = hs;
+    else if (step === 'set2'){
+      if (hs === S.pinFirst){ try { localStorage.setItem(PIN_KEY, hs); } catch {} S.pinFirst = null; S.pinChange = false; S.diceOpen = true; toast('密码设好了'); }
+      else { S.pinFirst = null; S.pinErr = true; }
+    } else if (hs === saved) S.diceOpen = true;
+    else { S.pinErr = true; if (navigator.vibrate) try { navigator.vibrate(150); } catch {} }
+    render();
+  };
+  const pad = h('div', {class: 'ppad'});
+  ['1', '2', '3', '4', '5', '6', '7', '8', '9', S.pinChange ? 'cancel' : '', '0', 'del'].forEach(k => {
+    if (!k) pad.append(h('span'));
+    else if (k === 'del') pad.append(h('button', {class: 'ghost', text: '删除', 'aria-label': '删除一位', onclick: () => press('del')}));
+    else if (k === 'cancel') pad.append(h('button', {class: 'ghost', text: '取消', onclick: () => { diceLock(); S.diceOpen = true; render(); }}));
+    else pad.append(h('button', {text: k, onclick: () => press(k)}));
+  });
+  const box = h('div', {class: 'card plock'},
+    h('div', {class: 'ic', text: '🔒'}),
+    h('div', {class: 'tt', text: title}),
+    h('div', {class: 'ss' + (S.pinErr ? ' err' : ''), text: sub}),
+    h('div', {class: 'pdots' + (S.pinErr ? ' err' : '')}, [0, 1, 2, 3].map(i => h('i', {class: i < S.pinIn.length ? 'on' : ''}))),
+    pad);
+  if (step === 'enter') box.append(h('button', {class: 'pforgot', text: '忘记密码？', onclick: () => confirmSheet('重设密码会同时清空这台手机上「我们自己写」的内容，确定吗？', '清空并重设', () => {
+    try { localStorage.removeItem(PIN_KEY); localStorage.removeItem('od_dice_mine'); } catch {}
+    S.diceMine = null; diceLock(); render(); toast('已清空，重新设一个密码吧');
+  })}));
+  p.append(box);
+}
+
 function diceView(p){
   const lv = diceLevel();
   if (!S.diceMode) S.diceMode = 'dice';
+  p.append(h('div', {class: 'dlock'},
+    h('button', {class: 'btn sm ghost', text: '改密码', onclick: () => { diceLock(); S.pinChange = true; render(); }}),
+    h('button', {class: 'btn sm ghost', text: '🔒 锁上', onclick: () => { diceLock(); haptic(); render(); }})));
   // 档位
   const lvRow = h('div', {class: 'dlv'});
   DICE_LEVELS.forEach(([k, label, ic]) => lvRow.append(h('button', {'aria-pressed': String(S.diceLv === k), class: 'lv' + k, onclick: () => {
@@ -1371,13 +1447,13 @@ function togetherPage(){
   const s = seenAt('coupons');
   const todos = Store.all('todo'), places = Store.all('place');
   const sub = S.togetherSeg === 'wish' ? (todos.length ? '一起完成了 ' + todos.filter(x => x.done).length + ' 个心愿' : '想和 TA 一起做的事')
-    : S.togetherSeg === 'places' ? '一起走过的地方' : S.togetherSeg === 'scratch' ? '每天一张，看看今天手气' : S.togetherSeg === 'wheel' ? '不知道去哪？转一下' : S.togetherSeg === 'dice' ? '只属于我们俩的小游戏' : '送给对方的小特权';
-  pageHead(p, '一起', sub, [['wish', '心愿清单'], ['places', '去过的地方'], ['coupons', '爱的小券', Store.all('coupon').some(c => (c.to === S.me && (c.at || 0) > s) || (c.from === S.me && (c.usedAt || 0) > s))], ['scratch', '刮刮乐', newScratch() > 0 || !(Store.get(todayCardId()) || {}).scratchedAt], ['wheel', '约会转盘', newDatePlans() > 0], ['dice', '亲密骰子']], 'togetherSeg');
+    : S.togetherSeg === 'places' ? '一起走过的地方' : S.togetherSeg === 'scratch' ? '每天一张，看看今天手气' : S.togetherSeg === 'wheel' ? '不知道去哪？转一下' : S.togetherSeg === 'dice' ? (S.diceOpen ? '只属于我们俩的小游戏' : '上了锁的小秘密') : '送给对方的小特权';
+  pageHead(p, '一起', sub, [['wish', '心愿清单'], ['places', '去过的地方'], ['coupons', '爱的小券', Store.all('coupon').some(c => (c.to === S.me && (c.at || 0) > s) || (c.from === S.me && (c.usedAt || 0) > s))], ['scratch', '刮刮乐', newScratch() > 0 || !(Store.get(todayCardId()) || {}).scratchedAt], ['wheel', '约会转盘', newDatePlans() > 0], ['dice', '🔒 小秘密']], 'togetherSeg');
   if (S.togetherSeg === 'wish') todoView(p);
   else if (S.togetherSeg === 'places') placesView(p);
   else if (S.togetherSeg === 'scratch'){ scratchView(p); seenLater('scratch'); }
   else if (S.togetherSeg === 'wheel'){ wheelView(p); seenLater('wheel'); }
-  else if (S.togetherSeg === 'dice') diceView(p);
+  else if (S.togetherSeg === 'dice') (S.diceOpen ? diceView : lockView)(p);
   else { couponsView(p); seenLater('coupons'); }
   return p;
 }
