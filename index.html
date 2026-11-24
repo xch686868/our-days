@@ -293,18 +293,20 @@ svg{display:block}
 .wheelbox .pin{position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:24px solid var(--rose);filter:drop-shadow(0 2px 3px rgba(0,0,0,.2));z-index:2}
 .wheelbox .hub{position:absolute;left:50%;top:50%;width:76px;height:76px;margin:-38px 0 0 -38px;border-radius:50%;background:var(--rose);color:#fff;font-family:var(--f-title);font-weight:700;font-size:17px;box-shadow:0 4px 14px rgba(232,70,111,.35),0 0 0 5px var(--card);z-index:2}
 .wheelbox .hub:disabled{opacity:.85}
-.dlv{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:-4px 0 12px}
-.dlv button{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 0;border-radius:14px;background:var(--fill);font-weight:700;font-size:15px;color:var(--ink2)}
-.dlv button span{font-size:17px}
+.dlv{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:-4px 0 12px}
+.dlv button{display:flex;align-items:center;justify-content:center;gap:4px;padding:10px 0;border-radius:14px;background:var(--fill);font-weight:700;font-size:14px;color:var(--ink2);white-space:nowrap}
+.dlv button span{font-size:16px}
 .dlv button[aria-pressed="true"].lv1{background:linear-gradient(135deg,#FFB3C7,#FF8FAB);color:#fff}
 .dlv button[aria-pressed="true"].lv2{background:linear-gradient(135deg,#B57BFF,#E8466F);color:#fff}
 .dlv button[aria-pressed="true"].lv3{background:linear-gradient(135deg,#FF5E62,#B3123E);color:#fff}
+.dlv button[aria-pressed="true"].lv4{background:linear-gradient(135deg,#C2185B,#2A0A1E);color:#fff}
 .dturn{display:flex;align-items:center;justify-content:space-between;margin:0 4px 12px;font-size:15px;color:var(--ink2)}
 .dturn b{color:var(--rose);font-weight:700}
 .dbox{border-radius:24px;padding:18px 16px 14px;color:#fff;box-shadow:var(--shadow)}
 .dbox.lv1{background:linear-gradient(160deg,#FF9DB5 0%,#FF7A9C 100%)}
 .dbox.lv2{background:linear-gradient(160deg,#9B5DE5 0%,#E8466F 100%)}
 .dbox.lv3{background:linear-gradient(160deg,#E8344E 0%,#7A0B2C 100%)}
+.dbox.lv4{background:linear-gradient(160deg,#A0124F 0%,#2A0A1E 100%)}
 .dice3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .die{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);border-radius:18px;padding:12px 6px;min-height:104px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}
 .die .k{font-size:12px;opacity:.8;font-weight:600}
@@ -320,6 +322,20 @@ svg{display:block}
 @keyframes dflip{from{transform:rotateY(90deg);opacity:.3}to{transform:none;opacity:1}}
 .dgo{background:#fff;color:var(--rose)}
 .dbox.lv3 .dgo{color:#B3123E}
+.dbox.lv4 .dgo{color:#A0124F}
+.dmine{margin-top:16px;padding:14px 14px 6px}
+.dmine summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-weight:700;font-size:15px;padding-bottom:8px}
+.dmine summary::-webkit-details-marker{display:none}
+.dmine summary small{font-weight:500;color:var(--muted);font-size:13px}
+.dmine .hint{font-size:12.5px;color:var(--muted);line-height:1.6;margin:0 0 10px}
+.dmine .row{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.dmine .row .input{background:var(--fill);flex:1;min-width:0}
+.dmine .seg{margin-bottom:10px}
+.dmine ul{list-style:none;margin:0;padding:0}
+.dmine li{display:flex;align-items:flex-start;gap:8px;padding:10px 2px;border-top:.5px solid var(--line);font-size:14.5px;line-height:1.5}
+.dmine li .k{flex:none;font-size:12px;font-weight:700;color:var(--rose);padding-top:2px}
+.dmine li .t{flex:1;min-width:0}
+.dmine li button{flex:none;color:var(--muted);font-size:18px;line-height:1;padding:0 4px}
 .dskip{display:block;margin:10px auto 0;color:rgba(255,255,255,.85);font-size:14px;font-weight:500}
 .dnote{margin:14px 8px 0;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.6}
 .wrow{display:flex;gap:10px;margin-bottom:18px}
@@ -1153,20 +1169,23 @@ function readLetter(l, asWriter){
 }
 
 /* =============== 亲密骰子（只在本机玩，不上传） =============== */
-// 每一项: [内容, 档位]  档位 1 甜蜜 / 2 暧昧 / 3 大胆；选哪档就抽这一档和以下的，本档出现得更多。
-const DICE_LEVELS = [['1', '甜蜜', '💗'], ['2', '暧昧', '🌙'], ['3', '大胆', '🔥']];
+// 每一项: [内容, 档位]  档位 1 甜蜜 / 2 暧昧 / 3 大胆 / 4 限制级；选哪档就抽这一档和以下的，本档出现得更多（限制级只混大胆档）。
+const DICE_LEVELS = [['1', '甜蜜', '💗'], ['2', '暧昧', '🌙'], ['3', '大胆', '🔥'], ['4', '限制级', '🌶️']];
 const DICE_ACT = [
   ['亲一下', 1], ['轻轻摸摸', 1], ['蹭一蹭', 1], ['捏一捏', 1], ['啄一口', 1], ['轻轻拍拍', 1],
   ['慢慢地亲', 2], ['轻轻吹气', 2], ['轻轻咬一下', 2], ['用指尖画圈', 2], ['用鼻尖蹭', 2], ['嘴唇贴着不动', 2], ['边亲边说情话', 2],
-  ['舔一下', 3], ['种一颗草莓', 3], ['用舌尖画圈', 3], ['一路吻下去', 3], ['用冰块划过', 3], ['又亲又咬', 3], ['用嘴唇慢慢扫过', 3]];
+  ['舔一下', 3], ['种一颗草莓', 3], ['用舌尖画圈', 3], ['一路吻下去', 3], ['用冰块划过', 3], ['又亲又咬', 3], ['用嘴唇慢慢扫过', 3],
+  ['用舌头慢慢舔', 4], ['含住不放', 4], ['用手慢慢揉', 4], ['用牙齿轻轻磨', 4], ['一边亲一边用手', 4], ['用热吻来回扫', 4], ['用指尖若有若无地撩', 4]];
 const DICE_PART = [
   ['额头', 1], ['脸颊', 1], ['手背', 1], ['鼻尖', 1], ['手心', 1], ['发顶', 1],
   ['耳朵', 2], ['脖子', 2], ['锁骨', 2], ['嘴唇', 2], ['后颈', 2], ['手腕内侧', 2], ['肩膀', 2],
-  ['腰', 3], ['后背', 3], ['大腿内侧', 3], ['小腹', 3], ['胸口', 3], ['耳垂', 3], ['腰窝', 3], ['脚踝', 3]];
+  ['腰', 3], ['后背', 3], ['大腿内侧', 3], ['小腹', 3], ['胸口', 3], ['耳垂', 3], ['腰窝', 3], ['脚踝', 3],
+  ['胸前', 4], ['臀部', 4], ['大腿根', 4], ['下腹', 4], ['最敏感的地方', 4], ['肚脐', 4]];
 const DICE_WAY = [
   ['3 秒', 1], ['数到 10', 1], ['看着对方的眼睛', 1], ['笑着', 1],
   ['闭上眼睛', 2], ['慢慢地，20 秒', 2], ['不许出声', 2], ['先贴着耳朵说句情话', 2],
-  ['蒙上对方的眼睛', 3], ['对方双手不许动', 3], ['只准用嘴', 3], ['关掉灯', 3], ['整整一分钟', 3], ['节奏由对方指挥', 3]];
+  ['蒙上对方的眼睛', 3], ['对方双手不许动', 3], ['只准用嘴', 3], ['关掉灯', 3], ['整整一分钟', 3], ['节奏由对方指挥', 3],
+  ['两个人都不穿衣服', 4], ['用丝巾绑住对方的手', 4], ['对着镜子', 4], ['在浴室里', 4], ['直到对方求饶', 4], ['整整三分钟', 4], ['对方不许发出声音', 4]];
 const DICE_DARE = [
   ['给对方一个 10 秒的拥抱，谁先松手谁输', 1], ['十指相扣，对视 30 秒不许笑', 1], ['说出对方今天最好看的三个地方', 1],
   ['公主抱或者背起对方走 5 步', 1], ['给对方按摩肩膀 2 分钟', 1], ['在对方手心写一个字，让 TA 猜', 1], ['学对方撒娇的样子', 1],
@@ -1176,7 +1195,13 @@ const DICE_DARE = [
   ['蒙上对方的眼睛，亲 TA 身上任意三个地方', 3], ['脱掉自己身上的一件衣服（饰品不算）', 3], ['只用嘴，帮对方脱掉一件衣服', 3],
   ['把对方抵在墙上，亲 30 秒', 3], ['跨坐在对方身上对视 1 分钟，谁先笑谁再抽一张', 3], ['用冰块从对方的脖子慢慢划到锁骨', 3],
   ['在对方身上种一颗草莓，位置 TA 来选', 3], ['接下来 5 分钟，你的手只能听对方指挥', 3], ['给对方跳一段 30 秒的贴身舞', 3],
-  ['嘴对嘴喂对方一颗葡萄，不许用手', 3], ['换上对方的上衣，在 TA 面前走一圈', 3], ['今晚的主导权交给对方', 3], ['让对方在你身上写一个字，你来猜', 3]];
+  ['嘴对嘴喂对方一颗葡萄，不许用手', 3], ['换上对方的上衣，在 TA 面前走一圈', 3], ['今晚的主导权交给对方', 3], ['让对方在你身上写一个字，你来猜', 3],
+  ['只用嘴，帮对方脱掉最后一件衣服', 4], ['用嘴伺候对方 2 分钟，TA 不许出声', 4], ['摆一个对方指定的姿势，保持 1 分钟不许动', 4],
+  ['让对方用丝巾或领带绑住你的手，接下来 10 分钟全听 TA 的', 4], ['一起洗澡，只能用手帮对方抹沐浴露', 4], ['对着镜子，从背后抱住对方慢慢亲', 4],
+  ['挑逗对方 3 分钟，TA 不许碰你，谁先忍不住谁输', 4], ['只用嘴，从对方的脖子一路亲到大腿根', 4], ['贴着耳朵，描述今晚你想对 TA 做的事，越具体越好', 4],
+  ['角色扮演 5 分钟，什么角色由对方来定', 4], ['跨坐在对方身上慢慢动 1 分钟，不许接吻', 4], ['冰块和热吻交替，在对方身上来回三遍', 4],
+  ['今晚第一个姿势由对方决定', 4], ['只穿对方的一件衬衫，在 TA 面前慢慢坐下', 4], ['关灯，只用手和嘴找出对方身上三个最敏感的地方', 4],
+  ['接下来 15 分钟你是对方的专属，TA 说什么就做什么', 4], ['把对方推倒在床上，接下来 5 分钟由你主导一切', 4], ['边说出你最喜欢 TA 身体的哪里，边去碰那里', 4]];
 const DICE_TRUTH = [
   ['第一次对我心动是什么时候？', 1], ['最喜欢我身上哪个地方？', 1], ['最想和我一起去哪里？', 1],
   ['我做过最让你感动的一件事是什么？', 1], ['第一次见我时，你心里在想什么？', 1], ['你为我吃过醋吗？是哪一次？', 1],
@@ -1184,16 +1209,29 @@ const DICE_TRUTH = [
   ['哪个瞬间你最想亲我，但是忍住了？', 2], ['你最想让我对你做的一件小事是什么？', 2], ['你身上哪里最怕痒、最敏感？', 2], ['想我的时候，你一般在干什么？', 2],
   ['你最难忘的是我们在一起的哪一晚？', 3], ['你有没有一个还没告诉过我的小幻想？', 3], ['你觉得我什么时候最性感？', 3],
   ['你更喜欢主动，还是被我主动？', 3], ['你最想让我穿什么给你看？', 3], ['有没有特别想要我，却没说出口的时候？', 3],
-  ['你喜欢开着灯，还是关着灯？', 3], ['你最想和我在哪里试一次？', 3]];
+  ['你喜欢开着灯，还是关着灯？', 3], ['你最想和我在哪里试一次？', 3],
+  ['你最喜欢哪个姿势？为什么？', 4], ['我们哪一次让你印象最深？具体说说', 4], ['除了家里，你最想和我在哪里来一次？', 4],
+  ['你身上最敏感的三个地方是哪里？', 4], ['你希望我在床上多做什么、少做什么？', 4], ['你自己偷偷想过和我做什么？', 4],
+  ['你更喜欢我用嘴还是用手？', 4], ['有没有想试的小道具或者新玩法？', 4], ['你最喜欢听我发出什么声音？', 4],
+  ['你想我温柔一点，还是凶一点？', 4], ['你想要的时候，一般会怎么暗示我？', 4], ['有没有哪次你其实还想要，但没说出口？', 4]];
+
+// 我们自己写的内容：只存在这台手机上
+function diceMine(){ if (!S.diceMine){ try { S.diceMine = JSON.parse(localStorage.getItem('od_dice_mine') || '[]'); } catch { S.diceMine = []; } } return S.diceMine; }
+function diceMineSave(){ try { localStorage.setItem('od_dice_mine', JSON.stringify(S.diceMine)); } catch {} }
+function diceList(mode){
+  const base = mode === 'dare' ? DICE_DARE : DICE_TRUTH;
+  return base.concat(diceMine().filter(x => x.m === mode).map(x => [x.t, x.l, true]));
+}
 
 function diceLevel(){ if (!S.diceLv){ try { S.diceLv = localStorage.getItem('od_dice_lv') || '2'; } catch { S.diceLv = '2'; } } return +S.diceLv; }
 function dicePick(list){
   const lv = diceLevel();
   const pool = [];
-  list.forEach(([t, l]) => { if (l <= lv) for (let i = 0; i < (l === lv ? 3 : 1); i++) pool.push(t); });
+  list.forEach(([t, l, mine]) => { if (l <= lv && (lv < 4 || l >= 3 || mine)) for (let i = 0; i < (mine || l === lv ? 3 : 1); i++) pool.push(t); });
   if (!S.diceLast) S.diceLast = new Map();
+  const key = list === DICE_ACT || list === DICE_PART || list === DICE_WAY ? list : list.mode;
   let t;
-  for (let i = 0; i < 6; i++){ t = pool[Math.floor(Math.random() * pool.length)]; if (t !== S.diceLast.get(list)) break; }
+  for (let i = 0; i < 6; i++){ t = pool[Math.floor(Math.random() * pool.length)]; if (t !== S.diceLast.get(key)) break; }
   return t;
 }
 function diceTurn(){ if (!S.diceTurn) S.diceTurn = S.me; return S.diceTurn; }
@@ -1204,6 +1242,10 @@ function diceView(p){
   // 档位
   const lvRow = h('div', {class: 'dlv'});
   DICE_LEVELS.forEach(([k, label, ic]) => lvRow.append(h('button', {'aria-pressed': String(S.diceLv === k), class: 'lv' + k, onclick: () => {
+    if (k === '4' && S.diceLv !== '4' && !S.diceLv4ok){
+      if (!confirm('限制级内容比较露骨，适合两个人关起门来玩。\n确定两个人都同意，再切换哦。')) return;
+      S.diceLv4ok = true;
+    }
     S.diceLv = k; S.diceRes = null; try { localStorage.setItem('od_dice_lv', k); } catch {} haptic(); render(); }}, h('span', {text: ic}), label)));
   p.append(lvRow);
   // 玩法
@@ -1238,9 +1280,9 @@ function diceView(p){
     if (S.busy) return;
     S.busy = true; go.disabled = true; haptic();
     const mode = S.diceMode;
-    const lists = mode === 'dice' ? [DICE_ACT, DICE_PART, DICE_WAY] : [mode === 'dare' ? DICE_DARE : DICE_TRUTH];
+    const lists = mode === 'dice' ? [DICE_ACT, DICE_PART, DICE_WAY] : [Object.assign(diceList(mode), {mode})];
     const picked = lists.map(dicePick);
-    lists.forEach((l, i) => S.diceLast.set(l, picked[i]));
+    lists.forEach((l, i) => S.diceLast.set(l.mode || l, picked[i]));
     const final = mode === 'dice' ? picked : picked[0];
     if (res && !skip) S.diceTurn = other(who);  // 下一轮换另一个人
     const t0 = Date.now();
@@ -1260,7 +1302,43 @@ function diceView(p){
   box.append(go);
   if (res) box.append(h('button', {class: 'dskip', text: '这个不想要，换一个', onclick: () => go.onclick(null, true)}));
   p.append(box);
+  p.append(diceMineView(lv));
   p.append(h('p', {class: 'dnote', text: '只在这台手机上玩，内容不会上传。两个人都开心才好玩，谁不想做都可以直接换一个 💗'}));
+}
+
+function diceMineView(lv){
+  const mine = diceMine();
+  if (!S.diceMineMode) S.diceMineMode = S.diceMode === 'truth' ? 'truth' : 'dare';
+  const d = h('details', {class: 'card dmine'});
+  if (S.diceMineOpen) d.open = true;
+  d.addEventListener('toggle', () => { S.diceMineOpen = d.open; });
+  d.append(h('summary', null, h('span', {text: '✏️ 我们自己写'}), h('small', {text: mine.length ? mine.length + ' 条' : '展开'})));
+  d.append(h('p', {class: 'hint', text: '写你们自己想玩的，会混进挑战卡或真心话里，而且比别的更容易抽到。写在哪一档，就在哪一档及以上出现。'}));
+  const seg = h('div', {class: 'seg', style: {gridTemplateColumns: '1fr 1fr'}});
+  [['dare', '挑战卡'], ['truth', '真心话']].forEach(([k, label]) => seg.append(h('button', {'aria-pressed': String(S.diceMineMode === k), onclick: () => { S.diceMineMode = k; render(); }}, label)));
+  d.append(seg);
+  const lvName = DICE_LEVELS.find(x => +x[0] === lv);
+  const inp = h('input', {class: 'input', id: 'diceMineIn', type: 'text', maxlength: '60', enterkeyhint: 'done',
+    placeholder: S.diceMineMode === 'dare' ? '比如：用嘴喂我吃一颗草莓' : '比如：你最想我穿什么给你看？'});
+  const add = () => {
+    const t = inp.value.trim(); if (!t) return;
+    mine.push({t, m: S.diceMineMode, l: lv}); diceMineSave(); haptic(); toast('加好了，放进「' + lvName[1] + '」档');
+    render(); setTimeout(() => { const el = document.getElementById('diceMineIn'); el && el.focus(); }, 30);
+  };
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing){ e.preventDefault(); add(); } });
+  d.append(h('div', {class: 'row'}, inp, h('button', {class: 'round rose', style: {width: '34px', height: '34px', boxShadow: 'none', flex: 'none'}, 'aria-label': '加上', html: I.plus, onclick: add})));
+  if (mine.length){
+    const ul = h('ul');
+    mine.slice().reverse().forEach(x => {
+      const lvI = DICE_LEVELS.find(y => +y[0] === x.l) || DICE_LEVELS[0];
+      ul.append(h('li', null,
+        h('span', {class: 'k', text: lvI[2] + (x.m === 'dare' ? ' 挑战' : ' 真心话')}),
+        h('span', {class: 't', text: x.t}),
+        h('button', {'aria-label': '删掉', text: '×', onclick: () => { S.diceMine = mine.filter(y => y !== x); diceMineSave(); haptic(); render(); }})));
+    });
+    d.append(ul);
+  }
+  return d;
 }
 
 /* =============== together: 心愿 / 去过的地方 / 爱的小券 =============== */
