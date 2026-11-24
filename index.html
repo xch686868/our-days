@@ -356,6 +356,7 @@ svg{display:block}
 .dfail{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.55)}
 .pres{text-align:center;font-weight:700;font-size:16px;padding:4px 0;line-height:1.5}
 .prow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dcd{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.55);margin-bottom:10px;font-variant-numeric:tabular-nums}
 .dnote{margin:14px 8px 0;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.6}
 .plock{padding:28px 16px 22px;text-align:center}
 .plock .ic{font-size:40px;line-height:1}
@@ -1359,6 +1360,7 @@ function duelView(lv){
       box.append(h('button', {class: 'dskip', text: '三张都不想要，换三张', onclick: () => { d.opts = diceCmds(lv, 3); haptic(); render(); }}));
     } else {
       box.append(h('div', {class: 'dcard show', style: {marginTop: '14px'}}, h('div', {class: 'tag', text: L + ' 来做'}), h('div', {class: 't', text: fill(d.opts[d.pick])})));
+      const cdb = cdBtn(fill(d.opts[d.pick])); if (cdb) box.append(cdb);
       box.append(h('button', {class: 'btn block dgo', text: '做完了，下一局', onclick: roll}));
     }
   }
@@ -1461,6 +1463,41 @@ function lockView(p){
   p.append(box);
 }
 
+/* ---------- 卡片里的倒计时：内容里写了几秒 / 几分钟，就给一个计时按钮 ---------- */
+function cdSecs(t){
+  const m = String(t).replace(/每 ?\d+\s*(秒|分钟)/g, '').match(/(\d+)\s*(秒|分钟)|([一两三四五])分钟|数到 ?(\d+)/);
+  if (!m) return 0;
+  if (m[1]) return +m[1] * (m[2] === '分钟' ? 60 : 1);
+  if (m[3]) return ('一两三四五'.indexOf(m[3]) + 1) * 60;
+  return +m[4];
+}
+function cdBtn(t){
+  const sec = cdSecs(t); if (!sec) return null;
+  const fmt = n => n >= 60 ? Math.floor(n / 60) + ':' + String(n % 60).padStart(2, '0') : n + ' 秒';
+  const label = () => {
+    const c = S.cd && S.cd.key === t ? S.cd : null;
+    if (!c) return '⏱ 开始计时 ' + fmt(sec);
+    const left = Math.max(0, Math.ceil((c.end - Date.now()) / 1000));
+    return left > 0 ? '⏱ 还剩 ' + fmt(left) + '（点一下停）' : '⏰ 时间到！点一下再来';
+  };
+  const b = h('button', {class: 'btn block dcd', 'data-cd': '1', onclick: () => {
+    const c = S.cd && S.cd.key === t ? S.cd : null;
+    if (c && c.end > Date.now()) S.cd = null; else { S.cd = {key: t, end: Date.now() + sec * 1000, done: false}; cdTick(); }
+    haptic(); b.textContent = label();
+  }});
+  b._label = label; b.textContent = label();
+  return b;
+}
+function cdTick(){
+  clearInterval(S.cdTimer);
+  S.cdTimer = setInterval(() => {
+    const c = S.cd;
+    document.querySelectorAll('[data-cd]').forEach(b => { if (b._label) b.textContent = b._label(); });
+    if (!c){ clearInterval(S.cdTimer); return; }
+    if (!c.done && Date.now() >= c.end){ c.done = true; clearInterval(S.cdTimer); if (navigator.vibrate) try { navigator.vibrate([200, 100, 200]); } catch {} }
+  }, 250);
+}
+
 /* ---------- 惩罚：摇骰子点数小的人要撑住，撑不住接挑战卡，挑战失败接强制高潮 ---------- */
 const PUN_SEC = [30, 60, 90, 120];
 // 强制高潮：按受罚的人分男女。「你」= 受罚的人
@@ -1516,7 +1553,7 @@ function punView(box, res, lv){
   } else if (P.stage === 'ok'){
     wrap.append(h('div', {class: 'pres', text: '🎉 ' + L + ' 撑住了 ' + P.sec + ' 秒，这一局过关'}));
   } else if (P.stage === 'dare'){
-    wrap.append(h('div', {class: 'pl', text: L + ' 没撑住，接受挑战卡：'}), card(L + ' 来做', P.card),
+    wrap.append(h('div', {class: 'pl', text: L + ' 没撑住，接受挑战卡：'}), card(L + ' 来做', P.card), cdBtn(P.card) || '',
       h('div', {class: 'prow'},
         h('button', {class: 'btn dgo', text: '✅ 做到了', onclick: () => { P.stage = 'passed'; haptic(); render(); }}),
         h('button', {class: 'btn dfail', text: '❌ 没做到', onclick: next})));
@@ -1524,7 +1561,7 @@ function punView(box, res, lv){
     wrap.append(h('div', {class: 'pres', text: '挑战完成，这一局放过 ' + L}));
   } else if (P.stage === 'final'){
     wrap.append(h('div', {class: 'pl', text: L + ' 挑战也失败了，' + (lv >= 4 ? '接受强制高潮：' : '加罚一张更大胆的：')}),
-      card(lv >= 4 ? '强制高潮' : '加罚', P.card),
+      card(lv >= 4 ? '强制高潮' : '加罚', P.card), cdBtn(P.card) || '',
       h('button', {class: 'btn block dgo', text: '结束这一局', onclick: () => { P.stage = 'over'; render(); }}));
   } else if (P.stage === 'over'){
     wrap.append(h('div', {class: 'pres', text: '这一局结束，再来一局？'}));
@@ -1598,6 +1635,7 @@ function diceView(p){
       h('div', {class: 't', text: res ? res.v : (S.diceMode === 'dare' ? '抽一张挑战，做到才算过关' : '抽一个问题，要说真心话哦')}));
     dice = [card];
     box.append(card);
+    if (res && S.diceMode === 'dare'){ const cdb = cdBtn(res.v); if (cdb) box.append(cdb); }
   }
   const go = h('button', {class: 'btn block dgo', text: S.diceMode === 'dice' || S.diceMode === 'night' ? (res ? '再摇一次' : '摇一摇') : (res ? '再抽一张' : '抽一张')});
   go.onclick = (e, skip) => {
