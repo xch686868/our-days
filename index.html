@@ -1401,7 +1401,7 @@ function couponSheet(){
 }
 
 /* =============== 刮刮乐：每人每天一张，奖品由对方兑现 =============== */
-const SCRATCH_TIERS = [['一等奖', '许一个愿望，必须实现', 2], ['二等奖', '一顿大餐', 8], ['三等奖', '一杯奶茶，甜度你定', 20], ['四等奖', '一个抱抱 + 一个亲亲', 30], ['五等奖', '一块钱红包', 40]];
+const SCRATCH_TIERS = [['一等奖', '当一天皇帝，对方全天听你的', 0.6], ['二等奖', '一顿大餐，对方买单', 4.4], ['三等奖', '一份小礼物，100 元以内', 15], ['四等奖', '全身按摩 20 分钟', 30], ['五等奖', '一杯奶茶，对方跑腿', 50]];
 const dayKey = (d = new Date()) => d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
 function prizeNames(){ const c = Store.get('scratchcfg'); return SCRATCH_TIERS.map((t, i) => (c && c.names && c.names[i]) || t[1]); }
 function drawTier(){ let r = Math.random() * 100; for (let i = 0; i < SCRATCH_TIERS.length; i++){ r -= SCRATCH_TIERS[i][2]; if (r < 0) return i; } return SCRATCH_TIERS.length - 1; }
