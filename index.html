@@ -1498,6 +1498,21 @@ function cdTick(){
   }, 250);
 }
 
+// 惩罚挑战卡：赢的人来做，输的人受着。「你」= 输的人，{w} = 赢的人
+const PUN_DARE = [
+  ['{w}的手伸进你衣服里随便摸 1 分钟，你不许躲', 1], ['{w}用指尖在你的大腿内侧画圈 30 秒，你不许笑', 1],
+  ['你趴好，{w}在你后背上写一句话，猜错就再写一遍', 1], ['{w}挠你的腰 20 秒，你不许出声', 1],
+  ['{w}揉你的屁股 30 秒，你不许动', 1], ['你闭上眼睛，{w}随便摸你 1 分钟，你要说出摸到了哪里', 1],
+  ['{w}亲你的脖子 1 分钟，你不许出声', 2], ['{w}把你压在墙上深吻 1 分钟，你双手不许动', 2],
+  ['{w}在你身上种一颗草莓，位置 TA 来选', 2], ['{w}舔你的耳垂 30 秒，你不许躲', 2],
+  ['你双手背在身后，{w}想亲哪里就亲哪里，亲 1 分钟', 2], ['{w}含住你的下唇轻轻咬 10 秒，你不许躲', 2],
+  ['{w}用领带绑住你的手腕，亲遍你的上半身，你不许挣开', 3], ['你趴在{w}腿上，被打屁股 10 下，每下都要大声数出来', 3],
+  [{m: '{w}蒙上你的眼睛，隔着裤子揉你 1 分钟', f: '{w}蒙上你的眼睛，隔着内衣揉你的胸 1 分钟'}, 3], ['你脱到只剩内衣，让{w}看 1 分钟，不许遮', 3],
+  ['{w}拿冰块（没有就用冰过的勺子）从你的锁骨划到小腹，你不许躲', 3], ['你双手举过头顶不许放下，{w}亲你的小腹 1 分钟', 3],
+  ['{w}把你的手绑起来，咬你的乳头直到你求饶', 4], ['你跪在床上，被{w}打屁股 10 下，每下都要说「谢谢」', 4],
+  [{m: '你躺好，{w}帮你撸，你快到的时候她就停，重复两次', f: '你张开腿，{w}用玩具贴着你的阴蒂 2 分钟，你不许并腿'}, 4],
+  [{m: '{w}用嘴含住你 2 分钟，你不许动、不许射', f: '{w}用手指弄你，你快到的时候他就停，重复两次'}, 4],
+  ['你被蒙上眼睛，{w}轮流用手和嘴弄你的乳头和私处 2 分钟，你不许出声', 4], ['{w}用力拧你的两边乳头，数到 20，你不许躲', 4]];
 /* ---------- 惩罚：摇骰子点数小的人要撑住，撑不住接挑战卡，挑战失败接强制高潮 ---------- */
 const PUN_SEC = [30, 60, 90, 120];
 // 强制高潮：按受罚的人分男女。「你」= 受罚的人
@@ -1538,7 +1553,8 @@ function punView(box, res, lv){
   const card = (tag, t) => h('div', {class: 'dcard show', style: {margin: '0 0 10px', minHeight: '120px'}}, h('div', {class: 'tag', text: tag}), h('div', {class: 't', text: t}));
   const next = () => { P.stage = 'final'; P.card = lv >= 4
     ? CLIMAX[loser === diceMale() ? 'm' : 'f'][Math.floor(Math.random() * 6)]
-    : gtext(dicePick(Object.assign(DICE_DARE.filter(x => x[1] === lv + 1).map(x => [x[0], lv]), {mode: 'pun'})), loser); haptic(); render(); };
+    : punCard(lv + 1); haptic(); render(); };
+  const punCard = l => gtext(dicePick(Object.assign(PUN_DARE.filter(x => x[1] === l).map(x => [x[0], lv]), {mode: 'pun' + l})), loser).replace(/\{w\}/g, Wn);
   if (P.stage === 'ready'){
     wrap.append(h('div', {class: 'pl', text: L + ' 要撑住：不许躲、不许推开、不许求饶'}));
     const chips = h('div', {class: 'psec'});
@@ -1549,19 +1565,19 @@ function punView(box, res, lv){
       h('div', {class: 'pl', text: Wn + ' 动手，' + L + ' 撑住'}),
       h('button', {class: 'btn block dfail', text: L + ' 没撑住', onclick: () => {
         clearInterval(S.punTimer); P.stage = 'dare';
-        P.card = gtext(dicePick(Object.assign(diceList('dare'), {mode: 'dare'})), loser); haptic(); render(); }}));
+        P.card = punCard(lv); haptic(); render(); }}));
   } else if (P.stage === 'ok'){
     wrap.append(h('div', {class: 'pres', text: '🎉 ' + L + ' 撑住了 ' + P.sec + ' 秒，这一局过关'}));
   } else if (P.stage === 'dare'){
-    wrap.append(h('div', {class: 'pl', text: L + ' 没撑住，接受挑战卡：'}), card(L + ' 来做', P.card), cdBtn(P.card) || '',
+    wrap.append(h('div', {class: 'pl', text: L + ' 没撑住，加罚一张：' + Wn + ' 来做，' + L + ' 受着'}), card(Wn + ' 罚 ' + L, P.card), cdBtn(P.card) || '',
       h('div', {class: 'prow'},
-        h('button', {class: 'btn dgo', text: '✅ 做到了', onclick: () => { P.stage = 'passed'; haptic(); render(); }}),
-        h('button', {class: 'btn dfail', text: '❌ 没做到', onclick: next})));
+        h('button', {class: 'btn dgo', text: '✅ ' + L + ' 撑住了', onclick: () => { P.stage = 'passed'; haptic(); render(); }}),
+        h('button', {class: 'btn dfail', text: '❌ 又没撑住', onclick: next})));
   } else if (P.stage === 'passed'){
-    wrap.append(h('div', {class: 'pres', text: '挑战完成，这一局放过 ' + L}));
+    wrap.append(h('div', {class: 'pres', text: L + ' 撑过了加罚，这一局放过 TA'.replace('TA', pron(loser))}));
   } else if (P.stage === 'final'){
-    wrap.append(h('div', {class: 'pl', text: L + ' 挑战也失败了，' + (lv >= 4 ? '接受强制高潮：' : '加罚一张更大胆的：')}),
-      card(lv >= 4 ? '强制高潮' : '加罚', P.card), cdBtn(P.card) || '',
+    wrap.append(h('div', {class: 'pl', text: L + ' 又没撑住，' + (lv >= 4 ? '接受强制高潮：' : '再罚一张更大胆的：')}),
+      card(lv >= 4 ? '强制高潮' : Wn + ' 罚 ' + L, P.card), cdBtn(P.card) || '',
       h('button', {class: 'btn block dgo', text: '结束这一局', onclick: () => { P.stage = 'over'; render(); }}));
   } else if (P.stage === 'over'){
     wrap.append(h('div', {class: 'pres', text: '这一局结束，再来一局？'}));
