@@ -1175,17 +1175,17 @@ const DICE_ACT = [
   ['亲一下', 1], ['轻轻摸摸', 1], ['蹭一蹭', 1], ['捏一捏', 1], ['啄一口', 1], ['轻轻拍拍', 1],
   ['慢慢地亲', 2], ['轻轻吹气', 2], ['轻轻咬一下', 2], ['用指尖画圈', 2], ['用鼻尖蹭', 2], ['嘴唇贴着不动', 2], ['边亲边说情话', 2],
   ['舔一下', 3], ['种一颗草莓', 3], ['用舌尖画圈', 3], ['一路吻下去', 3], ['用冰块划过', 3], ['又亲又咬', 3], ['用嘴唇慢慢扫过', 3],
-  ['用舌头慢慢舔', 4], ['含住不放', 4], ['用手慢慢揉', 4], ['用牙齿轻轻磨', 4], ['一边亲一边用手', 4], ['用热吻来回扫', 4], ['用指尖若有若无地撩', 4]];
+  ['用舌头慢慢舔', 4], ['含住吮吸', 4], ['用手揉捏', 4], ['用牙齿轻轻咬', 4], ['用指尖打圈', 4], ['边亲边用手', 4], ['涂上按摩油慢慢揉', 4]];
 const DICE_PART = [
   ['额头', 1], ['脸颊', 1], ['手背', 1], ['鼻尖', 1], ['手心', 1], ['发顶', 1],
   ['耳朵', 2], ['脖子', 2], ['锁骨', 2], ['嘴唇', 2], ['后颈', 2], ['手腕内侧', 2], ['肩膀', 2],
   ['腰', 3], ['后背', 3], ['大腿内侧', 3], ['小腹', 3], ['胸口', 3], ['耳垂', 3], ['腰窝', 3], ['脚踝', 3],
-  ['胸前', 4], ['臀部', 4], ['大腿根', 4], ['下腹', 4], ['最敏感的地方', 4], ['肚脐', 4]];
+  ['胸', 4], ['乳头', 4], ['臀部', 4], ['大腿根', 4], ['私处', 4], ['敏感点', 4]];
 const DICE_WAY = [
   ['3 秒', 1], ['数到 10', 1], ['看着对方的眼睛', 1], ['笑着', 1],
   ['闭上眼睛', 2], ['慢慢地，20 秒', 2], ['不许出声', 2], ['先贴着耳朵说句情话', 2],
   ['蒙上对方的眼睛', 3], ['对方双手不许动', 3], ['只准用嘴', 3], ['关掉灯', 3], ['整整一分钟', 3], ['节奏由对方指挥', 3],
-  ['两个人都不穿衣服', 4], ['用丝巾绑住对方的手', 4], ['对着镜子', 4], ['在浴室里', 4], ['直到对方求饶', 4], ['整整三分钟', 4], ['对方不许发出声音', 4]];
+  ['两个人都脱光', 4], ['用丝巾绑住对方的手', 4], ['对着镜子', 4], ['在浴室里', 4], ['直到对方求饶', 4], ['整整三分钟', 4], ['对方不许出声', 4]];
 const DICE_DARE = [
   ['给对方一个 10 秒的拥抱，谁先松手谁输', 1], ['十指相扣，对视 30 秒不许笑', 1], ['说出对方今天最好看的三个地方', 1],
   ['公主抱或者背起对方走 5 步', 1], ['给对方按摩肩膀 2 分钟', 1], ['在对方手心写一个字，让 TA 猜', 1], ['学对方撒娇的样子', 1],
@@ -1196,12 +1196,12 @@ const DICE_DARE = [
   ['把对方抵在墙上，亲 30 秒', 3], ['跨坐在对方身上对视 1 分钟，谁先笑谁再抽一张', 3], ['用冰块从对方的脖子慢慢划到锁骨', 3],
   ['在对方身上种一颗草莓，位置 TA 来选', 3], ['接下来 5 分钟，你的手只能听对方指挥', 3], ['给对方跳一段 30 秒的贴身舞', 3],
   ['嘴对嘴喂对方一颗葡萄，不许用手', 3], ['换上对方的上衣，在 TA 面前走一圈', 3], ['今晚的主导权交给对方', 3], ['让对方在你身上写一个字，你来猜', 3],
-  ['只用嘴，帮对方脱掉最后一件衣服', 4], ['用嘴伺候对方 2 分钟，TA 不许出声', 4], ['摆一个对方指定的姿势，保持 1 分钟不许动', 4],
-  ['让对方用丝巾或领带绑住你的手，接下来 10 分钟全听 TA 的', 4], ['一起洗澡，只能用手帮对方抹沐浴露', 4], ['对着镜子，从背后抱住对方慢慢亲', 4],
-  ['挑逗对方 3 分钟，TA 不许碰你，谁先忍不住谁输', 4], ['只用嘴，从对方的脖子一路亲到大腿根', 4], ['贴着耳朵，描述今晚你想对 TA 做的事，越具体越好', 4],
-  ['角色扮演 5 分钟，什么角色由对方来定', 4], ['跨坐在对方身上慢慢动 1 分钟，不许接吻', 4], ['冰块和热吻交替，在对方身上来回三遍', 4],
-  ['今晚第一个姿势由对方决定', 4], ['只穿对方的一件衬衫，在 TA 面前慢慢坐下', 4], ['关灯，只用手和嘴找出对方身上三个最敏感的地方', 4],
-  ['接下来 15 分钟你是对方的专属，TA 说什么就做什么', 4], ['把对方推倒在床上，接下来 5 分钟由你主导一切', 4], ['边说出你最喜欢 TA 身体的哪里，边去碰那里', 4]];
+  ['帮对方口交 2 分钟，TA 不许碰你', 4], ['让对方帮你口交 2 分钟，你不许出声', 4], ['来一次 69，谁先忍不住谁输', 4],
+  ['用手帮对方弄，快到的时候停下，重复两次', 4], ['骑在对方身上，你来动 3 分钟，节奏你说了算', 4], ['后入，保持 2 分钟不许停', 4],
+  ['对着镜子做 3 分钟，两个人都要一直看着镜子', 4], ['拿出一个小玩具，在对方身上用 3 分钟', 4], ['让对方用你最喜欢的方式让你到一次', 4],
+  ['一起洗澡，在浴室里来一次', 4], ['蒙上对方的眼睛，只用嘴和手，让 TA 猜你在碰哪里', 4], ['绑住对方的手，接下来 10 分钟随你处置', 4],
+  ['连换三个姿势，每个至少 1 分钟', 4], ['说出你现在最想让 TA 怎么弄你，然后让 TA 照做', 4], ['全裸给对方跳一段 30 秒的舞', 4],
+  ['边做边说你最喜欢 TA 身上哪里', 4], ['今晚到之前，必须先得到对方的允许', 4], ['用按摩油给对方全身按摩，最后停在最敏感的地方', 4]];
 const DICE_TRUTH = [
   ['第一次对我心动是什么时候？', 1], ['最喜欢我身上哪个地方？', 1], ['最想和我一起去哪里？', 1],
   ['我做过最让你感动的一件事是什么？', 1], ['第一次见我时，你心里在想什么？', 1], ['你为我吃过醋吗？是哪一次？', 1],
@@ -1210,10 +1210,15 @@ const DICE_TRUTH = [
   ['你最难忘的是我们在一起的哪一晚？', 3], ['你有没有一个还没告诉过我的小幻想？', 3], ['你觉得我什么时候最性感？', 3],
   ['你更喜欢主动，还是被我主动？', 3], ['你最想让我穿什么给你看？', 3], ['有没有特别想要我，却没说出口的时候？', 3],
   ['你喜欢开着灯，还是关着灯？', 3], ['你最想和我在哪里试一次？', 3],
-  ['你最喜欢哪个姿势？为什么？', 4], ['我们哪一次让你印象最深？具体说说', 4], ['除了家里，你最想和我在哪里来一次？', 4],
-  ['你身上最敏感的三个地方是哪里？', 4], ['你希望我在床上多做什么、少做什么？', 4], ['你自己偷偷想过和我做什么？', 4],
-  ['你更喜欢我用嘴还是用手？', 4], ['有没有想试的小道具或者新玩法？', 4], ['你最喜欢听我发出什么声音？', 4],
-  ['你想我温柔一点，还是凶一点？', 4], ['你想要的时候，一般会怎么暗示我？', 4], ['有没有哪次你其实还想要，但没说出口？', 4]];
+  ['你最喜欢哪个姿势？为什么？', 4], ['你更喜欢我用嘴还是用手？', 4], ['你最喜欢我帮你口的时候怎么做？', 4],
+  ['你最容易到的方式是什么？', 4], ['我们哪一次最爽？具体说说', 4], ['除了家里，你最想和我在哪里做一次？', 4],
+  ['你身上最敏感的三个地方是哪里？', 4], ['你希望我在床上多做什么、少做什么？', 4], ['想不想试试小玩具？想试哪种？', 4],
+  ['你喜欢我温柔一点，还是凶一点？', 4], ['做的时候，你最喜欢听我发出什么声音？', 4], ['你想要的时候，一般会怎么暗示我？', 4],
+  ['有没有哪次你其实还想要，但没说出口？', 4], ['你想听我在床上说什么？', 4]];
+// 「今晚怎么做」：只在限制级出现
+const NIGHT_POSE = [['传教士', 4], ['女上位', 4], ['后入', 4], ['侧躺从背后', 4], ['坐着面对面', 4], ['站着抵着墙', 4], ['趴着', 4], ['在床边', 4], ['反向女上位', 4], ['让对方挑', 4]];
+const NIGHT_FORE = [['69', 4], ['你先帮对方口', 4], ['对方先帮你口', 4], ['用手慢慢来', 4], ['一起洗个澡', 4], ['从头到脚亲一遍', 4], ['用小玩具', 4], ['按摩油全身按摩', 4], ['边亲边脱光', 4], ['给对方跳段脱衣舞', 4]];
+const NIGHT_RULE = [['不许出声', 4], ['对着镜子', 4], ['蒙上一个人的眼睛', 4], ['全程你来主导', 4], ['全程对方主导', 4], ['快到的时候停两次', 4], ['开着灯', 4], ['绑住一个人的手', 4], ['至少换三个姿势', 4], ['到之前要先求对方', 4]];
 
 // 我们自己写的内容：只存在这台手机上
 function diceMine(){ if (!S.diceMine){ try { S.diceMine = JSON.parse(localStorage.getItem('od_dice_mine') || '[]'); } catch { S.diceMine = []; } } return S.diceMine; }
@@ -1229,7 +1234,7 @@ function dicePick(list){
   const pool = [];
   list.forEach(([t, l, mine]) => { if (l <= lv && (lv < 4 || l >= 3 || mine)) for (let i = 0; i < (mine || l === lv ? 3 : 1); i++) pool.push(t); });
   if (!S.diceLast) S.diceLast = new Map();
-  const key = list === DICE_ACT || list === DICE_PART || list === DICE_WAY ? list : list.mode;
+  const key = list.mode || list;
   let t;
   for (let i = 0; i < 6; i++){ t = pool[Math.floor(Math.random() * pool.length)]; if (t !== S.diceLast.get(key)) break; }
   return t;
@@ -1250,7 +1255,11 @@ function diceView(p){
   p.append(lvRow);
   // 玩法
   const mode = h('div', {class: 'seg', style: {gridTemplateColumns: '1fr 1fr 1fr'}});
-  [['dice', '摇骰子'], ['dare', '挑战卡'], ['truth', '真心话']].forEach(([k, label]) => mode.append(h('button', {'aria-pressed': String(S.diceMode === k), onclick: () => { S.diceMode = k; S.diceRes = null; render(); }}, label)));
+  if (S.diceMode === 'night' && lv < 4) S.diceMode = 'dice';
+  const modes = [['dice', '摇骰子'], ['dare', '挑战卡'], ['truth', '真心话']];
+  if (lv >= 4) modes.splice(1, 0, ['night', '今晚']);
+  mode.style.gridTemplateColumns = 'repeat(' + modes.length + ',1fr)';
+  modes.forEach(([k, label]) => mode.append(h('button', {'aria-pressed': String(S.diceMode === k), onclick: () => { S.diceMode = k; S.diceRes = null; render(); }}, label)));
   p.append(mode);
 
   const who = diceTurn();
@@ -1262,12 +1271,15 @@ function diceView(p){
   const box = h('div', {class: 'dbox lv' + lv});
   const res = S.diceRes && S.diceRes.mode === S.diceMode ? S.diceRes : null;
   let dice = [];
-  if (S.diceMode === 'dice'){
-    const names = ['怎么做', '哪里', '怎样'];
+  if (S.diceMode === 'dice' || S.diceMode === 'night'){
+    const night = S.diceMode === 'night';
+    const names = night ? ['前戏', '姿势', '规则'] : ['怎么做', '哪里', '怎样'];
     const vals = res ? res.v : ['？', '？', '？'];
     dice = vals.map((v, i) => h('div', {class: 'die'}, h('div', {class: 'k', text: names[i]}), h('div', {class: 'v', text: v})));
     box.append(h('div', {class: 'dice3'}, dice));
-    box.append(h('div', {class: 'dsent', text: res ? nameOf(who) + '：' + res.v[2] + '，在对方的' + res.v[1] + '上' + res.v[0] : '摇一下，看看这一轮做什么'}));
+    box.append(h('div', {class: 'dsent', text: !res ? (night ? '摇一下，看看今晚怎么安排' : '摇一下，看看这一轮做什么')
+      : night ? '今晚先「' + res.v[0] + '」，姿势「' + res.v[1] + '」，规则「' + res.v[2] + '」'
+      : nameOf(who) + '：' + res.v[2] + '，在对方的' + res.v[1] + '上' + res.v[0]}));
   } else {
     const card = h('div', {class: 'dcard' + (res ? ' show' : '')},
       h('div', {class: 'tag', text: S.diceMode === 'dare' ? '挑战' : '真心话'}),
@@ -1275,23 +1287,24 @@ function diceView(p){
     dice = [card];
     box.append(card);
   }
-  const go = h('button', {class: 'btn block dgo', text: S.diceMode === 'dice' ? (res ? '再摇一次' : '摇一摇') : (res ? '再抽一张' : '抽一张')});
+  const go = h('button', {class: 'btn block dgo', text: S.diceMode === 'dice' || S.diceMode === 'night' ? (res ? '再摇一次' : '摇一摇') : (res ? '再抽一张' : '抽一张')});
   go.onclick = (e, skip) => {
     if (S.busy) return;
     S.busy = true; go.disabled = true; haptic();
     const mode = S.diceMode;
-    const lists = mode === 'dice' ? [DICE_ACT, DICE_PART, DICE_WAY] : [Object.assign(diceList(mode), {mode})];
+    const rolls = mode === 'dice' || mode === 'night';
+    const lists = mode === 'dice' ? [DICE_ACT, DICE_PART, DICE_WAY] : mode === 'night' ? [NIGHT_FORE, NIGHT_POSE, NIGHT_RULE] : [Object.assign(diceList(mode), {mode})];
     const picked = lists.map(dicePick);
     lists.forEach((l, i) => S.diceLast.set(l.mode || l, picked[i]));
-    const final = mode === 'dice' ? picked : picked[0];
+    const final = rolls ? picked : picked[0];
     if (res && !skip) S.diceTurn = other(who);  // 下一轮换另一个人
     const t0 = Date.now();
     dice.forEach(d => d.classList.add('rolling'));
     const tick = setInterval(() => {
       const el = Date.now() - t0;
-      if (mode === 'dice') dice.forEach((d, i) => { if (el < 650 + i * 280) d.querySelector('.v').textContent = dicePick(lists[i]); else { d.classList.remove('rolling'); d.querySelector('.v').textContent = picked[i]; } });
+      if (rolls) dice.forEach((d, i) => { if (el < 650 + i * 280) d.querySelector('.v').textContent = dicePick(lists[i]); else { d.classList.remove('rolling'); d.querySelector('.v').textContent = picked[i]; } });
       else dice[0].querySelector('.t').textContent = dicePick(lists[0]);
-      if (el > 650 + 2 * 280 || mode !== 'dice' && el > 700){
+      if (el > 650 + 2 * 280 || !rolls && el > 700){
         clearInterval(tick); S.busy = false;
         S.diceRes = {mode, v: final};
         if (navigator.vibrate) try { navigator.vibrate([10, 40, 18]); } catch {}
