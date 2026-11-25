@@ -1925,7 +1925,15 @@ function diceView(p){
     box.append(card);
     if (res && S.diceMode === 'dare' && !res.fail){ const cdb = cdBtn(res.v); if (cdb) box.append(cdb); }
     S.punBusy = false;
-    if (res && res.fail) S.punBusy = punView(box, {key: res.key, loser: res.actor, win: other(res.actor)}, lv, S.diceMode === 'truth' ? ' 不想说' : (res.why || ' 没撑住'));
+    if (res && res.fail) S.punBusy = punView(box, {key: res.key, loser: res.actor, win: other(res.actor)}, lv, S.diceMode === 'truth' ? ' 的回答 ' + nameOf(other(res.actor)) + ' 不满意' : (res.why || ' 没撑住'));
+    else if (res && S.diceMode === 'truth'){ const Q = nameOf(other(res.actor));
+      if (res.ok) box.append(h('div', {class: 'pres', style: {marginTop: '10px'}, text: '😊 ' + Q + ' 满意，这一题过关'}));
+      else { box.append(h('div', {class: 'pun', style: {marginTop: '10px'}}, h('div', {class: 'pl', text: nameOf(res.actor) + ' 说完了，' + Q + ' 满意吗？'}),
+        h('div', {class: 'prow'},
+          h('button', {class: 'btn dgo', text: '😊 满意', onclick: () => { res.ok = true; haptic(); render(); }}),
+          h('button', {class: 'btn dfail', text: '😤 不满意，接受惩罚', onclick: () => { res.fail = true; haptic(); render(); }}))));
+        if (res.raw) box.append(hideBtn(() => { diceHideAdd(hkey(res.raw, res.actor)); S.punBusy = false; go.onclick(null, true); }));
+        S.punBusy = true; } }
     else if (res){ const cum = S.diceMode === 'dare' && lv >= 4 && res.actor === diceMale() && /不许射/.test(res.v);
       box.append(h('button', {class: 'btn block dfail', style: {marginTop: '10px'}, text: S.diceMode === 'truth' ? '🤐 ' + nameOf(res.actor) + ' 不想说，接受惩罚' : cum ? '💦 ' + nameOf(res.actor) + ' 射了，接受惩罚' : '❌ ' + nameOf(res.actor) + ' 没撑住，接受惩罚',
       onclick: () => { res.fail = true; if (cum) res.why = ' 射了'; haptic(); render(); }})); }
