@@ -1247,15 +1247,15 @@ const DICE_PART = [
   ['大腿根', 3], ['肚脐', 3], ['腰侧', 3], ['屁股', 3],
   ['乳晕', 4], [{m: '阴蒂', f: '龟头'}, 4], [{m: '阴蒂', f: '蛋蛋'}, 4], [{m: '阴唇', f: '私处'}, 4], [{m: '阴蒂', f: '冠状沟'}, 4], [{m: '阴唇', f: '龟头'}, 4]];
 const DICE_WAY = [
-  ['闭上眼睛', 1], ['看着对方的眼睛', 1], ['数到 20', 1],
+  ['闭上眼睛', 1], ['看着对方的眼睛', 1],
   ['隔着衣服', 1], ['不许笑', 1], ['慢慢地', 1],
   ['闭上眼睛', 2], ['不许用手', 2], ['捧着对方的脸', 2],
   ['关上灯', 2], ['先看着对方的眼睛 5 秒', 2], ['把对方压在墙上', 2],
   ['蒙上对方的眼睛', 3], ['对方双手不许动', 3], ['用领带绑住对方的手腕', 3],
-  ['关掉灯', 3], ['两个人都只穿内衣', 3], ['整整一分钟', 3],
+  ['关掉灯', 3], ['两个人都只穿内衣', 3],
   ['慢慢来，不许急', 3], ['两个人都脱光', 4], ['用丝巾绑住对方的手', 4],
   [{m: '对方要一直叫主人', f: '对方要一直学小狗叫'}, 4], [{m: '对方越求饶越用力', f: '直到对方求饶'}, 4], ['慢慢来，不许急', 4],
-  ['对方不许出声', 4], ['蒙上对方的眼睛', 4], ['看着对方的眼睛', 4], ['数到 30', 4], ['对方双手背在身后', 4], ['一停一动，来回三次', 4], ['对方每躲一下就重来', 4], ['对方要大声报数', 4], ['把对方的手脚都绑住', 4],
+  ['对方不许出声', 4], ['蒙上对方的眼睛', 4], ['看着对方的眼睛', 4], ['对方双手背在身后', 4], ['一停一动，来回三次', 4], ['对方每躲一下就重来', 4], ['对方要大声报数', 4], ['把对方的手脚都绑住', 4],
   ['贴着对方耳朵说情话', 1], ['从后面抱住对方', 1], ['只用一只手', 1], ['对方不许躲', 1],
   ['把对方抱在腿上', 2], ['对方闭上眼睛猜', 2], ['一边亲一边说爱你', 2], ['亲满十下', 2],
   ['让对方趴着', 3], ['把对方压在床上', 3], ['对方双手举过头顶', 3], ['对方要大声数出来', 3], ['两个人都只穿内裤', 3],
@@ -1410,8 +1410,10 @@ const DICE_CMD = [
   [{m: '让{w}在 3 分钟里寸止你四次，每次停下你都要趴着「汪」三声，射了就接受惩罚', f: '让{w}寸止你三次，第四次你要叫他「主人」求他，他才让你到'}, 4], [{m: '让{w}用掌心磨你的龟头 30 秒，你不许躲，躲一下加 10 秒', f: '让{w}把玩具开最高档压着你的阴蒂 30 秒，你不许躲'}, 4], [{m: '让{w}在 3 分钟里撸到你快射就停，每停一次你自己数出来，数到五，射了就接受惩罚', f: '让{w}用玩具弄到你快到就拿开，每停一次你自己数出来，数到五才许到'}, 4], [{m: '让{w}快速撸你 1 分钟，你「汪汪」求饶她也不停，求一次多撸 10 秒，然后打屁股 10 下，射了就接受惩罚', f: '让{w}寸止你到求饶，求饶以后再加打屁股 10 下'}, 4],
   [{m: '让{w}一边快速撸你一边轮流咬你两边的乳头 1 分钟，咬一边撸二十下，不许射，射了就接受惩罚', f: '让{w}一边用玩具贴着你一边轮流咬你两边的乳头，咬一边调一档'}, 4], [{m: '让{w}用掌心包住你的龟头转着磨 1 分钟，同时拧你的乳头，你不许躲、不许射，射了就接受惩罚', f: '让{w}把玩具压在你的阴蒂上，同时拧你的乳头，你不许躲'}, 4], [{m: '让{w}用口水润湿了快速撸你 1 分钟，另一只手掐你的乳头，你不许射，射了就接受惩罚；撑住了要「汪」一声谢谢她', f: '让{w}用玩具弄你，另一只手掐你的乳头，你快到了就停'}, 4],
   [{m: '像小狗一样趴在{w}腿边，让她一边摸你的头一边快速撸你 1 分钟，你要一直「汪」，不许射，射了就接受惩罚', f: '让{w}用舌尖舔你的阴蒂 1 分钟，你越躲他舔得越久'}, 4], [{m: '叼着{w}的手指不许松口，让她用另一只手撸你 1 分钟，松口就打屁股，不许射，射了就接受惩罚', f: '让{w}一边舔你的阴蒂一边用玩具贴着阴唇 1 分钟，你并腿一次就多加 10 秒'}, 4], [{m: '跟在{w}身后像小狗一样爬到床边，再让她撸你 1 分钟，爬慢了就打屁股，不许射，射了就接受惩罚', f: '让{w}用手指轻轻捏你的乳头，玩具开低档贴着阴蒂 2 分钟，你推开他一次就调高一档'}, 4], [{m: '让{w}一边说「坏狗狗」一边打你屁股 10 下，再握紧撸你 1 分钟，不许射，射了就接受惩罚', f: '让{w}舔湿你的乳头再轻轻吹气，同时用玩具贴着你 1 分钟，你躲一下就多加 10 秒'}, 4]];
-function diceCmds(lv, n){
-  const all = DICE_CMD.filter(x => x[1] === lv).map(x => x[0]);
+function diceCmds(lv, n, loser){
+  let all = DICE_CMD.filter(x => x[1] === lv).map(x => x[0]);
+  const keep = all.filter(t => !diceHide().has(hkey(t, loser)));
+  if (keep.length >= n) all = keep;
   for (let i = all.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [all[i], all[j]] = [all[j], all[i]]; }
   return all.slice(0, n);
 }
@@ -1433,7 +1435,7 @@ function duelView(lv){
       if (Date.now() - t0 > 900){
         clearInterval(tick); S.busy = false;
         if (win) sc[win]++;
-        S.duel = {lv, A: a, B: b, win, opts: win ? diceCmds(lv, 3) : [], pick: null, key: 'duel' + Date.now()};
+        S.duel = {lv, A: a, B: b, win, opts: win ? diceCmds(lv, 3, other(win)) : [], pick: null, key: 'duel' + Date.now()};
         if (navigator.vibrate) try { navigator.vibrate([10, 40, 18]); } catch {}
         render();
       }
@@ -1450,13 +1452,18 @@ function duelView(lv){
     if (d.pick == null){
       box.append(h('div', {class: 'dsent', text: W + ' 赢了！挑一张，用来罚 ' + L}));
       d.opts.forEach((t, i) => box.append(h('button', {class: 'dopt', text: fill(t), onclick: () => { d.pick = i; haptic(); render(); }})));
-      box.append(h('button', {class: 'dskip', text: '三张都不想要，换三张', onclick: () => { d.opts = diceCmds(lv, 3); haptic(); render(); }}));
+      box.append(h('button', {class: 'dskip', text: '三张都不想要，换三张', onclick: () => { d.opts = diceCmds(lv, 3, other(d.win)); haptic(); render(); }}));
     } else {
       box.append(h('div', {class: 'dcard show', style: {marginTop: '14px'}}, h('div', {class: 'tag', text: W + ' 罚 ' + L}), h('div', {class: 't', text: fill(d.opts[d.pick])})));
       if (d.fail){
         if (!punView(box, {key: d.key, loser: other(d.win), win: d.win}, lv, d.why || ' 没撑住')) box.append(h('button', {class: 'btn block dgo', text: '下一局', onclick: roll}));
       } else {
         const cdb = cdBtn(fill(d.opts[d.pick])); if (cdb) box.append(cdb);
+        box.append(hideBtn(() => { diceHideAdd(hkey(d.opts[d.pick], other(d.win)));
+          const nw = diceCmds(lv, 12, other(d.win)).find(x => !d.opts.includes(x));
+          if (nw) d.opts[d.pick] = nw; else d.opts.splice(d.pick, 1);
+          if (!d.opts.length) d.opts = diceCmds(lv, 3, other(d.win));
+          d.pick = null; render(); }));
         box.append(h('div', {class: 'prow'},
           h('button', {class: 'btn dgo', text: '✅ ' + L + ' 撑住了，下一局', onclick: roll}),
           /不许射/.test(fill(d.opts[d.pick])) && lv >= 4 && other(d.win) === diceMale()
@@ -1473,16 +1480,23 @@ function duelView(lv){
 // 我们自己写的内容：只存在这台手机上
 function diceMine(){ if (!S.diceMine){ try { S.diceMine = JSON.parse(localStorage.getItem('od_dice_mine') || '[]'); } catch { S.diceMine = []; } } return S.diceMine; }
 function diceMineSave(){ try { localStorage.setItem('od_dice_mine', JSON.stringify(S.diceMine)); } catch {} }
+// 「这张不要了」：藏起来的卡只存这台手机，以后不再抽到
+function diceHide(){ if (!S.diceHide){ try { S.diceHide = new Set(JSON.parse(localStorage.getItem('od_dice_hide') || '[]')); } catch { S.diceHide = new Set(); } } return S.diceHide; }
+function diceHideAdd(t){ if (!t) return; diceHide().add(t); try { localStorage.setItem('od_dice_hide', JSON.stringify([...S.diceHide])); } catch {} toast('藏起来了，以后不会再抽到'); }
+function diceHideClear(){ S.diceHide = new Set(); try { localStorage.removeItem('od_dice_hide'); } catch {} }
+function hkey(t, actor){ return t && typeof t === 'object' ? t[actor === diceMale() ? 'm' : 'f'] : t; }
+function hideBtn(fn){ return h('button', {class: 'dskip', text: '🙈 这张不要了，以后别再抽到', onclick: () => { haptic(); fn(); }}); }
 function diceList(mode){
   const base = mode === 'dare' ? DICE_DARE : DICE_TRUTH;
   return base.concat(diceMine().filter(x => x.m === mode).map(x => [x.t, x.l, true]));
 }
 
 function diceLevel(){ if (!S.diceLv){ try { S.diceLv = localStorage.getItem('od_dice_lv') || '2'; } catch { S.diceLv = '2'; } } return +S.diceLv; }
-function dicePick(list){
+function dicePick(list, actor){
   const lv = diceLevel();
   const pool = [];
-  list.forEach(([t, l, mine]) => { if (l === lv) for (let i = 0; i < (mine ? 3 : 1); i++) pool.push(t); });
+  list.forEach(([t, l, mine]) => { if (l === lv && !(actor && diceHide().has(hkey(t, actor)))) for (let i = 0; i < (mine ? 3 : 1); i++) pool.push(t); });
+  if (!pool.length) list.forEach(([t, l]) => { if (l === lv) pool.push(t); });
   if (!S.diceLast) S.diceLast = new Map();
   const key = list.mode || list;
   let t;
@@ -1742,6 +1756,37 @@ const PUP_NIP = [
   '她扯着你的乳头让你像小狗一样跟着她在床上爬一圈，爬完再两边各咬一口',
   '她一边舔你的乳头一边轻轻撸你，突然停下来用力掐乳头，来回 10 次，你不许射',
   '你跪直双手背在身后，她掐住你两边乳头往前拉，你只能往前挪着跟着她，坚持 1 分钟'];
+// 女生乳头惩罚：他不满意时可选。「你」= 她（女生），不用玩具碰乳头，色但不狠
+const GIRL_NIP = [
+  '他含住你的乳头慢慢吸，舌尖绕着打圈，两边轮流各 1 分钟，你不许躲',
+  '你双手被绑在头上，他轮流舔你两边乳头 2 分钟，你每躲一下他就轻轻咬一口',
+  '他用指尖只绕着你的乳晕打圈，就是不碰乳头，你开口求他才碰一下，来回 2 分钟',
+  '他一边捏着你的乳头慢慢揉，一边贴着你耳朵说你现在有多色，1 分钟，你不许捂脸',
+  '他舔湿你的乳头再轻轻吹气，舔一下吹一下，两边各 20 次，你要一直看着他',
+  '蒙上你的眼，他随机舔、吸、轻咬你一边乳头，你要猜是哪边，猜错一次多加 10 秒，持续 2 分钟',
+  '他用两根手指夹住你的乳头轻轻往外拉，再松开，来回 20 次，每次你都要出声',
+  '他一边吸你的乳头，一边用玩具贴着你的阴蒂 1 分钟，你推开他一次就多吸 10 秒',
+  '他把你的乳头含在嘴里用舌尖快速弹，30 秒换边，来回 3 轮，你不许并腿',
+  '你跪坐在他面前挺起胸，他用手指轻轻拧你两边乳头 1 分钟，你越躲他拧得越久',
+  '他一边轻咬你的乳头，一边用玩具隔着内裤贴着你 1 分钟，你不许出声',
+  '他吸住你一边乳头不放，用手指揉另一边，你要说「我错了」他才换边，换满 4 次',
+  '他用舌尖从乳晕慢慢舔到乳头，再整个含住吸一下，两边各 15 次，你要自己数出来，数错重来',
+  '你自己捧着胸送到他嘴边，他想舔哪边就舔哪边，2 分钟，你不许放下手',
+  '他轻轻拍一下你的乳头再舔一下安慰，来回 15 次，你越求饶他舔得越慢'];
+// 事后照顾：最后一张罚完，赢的人照顾输的人。按输的人分：m = 他输，f = 她输
+const AFTERCARE = {
+  m: ['{w} 把 {l} 搂进怀里，摸摸头说「乖狗狗，辛苦了」，抱满 2 分钟',
+    '{w} 倒一杯水喂 {l} 喝，再帮他把绑着的手解开，揉揉手腕',
+    '{w} 亲一亲刚才被咬、被掐过的地方，问 {l} 哪里还疼',
+    '{w} 拿热毛巾帮 {l} 擦干净，再一起盖好被子躺 3 分钟',
+    '两个人面对面抱着，{w} 说一句刚才 {l} 最可爱的瞬间',
+    '{w} 轻轻揉一揉 {l} 的乳头和屁股，问他刚才最喜欢哪一下、哪一下太重了'],
+  f: ['{w} 把 {l} 抱在怀里轻轻拍背，抱满 2 分钟，说一句「你刚才好乖」',
+    '{w} 倒杯水喂 {l} 喝，帮她解开绑着的手，揉揉手腕',
+    '{w} 轻轻亲一亲 {l} 刚才被咬过的地方，问她疼不疼',
+    '{w} 拿热毛巾帮 {l} 擦干净，再帮她盖好被子',
+    '{w} 问 {l}：刚才最喜欢哪一下？哪一下下次要轻一点？认真听完',
+    '两个人抱着躺 3 分钟，{w} 摸着 {l} 的头发说三句喜欢她的地方']};
 function punView(box, res, lv, why){
   const loser = res.loser, L = nameOf(loser), Wn = nameOf(res.win);
   const pup = lv >= 4 && loser === diceMale();  // 限制级男生输：小狗模式，惩罚完由主人打分
@@ -1750,14 +1795,15 @@ function punView(box, res, lv, why){
   if (!S.punSec) S.punSec = [30, 60, 60, 90][lv - 1];
   const wrap = h('div', {class: 'pun'});
   const card = (tag, t) => h('div', {class: 'dcard show', style: {margin: '0 0 10px', minHeight: '120px'}}, h('div', {class: 'tag', text: tag}), h('div', {class: 't', text: t}));
-  const pick3 = list => { const c = list.slice();
+  const pick3 = list => { let c = list.filter(t => !diceHide().has(t)); if (c.length < 3) c = list.slice();
     for (let i = c.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [c[i], c[j]] = [c[j], c[i]]; } return c.slice(0, 3); };
-  const listOf = () => P.kind === 'nip' ? PUP_NIP : CLIMAX[loser === diceMale() ? 'm' : 'f'];
+  const listOf = () => P.kind === 'nip' ? (pup ? PUP_NIP : GIRL_NIP) : CLIMAX[pup ? 'm' : 'f'];
+  const nipName = pup ? '乳头折磨' : '乳头惩罚';
   const next = () => { P.stage = 'final'; if (lv >= 4){ P.kind = 'climax'; P.opts = pick3(listOf()); P.card = null; } else P.card = punCard(lv + 1); haptic(); render(); };
-  const punCard = l => gtext(dicePick(Object.assign(PUN_DARE.filter(x => x[1] === l).map(x => [x[0], lv]), {mode: 'pun' + l})), loser).replace(/\{w\}/g, Wn);
+  const punCard = l => { const r = dicePick(Object.assign(PUN_DARE.filter(x => x[1] === l).map(x => [x[0], lv]), {mode: 'pun' + l}), loser); P.raw = r; return gtext(r, loser).replace(/\{w\}/g, Wn); };
   if (P.stage === 'dare' && !P.card) P.card = punCard(lv);
   if (P.stage === 'ready'){
-    wrap.append(h('div', {class: 'pl', text: L + ' 要撑住：不许躲、不许推开、' + (pup ? '不许射' : '不许求饶')}));
+    wrap.append(h('div', {class: 'pl', text: L + ' 要撑住：不许躲、不许推开' + (pup ? '、不许射' : '') + '，求饶也没用'}));
     const chips = h('div', {class: 'psec'});
     PUN_SEC.forEach(n => chips.append(h('button', {'aria-pressed': String(S.punSec === n), text: n + ' 秒', onclick: () => { S.punSec = n; render(); }})));
     wrap.append(chips, h('button', {class: 'btn block dgo', text: '⏱ 开始惩罚', onclick: () => { P.stage = 'run'; P.sec = S.punSec; P.end = Date.now() + S.punSec * 1000; punTick(); haptic(); render(); }}));
@@ -1772,39 +1818,46 @@ function punView(box, res, lv, why){
   } else if (P.stage === 'dare'){
     wrap.append(h('div', {class: 'pl', text: L + (P.why || why || ' 没撑住') + '，罚一张：' + Wn + ' 来做，' + L + ' 受着'}), card(Wn + ' 罚 ' + L, P.card), cdBtn(P.card) || '',
       lv >= 4 ? h('div', {class: 'pl', style: {fontSize: '13px', opacity: '.8'}, text: (pup ? '🐶 小狗' : '') + '求饶、反抗都不算数，越反抗罚得越重、摸得越久；只有喊暂停词才真的停'}) : '',
-      pup ? h('button', {class: 'btn block dgo', text: '✅ 罚完了，' + Wn + ' 来打分', onclick: () => { P.stage = 'judge'; haptic(); render(); }})
+      lv >= 4 ? h('button', {class: 'btn block dgo', text: '✅ 罚完了，' + Wn + ' 来打分', onclick: () => { P.stage = 'judge'; haptic(); render(); }})
         : h('div', {class: 'prow'},
           h('button', {class: 'btn dgo', text: '✅ ' + L + ' 撑住了', onclick: () => { P.stage = 'passed'; haptic(); render(); }}),
-          h('button', {class: 'btn dfail', text: '❌ 又没撑住', onclick: next})));
+          h('button', {class: 'btn dfail', text: '❌ 又没撑住', onclick: next})),
+      hideBtn(() => { diceHideAdd(hkey(P.raw, loser)); P.card = punCard(lv); render(); }));
   } else if (P.stage === 'judge'){
-    wrap.append(h('div', {class: 'pl', text: '🐶 ' + L + ' 这只小狗乖不乖？' + Wn + ' 主人满意吗？'}),
+    wrap.append(h('div', {class: 'pl', text: pup ? '🐶 ' + L + ' 这只小狗乖不乖？' + Wn + ' 主人满意吗？' : '🌸 ' + L + ' 刚才乖不乖？' + Wn + ' 满意吗？'}),
       h('div', {class: 'prow'},
-        h('button', {class: 'btn dgo', text: '😊 满意，放过小狗', onclick: () => { P.stage = 'good'; haptic(); render(); }}),
+        h('button', {class: 'btn dgo', text: pup ? '😊 满意，放过小狗' : '😊 满意，放过' + pron(loser), onclick: () => { P.stage = 'good'; haptic(); render(); }}),
         h('button', {class: 'btn dfail', text: '😤 不满意', onclick: () => { P.stage = 'choose'; haptic(); render(); }})));
   } else if (P.stage === 'good'){
-    wrap.append(h('div', {class: 'pres', text: '🐶 主人满意，' + L + ' 是乖小狗，这一局放过他'}));
+    wrap.append(h('div', {class: 'pres', text: pup ? '🐶 主人满意，' + L + ' 是乖小狗，这一局放过他' : '😊 ' + Wn + ' 满意，' + L + ' 很乖，这一局放过' + pron(loser)}));
   } else if (P.stage === 'choose'){
-    wrap.append(h('div', {class: 'pl', text: '主人不满意！' + Wn + ' 选一个罚法：'}),
-      h('button', {class: 'btn block dfail', text: '💦 强制小狗高潮', onclick: () => { P.kind = 'climax'; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); }}),
-      h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '🔥 乳头折磨', onclick: () => { P.kind = 'nip'; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); }}));
+    wrap.append(h('div', {class: 'pl', text: (pup ? '主人' : Wn + ' ') + '不满意！' + Wn + ' 选一个罚法：'}),
+      h('button', {class: 'btn block dfail', text: pup ? '💦 强制小狗高潮' : '💦 强制高潮', onclick: () => { P.kind = 'climax'; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); }}),
+      h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: pup ? '🔥 乳头折磨' : '🌸 乳头惩罚', onclick: () => { P.kind = 'nip'; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); }}));
   } else if (P.stage === 'passed'){
     wrap.append(h('div', {class: 'pres', text: L + ' 撑过了，这一局放过' + pron(loser)}));
   } else if (P.stage === 'final' && !P.card){
-    const what = P.kind === 'nip' ? '乳头折磨' : (pup ? '强制小狗高潮' : '强制高潮');
-    wrap.append(h('div', {class: 'pl', text: (pup ? '' : L + ' 又没撑住，') + '接受' + what + '！' + Wn + ' 从三个里挑一个：'}));
+    const what = P.kind === 'nip' ? nipName : (pup ? '强制小狗高潮' : '强制高潮');
+    wrap.append(h('div', {class: 'pl', text: L + ' 接受' + what + '！' + Wn + ' 从三个里挑一个：'}));
     P.opts.forEach(t => wrap.append(h('button', {class: 'dopt', text: t, onclick: () => { P.card = t; haptic(); render(); }})));
     wrap.append(h('button', {class: 'dskip', text: '三个都不想要，换三个', onclick: () => { P.opts = pick3(listOf()); haptic(); render(); }}));
   } else if (P.stage === 'final'){
-    const what = P.kind === 'nip' ? '乳头折磨' : (pup ? '强制小狗高潮' : '强制高潮');
+    const what = P.kind === 'nip' ? nipName : (pup ? '强制小狗高潮' : '强制高潮');
     wrap.append(h('div', {class: 'pl', text: lv >= 4 ? L + ' 接受' + what + '：' : L + ' 又没撑住，再罚一张更大胆的：'}),
       lv >= 4 ? h('div', {class: 'pl', style: {fontSize: '13px', opacity: '.8'}, text: (pup ? '🐶 小狗' : '') + '求饶、反抗都不算数，越反抗越重；只有喊暂停词才真的停'}) : '',
       card(lv >= 4 ? what : Wn + ' 罚 ' + L, P.card), lv >= 4 && P.kind !== 'nip' ? '' : (cdBtn(P.card) || ''),
-      h('button', {class: 'btn block dgo', text: '结束这一局', onclick: () => { P.stage = 'over'; render(); }}));
+      h('button', {class: 'btn block dgo', text: lv >= 4 ? '罚完了，' + Wn + ' 来照顾 ' + L : '结束这一局', onclick: () => {
+        if (lv >= 4){ const cl = AFTERCARE[pup ? 'm' : 'f']; P.care = cl[Math.floor(Math.random() * cl.length)].replace(/\{w\}/g, Wn).replace(/\{l\}/g, L); P.stage = 'care'; }
+        else P.stage = 'over'; haptic(); render(); }}),
+      hideBtn(() => { if (lv >= 4){ diceHideAdd(P.card); P.card = null; P.opts = pick3(listOf()); } else { diceHideAdd(hkey(P.raw, loser)); P.card = punCard(lv + 1); } render(); }));
+  } else if (P.stage === 'care'){
+    wrap.append(h('div', {class: 'pl', text: '💗 刚才辛苦了，换 ' + Wn + ' 好好照顾 ' + L + '：'}), card('💗 事后照顾', P.care),
+      h('button', {class: 'btn block dgo', text: '💗 照顾好了，这一局结束', onclick: () => { P.stage = 'over'; haptic(); render(); }}));
   } else if (P.stage === 'over'){
     wrap.append(h('div', {class: 'pres', text: '这一局结束，再来一局？'}));
   }
   box.append(wrap);
-  return ['run', 'dare', 'judge', 'choose', 'final'].includes(P.stage);
+  return ['run', 'dare', 'judge', 'choose', 'final', 'care'].includes(P.stage);
 }
 
 function diceView(p){
@@ -1813,6 +1866,8 @@ function diceView(p){
   const male = diceMale();
   p.append(h('div', {class: 'dlock'},
     male ? h('button', {class: 'btn sm ghost', style: {marginRight: 'auto'}, text: '♂ 男生：' + nameOf(male), onclick: () => { setDiceMale(other(male)); S.diceRes = null; S.duel = null; toast('改成 ' + nameOf(other(male)) + ' 是男生'); render(); }}) : null,
+    diceHide().size ? h('button', {class: 'btn sm ghost', text: '恢复藏起的 ' + diceHide().size + ' 张', onclick: () => {
+      if (!confirm('把藏起来的 ' + diceHide().size + ' 张卡都放回去吗？')) return; diceHideClear(); toast('都放回去了'); render(); }}) : null,
     h('button', {class: 'btn sm ghost', text: '改密码', onclick: () => { diceLock(); S.pinChange = true; render(); }}),
     h('button', {class: 'btn sm ghost', text: '🔒 锁上', onclick: () => { diceLock(); haptic(); render(); }})));
   // 档位
@@ -1826,7 +1881,6 @@ function diceView(p){
   p.append(lvRow);
   // 玩法
   const mode = h('div', {class: 'seg', style: {gridTemplateColumns: '1fr 1fr 1fr'}});
-  if (S.diceMode === 'night') S.diceMode = 'dice';
   const modes = [['dice', '摇骰子'], ['duel', '比大小'], ['dare', '挑战卡'], ['truth', '真心话']];
   mode.style.gridTemplateColumns = 'repeat(' + modes.length + ',1fr)';
   modes.forEach(([k, label]) => mode.append(h('button', {'aria-pressed': String(S.diceMode === k), onclick: () => { S.diceMode = k; S.diceRes = null; render(); }}, label)));
@@ -1840,10 +1894,10 @@ function diceView(p){
   }
   if (S.diceMode === 'duel'){ p.append(duelView(lv), note); return; }
 
-  const rollMode = S.diceMode === 'dice' || S.diceMode === 'night';
+  const rollMode = S.diceMode === 'dice';
   const who = diceTurn();
   p.append(rollMode
-    ? h('div', {class: 'dturn'}, h('span', null, '两个人一起摇，', h('b', {text: S.diceMode === 'dice' ? '点数大的惩罚点数小的' : '点数小的听点数大的'})))
+    ? h('div', {class: 'dturn'}, h('span', null, '两个人一起摇，', h('b', {text: '点数大的惩罚点数小的'})))
     : h('div', {class: 'dturn'},
       h('span', null, '这一轮：', h('b', {text: nameOf(who)}), S.diceMode === 'truth' ? ' 来回答，' + nameOf(other(who)) + ' 来问' : ' 受着，' + nameOf(other(who)) + ' 来做'),
       h('button', {class: 'btn sm ghost', text: '换人', onclick: () => { S.diceTurn = other(who); render(); }})));
@@ -1851,9 +1905,8 @@ function diceView(p){
   const box = h('div', {class: 'dbox lv' + lv});
   const res = S.diceRes && S.diceRes.mode === S.diceMode ? S.diceRes : null;
   let dice = [];
-  if (S.diceMode === 'dice' || S.diceMode === 'night'){
-    const night = S.diceMode === 'night';
-    const names = night ? ['前戏', '姿势', '规则'] : ['怎么做', '哪里', '怎样'];
+  if (rollMode){
+    const names = ['怎么做', '哪里', '怎样'];
     const vals = res ? res.v : ['？', '？', '？'];
     dice = vals.map((v, i) => h('div', {class: 'die'}, h('div', {class: 'k', text: names[i]}), h('div', {class: 'v', text: v})));
     box.append(h('div', {class: 'dice3'}, dice));
@@ -1861,10 +1914,9 @@ function diceView(p){
     const ptA = h('b', {class: pts && win === 'A' ? 'w' : '', text: pts ? String(pts.A) : '？'}), ptB = h('b', {class: pts && win === 'B' ? 'w' : '', text: pts ? String(pts.B) : '？'});
     box.append(h('div', {class: 'dpts'}, h('span', {text: nameOf('A')}), ptA, h('i', {text: ':'}), ptB, h('span', {text: nameOf('B')})));
     box.ptA = ptA; box.ptB = ptB;
-    box.append(h('div', {class: 'dsent', text: !res ? (night ? '摇一下，看看今晚怎么安排' : '摇一下，看看这一轮做什么')
-      : night ? nameOf(res.loser) + ' 听 ' + nameOf(win) + ' 的：今晚先「' + res.v[0] + '」，姿势「' + res.v[1] + '」，规则「' + res.v[2] + '」'
+    box.append(h('div', {class: 'dsent', text: !res ? '摇一下，看看这一轮做什么'
       : nameOf(win) + ' 惩罚 ' + nameOf(res.loser) + '：' + res.v[2] + '，在' + pron(res.loser) + '的' + res.v[1] + '上' + res.v[0]}));
-    if (res && !night) S.punBusy = punView(box, res, lv); else S.punBusy = false;
+    S.punBusy = res ? punView(box, res, lv) : false;
   } else {
     const card = h('div', {class: 'dcard' + (res ? ' show' : '')},
       h('div', {class: 'tag', text: S.diceMode === 'dare' ? (res ? nameOf(other(res.actor)) + ' 对 ' + nameOf(res.actor) + ' 做' : '挑战') : (res ? nameOf(other(res.actor)) + ' 问 ' + nameOf(res.actor) : '真心话')}),
@@ -1878,28 +1930,28 @@ function diceView(p){
       box.append(h('button', {class: 'btn block dfail', style: {marginTop: '10px'}, text: S.diceMode === 'truth' ? '🤐 ' + nameOf(res.actor) + ' 不想说，接受惩罚' : cum ? '💦 ' + nameOf(res.actor) + ' 射了，接受惩罚' : '❌ ' + nameOf(res.actor) + ' 没撑住，接受惩罚',
       onclick: () => { res.fail = true; if (cum) res.why = ' 射了'; haptic(); render(); }})); }
   }
-  const go = h('button', {class: 'btn block dgo', text: S.diceMode === 'dice' || S.diceMode === 'night' ? (res ? '再摇一次' : '摇一摇') : (res ? '再抽一张' : '抽一张')});
+  const go = h('button', {class: 'btn block dgo', text: rollMode ? (res ? '再摇一次' : '摇一摇') : (res ? '再抽一张' : '抽一张')});
   go.onclick = (e, skip) => {
     if (S.busy) return;
     S.busy = true; go.disabled = true; haptic();
     const mode = S.diceMode;
-    const rolls = mode === 'dice' || mode === 'night';
+    const rolls = mode === 'dice';
     const lists = mode === 'dice' ? [DICE_ACT, DICE_PART, DICE_WAY] : [Object.assign(diceList(mode), {mode})];
-    // 摇骰子 / 今晚：两个人同时摇点数，点数小的来做；挑战卡 / 真心话按轮换
+    // 摇骰子：两个人同时摇点数，点数大的动手；挑战卡 / 真心话按轮换
     if (!rolls && res && !skip) S.diceTurn = other(who);  // 下一轮换另一个人
     let pts = null, actor = diceTurn();
     let win = null, loser = null;
     if (rolls){
       let a, b; do { a = 1 + Math.floor(Math.random() * 6); b = 1 + Math.floor(Math.random() * 6); } while (a === b);
       pts = {A: a, B: b}; win = a > b ? 'A' : 'B'; loser = other(win);
-      actor = mode === 'dice' ? win : loser;  // 摇骰子：点数大的动手惩罚；今晚：点数小的照做
+      actor = win;  // 点数大的动手惩罚
     }
-    const raw = lists.map(dicePick);
+    const raw = lists.map(l => dicePick(l, rolls ? null : actor));
     const conv = () => raw.map(t => gtext(t, actor));
     let picked = conv();
     // 摇出不合理的搭配就重摇
     const isBad = mode === 'dice' ? diceBad : null;
-    for (let i = 0; isBad && i < 40 && isBad(picked); i++){ lists.forEach((l, j) => { raw[j] = dicePick(l); }); picked = conv(); }
+    for (let i = 0; isBad && i < 40 && isBad(picked); i++){ lists.forEach((l, j) => { raw[j] = dicePick(l, rolls ? null : actor); }); picked = conv(); }
     lists.forEach((l, i) => S.diceLast.set(l.mode || l, raw[i]));
     const final = rolls ? picked : picked[0];
     const t0 = Date.now();
@@ -1912,7 +1964,7 @@ function diceView(p){
       } else dice[0].querySelector('.t').textContent = gtext(dicePick(lists[0]), actor);
       if (el > 650 + 2 * 280 || !rolls && el > 700){
         clearInterval(tick); S.busy = false;
-        S.diceRes = {mode, v: final, pts, actor, win, loser, key: Date.now()};
+        S.diceRes = {mode, v: final, raw: rolls ? null : raw[0], pts, actor, win, loser, key: Date.now()};
         if (navigator.vibrate) try { navigator.vibrate([10, 40, 18]); } catch {}
         render();
       }
@@ -1921,6 +1973,7 @@ function diceView(p){
   if (!S.punBusy){
     box.append(go);
     if (res) box.append(h('button', {class: 'dskip', text: '这个不想要，换一个', onclick: () => go.onclick(null, true)}));
+    if (res && !rollMode && res.raw) box.append(hideBtn(() => { diceHideAdd(hkey(res.raw, res.actor)); go.onclick(null, true); }));
   }
   p.append(box);
   p.append(diceMineView(lv));
