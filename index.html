@@ -2179,6 +2179,7 @@ function punView(box, res, lv, why){
   const rl = () => { const t = P.card || ''; if (P.hard && P.card && P.rulesFor !== P.card){ P.rules = hardRules(loser, P.card); P.rulesFor = P.card; } const talk = /说|报数|数到|数出|求|喊|叫|回答|答|讲|汪|不许出声|只许/.test(t);
     return (P.rules || []).filter(r => !(r[3] && r[3].test(t)) && !(talk && r[0] !== 'body')).map(r => r[1]).join('；同时'); };
   const banner = extra => lv >= 4 ? h('div', {class: 'prule', text: (P.hard ? '📌 二次惩罚，规则换了：' + (rl() ? rl() + '；破了规则就直接强制高潮；' : '') : '📌 规则：' + (rl() ? rl() + '（惩罚时照样要守）；' : '')) + extra + (pup ? '🐶 小狗' : '') + '求饶、反抗都不算数；只有喊暂停词才真的停'}) : '';
+  const unhappy = () => { goHard(); if (pup && !P.doubled){ P.doubled = true; P.card = hardCard(); P.stage = 'dare'; } else P.stage = 'choose'; };
   const goHard = () => { if (!P.hard){ P.hard = true; P.rules = hardRules(loser); } };
   const breakRule = () => { P.why = ' 在二次惩罚里破了规则'; P.kind = P.kind === 'over' || P.cum ? 'over' : 'climax'; P.forced = ' 破了规则'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); };
   const breakBtn = () => P.hard ? h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '❌ 破了规则 → 强制高潮', onclick: breakRule}) : '';
@@ -2211,7 +2212,7 @@ function punView(box, res, lv, why){
   } else if (P.stage === 'ok'){
     wrap.append(h('div', {class: 'pres', text: '🎉 ' + L + ' 撑住了 ' + P.sec + ' 秒，这一局过关'}));
   } else if (P.stage === 'dare'){
-    wrap.append(h('div', {class: 'pl', text: P.doubled ? '🐶 主人不满意！加倍惩罚：' + Wn + ' 来做，' + L + ' 受着' : L + (P.why || why || ' 没撑住') + '，罚一张：' + Wn + ' 来做，' + L + ' 受着'}),
+    wrap.append(h('div', {class: 'pl', text: P.doubled ? (P.broke ? '🐶 破了规则，主人不满意！加倍惩罚：' : '🐶 主人不满意！加倍惩罚：') + Wn + ' 来做，' + L + ' 受着' : L + (P.why || why || ' 没撑住') + '，罚一张：' + Wn + ' 来做，' + L + ' 受着'}),
       banner('这一张不许' + come + '，' + come + '了就由 ' + Wn + ' 选继续强制高潮还是' + nipName + '。'),
       card(P.doubled ? '🔥 加倍惩罚' : Wn + ' 罚 ' + L, P.card), cdBtn(P.card, lv >= 4 ? totSecs(P.card) : null) || '',
       lv >= 4 ? h('div', {class: 'prow'},
@@ -2220,20 +2221,20 @@ function punView(box, res, lv, why){
         : h('div', {class: 'prow'},
           h('button', {class: 'btn dgo', text: '✅ ' + L + ' 撑住了', onclick: () => { P.stage = 'passed'; haptic(); render(); }}),
           h('button', {class: 'btn dfail', text: '❌ 又没撑住', onclick: next})),
-      lv >= 4 ? breakBtn() : '',
+      lv >= 4 ? (P.hard ? breakBtn() : rl() ? h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '❌ 破了规则 → 算' + (pup ? '主人' : Wn + ' ') + '不满意', onclick: () => { P.why = ' 在惩罚里破了规则'; P.broke = true; unhappy(); haptic(); render(); }}) : '') : '',
       hideBtn(() => { diceHideAdd(hkey(P.raw, loser)); P.card = P.doubled ? hardCard() : punCard(lv); render(); }));
   } else if (P.stage === 'judge'){
     wrap.append(h('div', {class: 'pl', text: pup ? '🐶 ' + L + ' 这只小狗乖不乖？' + Wn + ' 主人满意吗？' : '🌸 ' + L + ' 刚才乖不乖？' + Wn + ' 满意吗？'}),
       h('div', {class: 'prow'},
         h('button', {class: 'btn dgo', text: pup ? '😊 满意，放过小狗' : '😊 满意，放过' + pron(loser), onclick: () => { P.stage = 'good'; haptic(); render(); }}),
         h('button', {class: 'btn dfail', text: pup && !P.doubled ? '😤 不满意，加倍惩罚' : '😤 不满意', onclick: () => {
-          goHard(); if (pup && !P.doubled){ P.doubled = true; P.card = hardCard(); P.stage = 'dare'; } else P.stage = 'choose'; haptic(); render(); }})));
+          unhappy(); haptic(); render(); }})));
   } else if (P.stage === 'good'){
     wrap.append(h('div', {class: 'pres', text: pup ? '🐶 主人满意，' + L + ' 是乖小狗，这一局放过他' : '😊 ' + Wn + ' 满意，' + L + ' 很乖，这一局放过' + pron(loser)}),
       lv >= 4 ? h('button', {class: 'btn block dgo', style: {marginTop: '10px'}, text: '💗 ' + Wn + ' 去照顾 ' + L, onclick: () => { toCare(); haptic(); render(); }}) : '');
   } else if (P.stage === 'choose'){
     const ov = P.cum ? 'over' : 'climax';
-    wrap.append(h('div', {class: 'pl', text: P.cum ? L + (P.why || ' ' + come + '了') + '！' + Wn + ' 来选怎么罚：' : (pup ? '主人' : Wn + ' ') + '不满意！' + Wn + ' 选一个罚法：'}),
+    wrap.append(h('div', {class: 'pl', text: P.cum ? L + (P.why || ' ' + come + '了') + '！' + Wn + ' 来选怎么罚：' : (P.broke ? L + ' 破了规则，' : '') + (pup ? '主人' : Wn + ' ') + '不满意！' + Wn + ' 选一个罚法：'}),
       h('button', {class: 'btn block dfail', text: '💦 ' + (P.cum ? '继续' : '') + (pup ? '强制小狗高潮' : '强制高潮'), onclick: () => { goHard(); P.kind = ov; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); }}),
       h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: pup ? '🔥 乳头折磨' : '🌸 乳头惩罚', onclick: () => { goHard(); P.kind = 'nip'; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); }}));
   } else if (P.stage === 'passed'){
