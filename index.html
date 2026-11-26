@@ -2351,13 +2351,42 @@ function chalRules(loser, text){
   const two = body.length ? body[Math.floor(Math.random() * body.length)] : null;
   return two ? [one, two] : [one];
 }
+// 小惩罚卡：{w} = 罚人的一方，「你」= 被罚的人；破规则时随机抽一张，抽到就固定在这一局
+const MINI = {
+  m: ['{w} 用手掌拍打你的蛋蛋 10 下，你每下都要「汪」着报数',
+    '{w} 用手掌拍打你的蛋蛋 15 下，一下比一下快，你每下都要「汪」一声',
+    '{w} 握紧你的根部，用手掌拍打你的蛋蛋 10 下，你每下都要说「谢谢主人」',
+    '{w} 一边撸你一边拍打你的蛋蛋，撸十下拍一下，拍满 10 下，你每下都要「汪」',
+    '你自己把腿掰到最开，{w} 用手掌拍打你的蛋蛋 12 下，你每下都要「汪」着说「小狗错了」',
+    '{w} 用抹了润滑的掌心包住你的龟头转着磨 30 秒，你只许「汪」',
+    '{w} 用指尖快速揉你的系带和龟头 30 秒，你快射了要「汪汪」报告，她就停下再用掌心磨你的龟头十下',
+    '{w} 握紧你的根部，用掌心用力磨你的龟头 20 下，你每下都要「汪」着报数',
+    '{w} 用嘴含住你的龟头用力吸（或用掌心包住用力磨）30 秒，你只许「汪」',
+    '{w} 用力拧住你的两边乳头往上提，数到 20 才松手，你每听一个数都要「汪」一声',
+    '{w} 咬住你的一边乳头，同时用掌心磨你的龟头 30 秒，你只许「汪」',
+    '{w} 掐住你的两边乳头转圈，转满 15 圈，你每圈都要「汪」着说「主人饶了小狗」'],
+  f: ['{w} 用手掌轻轻拍你的阴蒂 10 下，你每下都要叫一声「爸爸」',
+    '{w} 用手掌轻轻拍你的阴蒂 15 下，一下比一下快，你每下都要叫「爸爸」',
+    '{w} 一边轻轻拍你的阴蒂一边说「母狗不乖」，拍满 10 下，你每下都要说「母狗错了」',
+    '你自己把腿掰开，{w} 用手指轻轻拍你的阴蒂 12 下，你每下都要说「谢谢爸爸」',
+    '{w} 把玩具开到最高档贴着你的阴蒂 30 秒，你只许叫「爸爸」',
+    '{w} 把玩具贴着你的阴蒂一档一档往上调，每档停十秒，调到最高档再压 20 秒',
+    '{w} 用玩具贴着你的阴蒂，同时轻轻咬你的乳头 30 秒，你要一直说「我是你的母狗」',
+    '{w} 用玩具压着你的阴蒂画圈 30 秒，你快到了要求「爸爸让母狗到」，他就把玩具拿开',
+    '{w} 用玩具贴着你的阴蒂，你每叫一声「爸爸」他就调高一档，调到最高档再压 20 秒',
+    '{w} 轻轻咬住你的乳头吸 30 秒，两边轮着来，你每被吸一下都要叫「爸爸」',
+    '{w} 轻咬你的乳头，同时用手指揉你的阴蒂 30 秒，你只许叫「爸爸」',
+    '{w} 用舌头快速舔你的乳头（或用手指轻轻捏）30 秒，最后轻轻咬一下，你要说「谢谢爸爸」']
+};
 // 限制级容错：一局里第一次破规则先来个小惩罚；小惩罚里躲了、动了就直接二次惩罚
-const miniCard = (pup, Wn, L) => (pup ? Wn + ' 用手掌拍打 ' + L + ' 的蛋蛋 10 下，' + L + ' 每下都要「汪」着报数' : Wn + ' 用手掌轻轻拍 ' + L + ' 的阴蒂 10 下，' + L + ' 每下都要叫一声「爸爸」')
-  + '。不许躲、不许动、不许' + (pup ? '合腿' : '并腿') + '，躲了或动了就直接二次惩罚';
-const miniBox = (pup, Wn, L, ok, bad) => h('div', {},
+const miniCard = (pup, Wn, L, st) => { const l = MINI[pup ? 'm' : 'f'];
+  if (!(st.miniT >= 0 && st.miniT < l.length)) st.miniT = Math.floor(Math.random() * l.length);
+  return l[st.miniT].replace(/\{w\}/g, Wn) + '。不许躲、不许动、不许' + (pup ? '合腿' : '并腿') + '，躲了或动了就直接二次惩罚'; };
+const miniBox = (pup, Wn, L, ok, bad, st) => { const t = miniCard(pup, Wn, L, st || {}); return h('div', {},
   h('div', {class: 'pl', text: '⚠️ ' + L + ' 破了规则！这一次先给个小惩罚（只有一次机会）：'}),
-  h('div', {class: 'dcard show', style: {margin: '0 0 10px', minHeight: '100px'}}, h('div', {class: 'tag', text: '🖐 小惩罚'}), h('div', {class: 't', text: miniCard(pup, Wn, L)})),
-  h('div', {class: 'prow'}, h('button', {class: 'btn dgo', text: '✅ 老实受完了，继续', onclick: ok}), h('button', {class: 'btn dfail', text: '❌ 躲了 / 动了 → 二次惩罚', onclick: bad})));
+  h('div', {class: 'dcard show', style: {margin: '0 0 10px', minHeight: '100px'}}, h('div', {class: 'tag', text: '🖐 小惩罚'}), h('div', {class: 't', text: t})),
+  /一档/.test(t) ? '' : cdBtn(t) || '',
+  h('div', {class: 'prow'}, h('button', {class: 'btn dgo', text: '✅ 老实受完了，继续', onclick: ok}), h('button', {class: 'btn dfail', text: '❌ 躲了 / 动了 → 二次惩罚', onclick: bad}))); };
 function chalView(box, c, lv, o){
   const L = nameOf(o.loser), Wn = nameOf(o.win), pup = o.loser === diceMale(), come = pup ? '射' : '到';
   const fmt = n => n >= 60 ? Math.floor(n / 60) + ' 分' + (n % 60 ? ' ' + (n % 60) + ' 秒' : '钟') : n + ' 秒';
@@ -2391,7 +2420,7 @@ function chalView(box, c, lv, o){
   } else if (c.st === 'mini'){
     w.append(h('div', {class: 'prule', text: '⏸ 计时先停着，还剩 ' + fmt(Math.ceil(c.left / 1000))}),
       miniBox(pup, Wn, L, () => { c.st = 'run'; c.end = Date.now() + c.left; chalTick(c); haptic(); render(); },
-        () => { c.st = 'fail'; c.hard = true; o.onFail(' 在小惩罚里躲了', false); haptic(); render(); }));
+        () => { c.st = 'fail'; c.hard = true; o.onFail(' 在小惩罚里躲了', false); haptic(); render(); }, c));
   } else if (c.st === 'ok'){
     w.append(h('div', {class: 'pres', text: '🎉 ' + L + ' 撑满了 ' + fmt(c.sec) + '，挑战过关'}));
   }
@@ -2501,7 +2530,7 @@ function punView(box, res, lv, why){
       hideBtn(() => { diceHideAdd(hkey(P.raw, loser)); P.card = P.doubled ? hardCard() : punCard(lv); render(); }));
   } else if (P.stage === 'mini'){
     wrap.append(miniBox(pup, Wn, L, () => { P.stage = 'dare'; haptic(); render(); },
-      () => { P.why = ' 在小惩罚里躲了'; P.broke = P.dodge = true; unhappy(); haptic(); render(); }));
+      () => { P.why = ' 在小惩罚里躲了'; P.broke = P.dodge = true; unhappy(); haptic(); render(); }, P));
   } else if (P.stage === 'judge'){
     const two = P.doubled;
     wrap.append(h('div', {class: 'pl', text: (two ? '二次惩罚罚完了。' : '') + (pup ? '🐶 ' + L + ' 这只小狗乖不乖？' + Wn + ' 主人满意吗？' : '🌸 ' + L + ' 刚才乖不乖？' + Wn + ' 满意吗？')}),
