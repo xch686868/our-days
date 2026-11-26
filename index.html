@@ -2718,11 +2718,14 @@ function punView(box, res, lv, why){
       lv >= 4 ? cumBtn() : '', lv >= 4 ? bigBtn() : '',
       hideBtn(() => { if (lv >= 4){ diceHideAdd(P.card); P.card = null; P.opts = pick3(listOf()); } else { diceHideAdd(hkey(P.raw, loser)); P.card = punCard(lv + 1); } render(); }));
   } else if (P.stage === 'big'){
-    const n = P.breaks || 1, secs = totSecs(P.big);  // 大惩罚：没写次数的一律 1 分钟，有次数的不计时；不听话点一下加 30 秒
+    // 大惩罚：没写次数的 1 分钟、有次数的不计时；破得越多越重：第 N 次时间或次数 ×(1 + 0.5 × (N - 1))，时间最多 30 分钟
+    const n = P.breaks || 1, mul = 1 + 0.5 * (n - 1), base = totSecs(P.big), secs = base ? Math.min(ADD_MAX, Math.round(base * mul)) : 0;
+    const bigT = base || mul === 1 ? P.big : P.big.replace(/(\d+) 下/g, (x, v) => Math.round(+v * mul) + ' 下');
     const R = (P.rules || []).filter(r => !ruleClash(r, P.big)).map(r => r[1]);
     wrap.append(h('div', {class: 'pl', text: '💥 ' + L + ' 破了规则！这一局第 ' + n + ' 次，来一张大惩罚（比小惩罚更狠）：'}),
+      n >= 2 ? h('div', {class: 'phard'}, h('div', {class: 'ht', text: '🔥 破得越多罚得越重：这次' + (base ? '时间' : '次数') + ' ×' + mul + (base ? '（最多 30 分钟）' : '')})) : '',
       R.length ? h('div', {class: 'prule sm', text: '📌 规则照样要守：' + R.join('；') + '。只有喊暂停词才真的停'}) : '',
-      card('💥 大惩罚', P.big), secs ? cdBtn(P.big, secs) :
+      card('💥 大惩罚', bigT), secs ? cdBtn(P.big, secs) :
         h('button', {class: 'btn block dadd', text: '➕ 不听话 +10 下' + (P.bigAdd ? '（已经加了 ' + P.bigAdd + ' 下）' : ''), onclick: () => { P.bigAdd = (P.bigAdd || 0) + 10; haptic(); render(); }}),
       h('div', {class: 'prow'},
         h('button', {class: 'btn dgo', text: '✅ 罚完了，接着刚才那张', onclick: () => { P.stage = 'final'; haptic(); render(); }}),
