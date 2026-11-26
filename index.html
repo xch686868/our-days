@@ -1752,12 +1752,12 @@ function dicePick(list, actor){
 }
 function diceTurn(){ if (!S.diceTurn) S.diceTurn = S.me; return S.diceTurn; }
 // 谁是男生：只存这台手机；名字里有「大宝宝 / 小宝宝」就自动认出来
-// 限制级开局生成安全词：男女不一样，又长又羞耻；喊出来就真的停（说不出口时连拍对方三下也停）
+// 限制级开局生成安全词：男女不一样，又长又羞耻；喊出来就真的停
 const SAFE_W = {
-  m: [['主人', '我的好主人', '主人大人'], ['小狗的贱鸡巴', '发情的贱狗鸡巴', '小狗流水的骚鸡巴', '小狗不争气的鸡巴'],
-    ['已经被您玩坏了', '硬得快要爆了', '酸得一抽一抽的', '被磨得流了一床的水'],
-    ['求主人可怜可怜下贱的小狗', '小狗是主人最下贱的发情公狗', '小狗愿意一辈子给主人舔脚', '小狗再也不敢偷偷想射了'],
-    ['，汪汪汪', '，求主人停下来，汪', '，小狗认输了，汪汪']],
+  m: [['主人', '我的好主人', '主人大人'], ['小狗下贱的骚狗鸡巴', '发情公狗的贱屌', '小狗流着骚水的贱鸡巴', '小狗只配给主人玩的狗鸡巴'],
+    ['被主人玩得流了一床骚水', '硬得一跳一跳就想往主人手里射', '被磨得龟头又酸又麻还在流水', '憋着一肚子狗精射不出来'],
+    ['小狗是只配舔主人骚逼和脚趾的贱狗', '求主人把小狗当成发情的公狗随便玩', '小狗只配跪着给主人舔干净', '小狗想射想得只会对着主人摇屁股'],
+    ['，汪汪汪', '，求主人饶了贱狗，汪', '，贱狗认输了，汪汪']],
   f: [['爸爸', '我的好爸爸', '亲爱的爸爸'], ['骚母狗的小穴', '母狗下面那张贱嘴', '你的骚母狗', '母狗湿透的骚逼'],
     ['已经被爸爸玩到流了一床水', '痒得一直往外流水', '被玩得一抽一抽合不上'],
     ['求爸爸可怜可怜下贱的小母狗', '母狗是爸爸专用的骚货', '母狗再也不敢跟爸爸顶嘴了'],
@@ -2661,7 +2661,7 @@ function punView(box, res, lv, why){
   const rlist = () => { const t = P.card || ''; const talk = /说|报数|数到|数出|求|喊|叫|回答|答|讲|汪|不许出声|只许/.test(t);
     return (P.rules || []).filter(r => !ruleClash(r, t) && !(talk && r[0] !== 'body')).map(r => r[1]); };
   const rl = () => rlist().join('；同时');
-  const tail = extra => extra + (pup ? '🐶 小狗' : '') + '求饶、反抗都不算数；只有喊安全词（或连拍对方三下）才真的停';
+  const tail = extra => extra + (pup ? '🐶 小狗' : '') + '求饶、反抗都不算数；只有喊安全词才真的停';
   // 二次惩罚的规则换一次就固定，后面换卡也不变；跟这张卡冲突的那条灰掉、这张先不算
   const hardBox = () => { const t = P.card || ''; fixRules(t); const R = P.rules || []; if (!R.length) return '';
     const sw = P.swap && P.swap.t === t ? P.swap.gone : [];
@@ -2817,7 +2817,7 @@ function punView(box, res, lv, why){
     const R = (P.rules || []).filter(r => !ruleClash(r, P.big)).map(r => r[1]);
     wrap.append(h('div', {class: 'pl', text: '💥 ' + L + ' 破了规则！这一局第 ' + n + ' 次，来一张大惩罚（比小惩罚更狠）：'}),
       n >= 2 ? h('div', {class: 'phard'}, h('div', {class: 'ht', text: '🔥 破得越多罚得越重：这次' + (base ? '时间' : '次数') + ' ×' + mul + '，卡上已经算好了'})) : '',
-      R.length ? h('div', {class: 'prule sm', text: '📌 规则照样要守：' + R.join('；') + '。只有喊安全词（或连拍对方三下）才真的停'}) : '',
+      R.length ? h('div', {class: 'prule sm', text: '📌 规则照样要守：' + R.join('；') + '。只有喊安全词才真的停'}) : '',
       card('💥 大惩罚', bigT), secs ? pcd(P.big + ' #' + n, secs, Infinity) :
         h('button', {class: 'btn block dadd', text: '➕ 不听话 +10 下' + (P.bigAdd ? '（已经加了 ' + P.bigAdd + ' 下）' : ''), onclick: () => { P.bigAdd = (P.bigAdd || 0) + 10; haptic(); render(); }}),
       h('div', {class: 'prow'},
@@ -2858,7 +2858,7 @@ function diceView(p){
     male ? h('button', {class: 'btn sm ghost', style: {marginRight: 'auto'}, text: '♂ 男生：' + nameOf(male), onclick: () => { setDiceMale(other(male)); S.diceRes = null; S.duel = null; toast('改成 ' + nameOf(other(male)) + ' 是男生'); render(); }}) : null,
     diceHide().size ? h('button', {class: 'btn sm ghost', text: '恢复藏起的 ' + diceHide().size + ' 张', onclick: () => {
       if (!confirm('把藏起来的 ' + diceHide().size + ' 张卡都放回去吗？')) return; diceHideClear(); toast('都放回去了'); render(); }}) : null,
-    diceLevel() >= 4 && male && S.safe && S.safe.ok ? h('button', {class: 'btn sm ghost', text: '🛑 安全词', onclick: () => { const w = safeWords(); alert('♂ ' + nameOf(male) + '：\n' + w.m + '\n\n♀ ' + nameOf(other(male)) + '：\n' + w.f + '\n\n喊出来就真的停；说不出口就连拍对方三下。'); }}) : null,
+    diceLevel() >= 4 && male && S.safe && S.safe.ok ? h('button', {class: 'btn sm ghost', text: '🛑 安全词', onclick: () => { const w = safeWords(); alert('♂ ' + nameOf(male) + '：\n' + w.m + '\n\n♀ ' + nameOf(other(male)) + '：\n' + w.f + '\n\n喊出来就真的停。'); }}) : null,
     h('button', {class: 'btn sm ghost', text: '改密码', onclick: () => { diceLock(); S.pinChange = true; render(); }}),
     h('button', {class: 'btn sm ghost', text: '🔒 锁上', onclick: () => { diceLock(); haptic(); render(); }})));
   // 档位
@@ -2876,7 +2876,7 @@ function diceView(p){
   mode.style.gridTemplateColumns = 'repeat(' + modes.length + ',1fr)';
   modes.forEach(([k, label]) => mode.append(h('button', {'aria-pressed': String(S.diceMode === k), onclick: () => { S.diceMode = k; S.diceRes = null; render(); }}, label)));
   p.append(mode);
-  const note = h('p', {class: 'dnote', text: (lv >= 3 ? '绑的时候别太紧，能塞进两根手指；' : '') + (lv >= 4 ? '安全词喊出来就真的停，说不出口就连拍对方三下。' : lv >= 3 ? '用力的玩法先约好一个安全词，一喊就停。' : '') + '只在这台手机上玩，内容不会上传。两个人都开心才好玩，谁不想做都可以直接换一个 💗'});
+  const note = h('p', {class: 'dnote', text: (lv >= 3 ? '绑的时候别太紧，能塞进两根手指；' : '') + (lv >= 4 ? '安全词喊出来就真的停。' : lv >= 3 ? '用力的玩法先约好一个安全词，一喊就停。' : '') + '只在这台手机上玩，内容不会上传。两个人都开心才好玩，谁不想做都可以直接换一个 💗'});
   if (!male){
     p.append(h('div', {class: 'card plock'}, h('div', {class: 'tt', text: '先告诉我，谁是男生？'}),
       h('div', {class: 'ss', text: '有些玩法男生女生不一样，选一次就记住了'}),
@@ -2885,11 +2885,11 @@ function diceView(p){
   }
   if (lv >= 4 && !safeWords().ok){
     const w = safeWords();
-    p.append(h('div', {class: 'card plock'}, h('div', {class: 'tt', text: '🛑 先生成这次的安全词'}),
+    p.append(h('div', {class: 'card plock'}, h('div', {class: 'tt', text: '🛑 这次的安全词'}),
       h('div', {class: 'ss', text: '男女不一样。喊出这一整句就真的停，不算输、不受罚，一个字都不能错。'}),
       h('div', {class: 'prule', text: '♂ ' + nameOf(male) + ' 的安全词：' + w.m}),
       h('div', {class: 'prule', text: '♀ ' + nameOf(other(male)) + ' 的安全词：' + w.f}),
-      h('div', {class: 'ss', text: '实在说不出口、或者嘴被占着的时候：连拍对方三下，也一样马上停。两个人各念一遍再开始。'}),
+      h('div', {class: 'ss', text: '两个人各念一遍再开始。'}),
       h('div', {class: 'wrow', style: {marginBottom: 0}},
         h('button', {class: 'btn ghost', text: '🔄 换一组', onclick: () => { safeSet({m: safeMake('m'), f: safeMake('f'), ok: false}); haptic(); render(); }}),
         h('button', {class: 'btn', text: '✅ 记住了，开始玩', onclick: () => { safeSet(Object.assign({}, w, {ok: true})); haptic(); render(); }}))));
