@@ -2309,16 +2309,18 @@ const AFTERCARE = {
 // 限制级挑战：先刺激、计时，输的人要撑满时间，同时守住一条规则；守不住、没撑住就进惩罚，射了/到了由赢的人选继续强制高潮还是乳头
 // [类型, 规则, 守不住时的按钮]：卡上已经要说话 / 不许出声的，只抽「身体」类规则，免得打架
 const CHAL_RULE = {
-  m: [['talk', '嘴里要一直「汪汪汪」，声音小了也算输', '🐶 不汪了'], ['talk', '要一直求「主人饶了小狗」', '停下不求了'], ['talk', '要一直说「小狗好舒服，谢谢主人」', '停下没说'],
+  m: [['talk', '嘴里要一直「汪汪汪」，声音小了也算输', '🐶 不汪了'], ['talk', '要一直求「主人把小狗的龟头磨坏」', '停下不求了'], ['talk', '要一直说「小狗的鸡巴好酸，谢谢主人玩」', '停下没说'],
     ['talk', '要一直说「小狗的龟头是主人的」', '停下没说'], ['talk', '要一直「汪」着报告离射还有多远：还早、快了、忍不住了', '没报告'], ['talk', '要大声报数，数错一次从头再数', '数错 / 停了'],
     ['quiet', '不许出声，龟头被磨也不许哼一声', '出声了'], ['body', '不许挺腰、不许缩，龟头被弄也不许躲', '躲了'],
     ['body', '要伸着舌头像小狗一样喘，口水流下来也不许合嘴', '合嘴了'],
     ['talk', '每被弄一下都要「汪」一声，漏一下就算输', '漏汪了'], ['talk', '只许像小狗一样「呜呜」哼着求主人，不许说人话', '说人话了'],
-    ['talk', '说话只许自称「小狗」，说「我」就算输', '说了「我」'], ['talk', '要一直「汪汪」求主人「轻一点」，停下就算输', '停下没求'],
-    ['talk', '主人问「乖不乖」就要马上回「小狗很乖」，回慢了就算输', '回慢了'], ['talk', '快射了要「汪汪汪」三声报告，主人说停才能停', '没报告'],
+    ['talk', '说话只许自称「小狗」，说「我」就算输', '说了「我」'], ['talk', '要一直「汪汪」求主人「再用力一点」，停下就算输', '停下没求'],
+    ['talk', '主人问「你是什么」就要马上回「小狗是主人的鸡巴玩具」，回慢了就算输', '回慢了'], ['talk', '快射了要「汪汪汪」三声报告，主人说停才能停', '没报告'],
     ['body', '要叼着项圈（或衣角），不许松口', '松口了', /说|叫|汪|求|报|喊|含|吸|舔|嘴/],
     ['body', '主人碰哪里就要把哪里送上去，不许往回缩', '缩了'], ['body', '龟头被弄到发抖也不许缩腰', '缩腰了', /不许挺腰/],
-    ['body', '乳头被碰就要挺胸送上去，不许缩', '缩了'], ['body', '口水和前面流出来的水都不许擦', '擦了'], ['body', '蛋蛋被拍也不许合腿，腿要一直张开', '合腿了', /跪|站|趴|并腿/]],
+    ['body', '乳头被碰就要挺胸送上去，不许缩', '缩了'], ['body', '口水和前面流出来的水都不许擦', '擦了'], ['body', '蛋蛋被拍也不许合腿，腿要一直张开', '合腿了', /跪|站|趴|并腿/],
+    ['woof', '主人的手一停，就要「呜呜」叫着挺腰往主人手里蹭，蹭到主人继续为止', '没蹭', /不许挺腰/], ['body', '鸡巴要一直硬着挺给主人，软一点就算输', '软了'],
+    ['woof', '每被拍一下蛋蛋都要「汪」一声，再把腿分得更开求主人打', '没汪 / 没分开'], ['woof', '主人每夸一句「好狗」，都要「汪」一声把鸡巴挺上去讨赏', '没挺']],
   f: [['talk', '要一直叫他「爸爸」', '停下没叫'], ['talk', '要一直说「我是你的母狗」', '停下没说'], ['talk', '要一直说自己有多湿、有多想要', '停下没说'],
     ['talk', '要一直求「爸爸轻一点」', '停下没求'], ['talk', '要一直说「爸爸好舒服」', '停下没说'], ['talk', '要大声报数，数错一次从头再数', '数错 / 停了'],
     ['quiet', '不许出声，哼一声都不行', '出声了'], ['body', '腿要一直张开，不许并', '并腿了', /并腿|跪|站|趴/],
@@ -2327,39 +2329,47 @@ const CHAL_RULE = {
 };
 // 二次惩罚规则（更严、更色，守不住直接强制高潮）。类型：talk 要说人话 / woof 要「汪」/「呜」叫（不禁止说话）/ quiet 不许说话 / body 身体或姿势；第 4 项 = 这张卡里出现就算冲突（只看被罚的人自己的手和姿势）
 const HARD_RULE = {
-  m: [['talk', '每被弄一下都要「汪」一声，再说「小狗的鸡巴是主人的」，漏一下就算破规则', '漏了'], ['talk', '要一直求「主人玩坏小狗吧」，主人没说可以就不许射', '停下没求'],
-    ['talk', '要一直说主人在玩你哪里、龟头有多酸多胀，一句都不许停', '停下没说'], ['talk', '每句话前面都要加「主人」、后面都要加「汪」，忘了一次就算破规则', '忘了'],
-    ['talk', '要一直报告离射还有多远，还要说想射在主人哪里', '停下没报告'],
-    ['talk', '每被弄一下都要「汪汪」两声，再说「谢谢主人玩小狗」，漏一下就算破规则', '漏了'],
-    ['talk', '每被玩一下都要「汪」着求「主人饶了小狗」，求饶一句都不许停', '停下没求'], ['talk', '说话只许自称「小狗」，说一次「我」就算破规则', '说了「我」'],
-    ['talk', '要一直「汪汪」报告龟头有多酸，酸到受不了也要报', '没报告'], ['talk', '主人每问一句「舒服吗」都要回「小狗快被玩坏了，谢谢主人」，回慢了就算破规则', '回慢了'],
+  m: [['talk', '每被弄一下都要「汪」一声，再说「小狗的鸡巴是主人的」，漏一下就算漏一次', '漏了'], ['talk', '要一直求「主人把小狗的龟头玩坏吧」，主人没说可以就不许射', '停下没求'],
+    ['talk', '要一直说主人在玩你哪里、龟头有多酸多胀，一句都不许停，说得不够下流主人就拍一下蛋蛋', '停下没说'], ['talk', '要一直「汪」着报告离射还有多远，还要求主人让小狗射在她身上哪里', '停下没报告'],
+    ['talk', '每被弄一下都要「汪汪」两声，再说「谢谢主人玩小狗」，漏一下就算漏一次', '漏了'],
+    ['talk', '每被玩一下都要「汪」着说「小狗的蛋蛋随便主人打」，一句都不许停', '停下没说'], ['talk', '要一直「汪汪」报告龟头有多酸，酸到受不了也要报', '没报告'], ['talk', '主人每问一句「舒服吗」都要回「小狗快被玩坏了，谢谢主人」，回慢了就算漏一次', '回慢了'],
     ['talk', '要一直求主人「再狠一点玩小狗」，一句「停」都不许说', '求停了'], ['talk', '每次快射都要「汪汪汪」三声报告，报告完还要求主人别停', '没报告'],
     ['talk', '每次被寸止停下，都要自己说「小狗还想要，求主人继续玩」，说得不够骚就再寸止一次（最多寸止十次）', '没求 / 不够骚'],
-    ['talk', '主人问「你是谁的」，要马上回「小狗的鸡巴是主人的」，慢一秒就算破规则', '回慢了'],
-    ['talk', '要一直说主人正在怎么玩你的鸡巴，说得越下流越好，停超过 3 秒就算破规则', '停了'],
-    ['talk', '每被寸止一次都要报数「第几次，谢谢主人」，报错就算破规则', '报错了'],
+    ['talk', '主人问「你是谁的」，要马上回「小狗的鸡巴是主人的」，慢一秒就算漏一次', '回慢了'],
+    ['talk', '要一直说主人正在怎么玩你的鸡巴，说得越下流越好，停超过 3 秒就算漏一次', '停了'],
+    ['talk', '每被寸止一次都要报数「第几次，谢谢主人」，报错就算漏一次', '报错了'],
     ['woof', '每喘一口气都要带一声「呜」，像小狗一样哼着受，一声都不许憋回去', '憋回去了'],
-    ['woof', '每被玩一下龟头都要「汪」一声，叫得不够响主人就加 30 秒（最多加到 30 分钟）', '叫小声了'],
-    ['woof', '快射了必须先「汪汪汪」三声求主人批准，没批准就射算破规则', '没批准就射了'],
-    ['woof', '主人每拍一下蛋蛋或屁股，都要「汪」一声再挺腰送上去，漏一下就算破规则', '漏了', /不许挺腰/],
-    ['woof', '被磨龟头的时候要一直「汪汪」叫到主人停手，中间停一下就算破规则', '停了'],
-    ['woof', '主人一叫「狗狗」，你就要「汪」一声把鸡巴挺给主人，慢了就算破规则', '慢了'],
+    ['woof', '每被玩一下龟头都要「汪」一声，叫得不够响主人就加 30 秒', '叫小声了'],
+    ['woof', '快射了必须先「汪汪汪」三声求主人批准，没批准就射算漏一次', '没批准就射了'],
+    ['woof', '主人每拍一下蛋蛋或屁股，都要「汪」一声再挺腰送上去，漏一下就算漏一次', '漏了', /不许挺腰/],
+    ['woof', '被磨龟头的时候要一直「汪汪」叫到主人停手，中间停一下就算漏一次', '停了'],
+    ['woof', '主人一叫「狗狗」，你就要「汪」一声把鸡巴挺给主人，慢了就算漏一次', '慢了'],
     ['body', '腰要一直往前挺，把鸡巴送到主人手里（或嘴里），不许往回缩', '缩了', /不许挺腰/],
     ['body', '不说话的时候舌头要伸出来，像发情的小狗一样喘，口水流下来也不许擦', '擦了', /叼|舔她|亲她|你舔|你亲|你含/],
-    ['body', '龟头被磨到最酸也不许缩腰，主人磨哪里就把哪里送上去', '缩腰了', /不许挺腰/], ['body', '蛋蛋被拍也不许合腿，腿要一直张到最开', '合腿了'],
+    ['body', '龟头被磨到最酸也不许缩腰，主人磨哪里就把哪里送上去', '缩腰了', /不许挺腰/], ['body', '蛋蛋被拍也不许合腿，腿要一直张到最开，合一下主人就多拍五下', '合腿了'],
     ['body', '脖子上要系着项圈（或一根带子），主人拽到哪你就要把鸡巴送到哪，不许往后躲', '躲了'],
-    ['body', '快射了也不许自己躲，主人不停就只能挺着受着', '躲了'], ['body', '每被拍一下屁股都要摇一下屁股讨好主人，漏一下就算破规则', '漏了', /躺|仰/],
-    ['body', '主人的手一停，你就要自己挺腰往主人手里蹭，蹭得不够骚就加 30 秒（最多加到 30 分钟）', '没蹭', /不许挺腰/],
-    ['body', '蛋蛋被拍的时候要自己把腿分得更开迎上去，往回缩一下就算破规则', '缩了'],
-    ['body', '被寸止停下的时候鸡巴要一直挺着翘给主人看，软下去一点就算破规则', '软了'],
+    ['body', '快射了也不许自己躲，主人不停就只能挺着受着', '躲了'], ['body', '每被拍一下屁股都要摇一下屁股讨好主人，漏一下就算漏一次', '漏了', /躺|仰/],
+    ['body', '主人的手一停，你就要自己挺腰往主人手里蹭，蹭得不够骚就加 30 秒', '没蹭', /不许挺腰/],
+    ['body', '蛋蛋被拍的时候要自己把腿分得更开迎上去，往回缩一下就算漏一次', '缩了'],
+    ['body', '被寸止停下的时候鸡巴要一直挺着翘给主人看，软下去一点就算漏一次', '软了'],
     ['body', '主人说「摇」就要摇屁股，说「停」才许停，龟头被磨着也不许停', '停了', /躺|仰/],
     ['body', '乳头被拧、大腿内侧被掐都不许躲，越受不了越要挺上去给主人', '躲了'],
-    ['body', '膝盖要一直分到最开，鸡巴和蛋蛋一直对着主人，并一下腿就算破规则', '并腿了'],
-    ['body', '主人不碰你的时候，你也要自己晃着鸡巴讨好主人，停下就算破规则', '停了'],
+    ['body', '膝盖要一直分到最开，鸡巴和蛋蛋一直对着主人，并一下腿就算漏一次', '并腿了'],
+    ['body', '主人不碰你的时候，你也要自己晃着鸡巴讨好主人，停下就算漏一次', '停了'],
     ['body', '口水、眼泪和前面流出来的水都不许擦，要留给主人看清楚', '擦了'],
-    ['body', '手不许碰主人、不许抓床单', '碰了 / 抓了', /绑|双手|你的手|手背|背在身后|抱头|爪|自己撸|自己揉|自己掰|自己摸|自己用|抱起|抱着/],
-    ['body', '龟头被磨到发抖也不许缩腰，越酸越要往主人手里送', '缩腰了', /不许挺腰/], ['body', '主人每碰一下你的乳头，你都要挺胸送上去，缩一下就算破规则', '缩了'],
-    ['body', '身子可以抖，但不许往回躲一下，躲一下主人就多玩 30 秒', '躲了'], ['body', '快射的时候腰要停住、腿要张开，主人不点头不许往上顶一下', '顶了', /不许挺腰/]],
+    ['body', '手不许碰主人、不许抓床单，再受不了也只能攥紧拳头', '碰了 / 抓了', /绑|双手|你的手|手背|背在身后|抱头|爪|自己撸|自己揉|自己掰|自己摸|自己用|抱起|抱着/],
+    ['body', '龟头被磨到发抖也不许缩腰，越酸越要往主人手里送', '缩腰了', /不许挺腰/], ['body', '主人每碰一下你的乳头，你都要挺胸送上去，缩一下就算漏一次', '缩了'],
+    ['body', '身子可以抖，但不许往回躲一下，躲一下主人就多玩 30 秒', '躲了'], ['body', '快射的时候腰要停住、腿要张开，主人不点头不许往上顶一下', '顶了', /不许挺腰/],
+    ['talk', '每被玩一下都要说一句「小狗是主人的鸡巴玩具」，说漏一句就算漏一次', '漏了'], ['talk', '要一直求「主人把小狗玩到流水」，求的声音小了就算漏一次', '停下没求'],
+    ['talk', '每次被拍蛋蛋都要说「谢谢主人，小狗的蛋蛋还要」，漏一下就算漏一次', '漏了'],
+    ['woof', '主人的手一停，就要「呜呜」叫着用脸蹭主人的手讨摸，蹭到主人继续为止', '没蹭', /蒙/], ['woof', '主人每夸一句「好狗」，都要「汪」一声把鸡巴挺上去讨赏', '没挺', /不许挺腰/],
+    ['woof', '前面流水了要马上「汪」着报告「小狗流水了，求主人看」，没报告被主人发现就算漏一次', '没报告'],
+    ['body', '主人的手指伸到嘴边就要像小狗一样舔，舔得不够骚主人就拍一下蛋蛋', '没舔', /叼/],
+    ['body', '要把项圈的绳子（或一根带子）叼在嘴里交给主人牵着，绳子掉了就算漏一次', '掉了', /说|叫|汪|求|报|喊|含|吸|舔|嘴/],
+    ['woof', '被拍屁股的时候要「汪」一声，再把屁股翘高送上去讨下一巴掌', '没翘', /躺|仰/], ['woof', '龟头被磨到最酸的时候也只许「呜呜」叫着求主人继续，不许说一个「停」字', '说停了'],
+    ['body', '鸡巴要一直硬着挺给主人玩，软一点主人就拍一下蛋蛋', '软了'], ['woof', '每被主人摸一下头，都要「汪」一声把脸贴到主人手心里', '没贴', /蒙/],
+    ['body', '主人碰你的哪里，你都要像小狗一样把哪里拱上去送给主人，躲一下就算漏一次', '躲了'], ['woof', '主人一碰你的蛋蛋，你就要「呜」一声把腿分得更开，求主人打', '没分开'],
+    ['woof', '每次被寸止停下，都要「呜呜」叫着用鸡巴往主人手里蹭，求她继续', '没蹭', /不许挺腰/]],
   f: [['talk', '要一直说「爸爸，母狗下面好湿，想被爸爸玩坏」', '停下没说'], ['talk', '每被弄一下都要说「谢谢爸爸玩母狗」，漏一下就算破规则', '漏了'],
     ['talk', '要一直求「爸爸让母狗到」，爸爸没说可以就不许到', '停下没求'], ['talk', '要一直说爸爸在玩你哪里、你下面有多湿多想要，一句都不许停', '停下没说'],
     ['talk', '快到了要先软软地求「爸爸让母狗到」，爸爸没答应就到了算破规则', '没求就到了'],
@@ -2381,7 +2391,7 @@ const RULE_TALK = /说|报数|数到|数出|求|喊|叫|回答|答|讲|汪|呜/,
 const ruleClash = (r, t) => !!t && ((r[3] && r[3].test(t)) || (r[0] === 'quiet' && RULE_TALK.test(t)) || (r[0] === 'talk' && (RULE_SILENT.test(t) || RULE_ONLY.test(t) || (/一直/.test(r[1]) && /一直(说|求|报|喊)/.test(t)))) || (r[0] === 'woof' && RULE_SILENT.test(t)));
 const rulePose = r => /双手|跪|四肢|仰躺|趴|蹲|撅|掰/.test(r[1]);  // 固定姿势（规则里已经基本没有，姿势交给开局姿势和卡）
 // 规则按部位分格子：嘴、手、眼睛、姿势，同一个部位只能有一条规则
-const ruleSlots = r => { const s = [], t = r[1];
+const ruleSlots = r => { const s = [], t = r[1]; if (r[4]) return s;
   if (r[0] !== 'body' || /舌头|叼/.test(t)) s.push('mouth');
   if (/双手|手不许|手要|用手|手停|握拳|掰|爪|抱头|自己揉|揉着/.test(t)) s.push('hand');
   if (/眼睛|盯着|看着/.test(t)) s.push('eye');
@@ -2441,9 +2451,11 @@ const MINI = {
     '{w} 轻咬你的乳头，同时用手指揉你的阴蒂 30 秒，你只许叫「爸爸」',
     '{w} 用舌头快速舔你的乳头（或用手指轻轻捏）30 秒，最后轻轻咬一下，你要说「谢谢爸爸」']
 };
+// 男生二次惩罚固定的「小狗身份」规则，一直有效
+const PUP_ID = ['talk', '全程只许自称「小狗」，每句话结尾都要带「汪」，忘一次就当场拍一下蛋蛋', '忘了', undefined, 1];
 // 二次惩罚的开局姿势：罚人的一方挑一个，二次惩罚、强制高潮、大惩罚一路都用；卡上写了姿势就听卡的，做完回到开局姿势
 const POSE = {
-  m: [['四肢着地跪趴，屁股撅到最高', /跪趴|趴/], ['跪直，双手背在身后，挺着鸡巴给主人', /跪(?!趴)/, 1], ['仰躺露出肚子，四肢蜷起来当爪子', /仰躺|躺着|躺/, 1],
+  m: [['四肢着地跪趴，屁股撅到最高', /跪趴|趴/, 1], ['跪直，双手背在身后，挺着鸡巴给主人', /跪(?!趴)/, 1], ['仰躺露出肚子，四肢蜷起来当爪子', /仰躺|躺着|躺/, 1],
     ['蹲坐，双手蜷在胸前当爪子，腿张开', /蹲/, 1], ['跪着，双手抱头，膝盖分到最开', /跪(?!趴)/, 1], ['趴在主人腿上，屁股翘起来', /趴|腿上/],
     ['仰躺，自己抱着膝盖把腿分到最开', /仰躺|躺着|躺/, 1], ['跪趴，脸贴着床，屁股撅高，双手背在身后', /跪趴|趴/, 1]],
   f: [['仰躺，腿张开', /仰躺|躺着/], ['跪着挺胸，双手背在身后', /跪(?!趴)/, 1], ['跪趴，屁股撅高', /跪趴|趴/], ['坐在爸爸怀里，腿张开', /坐|怀里|腿上/], ['侧躺，上面那条腿抬起来', /侧躺/],
@@ -2514,15 +2526,23 @@ function chalView(box, c, lv, o){
   const tn = span && box.querySelector('.dcard .t');
   if (tn) tn.textContent = o.text.slice(0, span.at) + fmt(c.sec) + o.text.slice(span.at + span.len);
   const step = addStep(o.text) || 30;
-  const rtext = c.rules.map(r => r[1]).join('；同时') + (pup ? '；快射了要先「汪」着报告，没报告就算输' : '');
+  // 男生挑战也有开局姿势：卡上没写姿势时，主人从 3 个里挑（默认第一个）
+  if (lv >= 4 && pup && !c.poseOpts){ const tx = o.text || '';
+    if (POSE_WORD.test(tx)) c.poseOpts = [];
+    else { let a = POSE.m.filter(x => !c.rules.some(r => r[3] && r[3].test(x[0])) && !poseClash(x, tx)); if (a.length < 3) a = POSE.m.slice();
+      for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } c.poseOpts = a.slice(0, 3); c.pose = c.poseOpts[0]; } }
+  const rtext = c.rules.map(r => r[1]).join('；同时') + (pup ? '；快射了要先「汪」着报告，没报告就算输' : '') + (c.pose ? '。🐶 姿势：' + c.pose[0] : '');
   if (!c.st) c.st = 'ready';
   const w = h('div', {class: 'pun'});
   if (c.st === 'ready'){
     w.append(h('div', {class: 'pl', text: L + ' 要撑住 ' + fmt(c.sec) + '：' + rtext + '；不许躲、不许推开、不许' + come + '。卡上写的姿势和动作优先，跟规则冲突的这次先不算。守不住规则或者没撑住，就进惩罚' + (!span && /\d+ ?(秒|分钟)/.test(o.text || '') ? '（卡上写的是每一段的时间，整个挑战以计时为准）' : '')}));
     const chips = h('div', {class: 'psec'});
     secs.forEach(n => chips.append(h('button', {'aria-pressed': String(c.sec === n), text: fmt(n), onclick: () => { c.sec = n; render(); }})));
+    if (c.poseOpts && c.poseOpts.length){ const pc = h('div', {class: 'psec'});
+      c.poseOpts.forEach(x => pc.append(h('button', {'aria-pressed': String(c.pose === x), text: x[0], onclick: () => { c.pose = x; haptic(); render(); }})));
+      w.append(h('div', {class: 'pl', text: '🐶 ' + Wn + ' 挑一个开局姿势：'}), pc); }
     w.append(chips, h('button', {class: 'btn block dgo', text: '⏱ 开始计时，' + Wn + ' 动手', onclick: () => { c.st = 'run'; c.t0 = Date.now(); c.end = c.t0 + c.sec * 1000; chalTick(c); haptic(); render(); }}),
-      h('button', {class: 'dskip', text: '换规则', onclick: () => { c.rules = chalRules(o.loser, o.text); haptic(); render(); }}));
+      h('button', {class: 'dskip', text: '换规则', onclick: () => { c.rules = chalRules(o.loser, o.text); c.poseOpts = null; c.pose = null; haptic(); render(); }}));
   } else if (c.st === 'run'){
     const fail = (why, cum) => { clearInterval(S.chTimer); const held = Math.floor((Date.now() - c.t0) / 1000); c.st = 'fail'; o.onFail(' 只撑了 ' + held + ' 秒就' + why, cum); haptic(); render(); };
     w.append(h('div', {class: 'pcount', id: 'chLeft', text: String(Math.max(0, Math.ceil((c.end - Date.now()) / 1000)))}),
@@ -2587,7 +2607,7 @@ function punView(box, res, lv, why){
   // 二次规则平时固定；哪条跟这张卡真撞上了，就自动换成一条不冲突的同类规则（不再划横线）
   const fits = t => !P.hard || !(P.rules || []).some(r => clash(r, t));
   const fixRules = t => { const R = P.rules; if (!t || !R) return; const all = HARD_RULE[pup ? 'm' : 'f'], gone = [];
-    R.forEach((r, i) => { if (!clash(r, t)) return;
+    R.forEach((r, i) => { if (!clash(r, t) || r[4]) return;
       const ok = x => !R.some(y => y[1] === x[1]) && !clash(x, t) && slotFree(x, R, i) && !(P.pose && x[3] && x[3].test(P.pose[0])) && !(x[0] === 'body' && /舌头/.test(x[1]) && R.some(y => y[0] !== 'body'));
       let c = all.filter(x => (x[0] === 'body') === (r[0] === 'body') && ok(x)); if (!c.length) c = all.filter(ok);
       if (c.length){ R[i] = c[Math.floor(Math.random() * c.length)]; gone.push(r[1]); } });
@@ -2603,13 +2623,13 @@ function punView(box, res, lv, why){
       P.pose ? h('div', {class: 'hsw', text: (pup ? '🐶 ' : '🌸 ') + '开局姿势：' + P.pose[0] + (poseClash(P.pose, t) ? '（这张卡写了姿势，先听卡的，做完回到这个姿势）' : '')}) : '',
       h('ol', {}, ...R.map(r => clash(r, t) ? h('li', {class: 'off', text: r[1] + '（这张卡先不算）'}) : h('li', {text: r[1]}))),
       sw.length ? h('div', {class: 'hsw', text: '🔄 有 ' + sw.length + ' 条和这张卡冲突，已自动换掉（原来是：' + sw.join('；') + '）'}) : '',
-      h('div', {class: 'hf', text: '卡上写的姿势和动作优先，跟规则冲突的地方这张先不算，不算破规则。' + (P.stage === 'final' ? '破了任何一条 → 大惩罚（罚完接着这张）' : '破了任何一条 → 直接强制高潮')})); };
+      h('div', {class: 'hf', text: '卡上写的姿势和动作优先，跟规则冲突的地方这张先不算，不算破规则。' + (pup ? '漏一下当场挨一下（拍蛋蛋 / 多磨 30 秒 / 拧乳头），漏满 3 次才算破规则。' : '') + (P.stage === 'final' ? '破了任何一条 → 大惩罚（罚完接着这张）' : '破了任何一条 → 直接强制高潮')})); };
   const banner = extra => lv < 4 ? '' : P.hard
     ? h('div', {}, hardBox(), h('div', {class: 'prule sm', text: tail(extra, true)}))
     : h('div', {class: 'prule', text: '📌 规则：' + (rl() ? rl() + '（惩罚时照样要守）；' : '') + tail(extra)});
   // 强制高潮里「再罚一张」层层加码：一张比一张狠，每张再加一样色的加料；他比她更狠
-  // 不设张数上限：寸止每张多一次（他最多 10 次、她最多 6 次），时间倍数一直涨（不封顶）；规则他最多 4 条、她最多 3 条，满了就换掉最早的一条
-  const UP = pup ? {edge: a => Math.min(10, a + 1), mul: a => 1.5 + 0.5 * a, max: 4} : {edge: a => Math.min(6, a), mul: a => 1 + 0.5 * a, max: 3};
+  // 不设张数上限：寸止每张多一次（他最多 10 次、她最多 6 次），时间倍数一直涨（不封顶）；规则他最多 5 条（含小狗身份）、她最多 3 条，满了就换掉最早的一条
+  const UP = pup ? {edge: a => Math.min(10, a + 1), mul: a => 1.5 + 0.5 * a, max: 5} : {edge: a => Math.min(6, a), mul: a => 1 + 0.5 * a, max: 3};
   const EXTRA = pup ? [
       ['蒙上眼睛，你看不到下一下是什么', /看着|眼睛|镜子|蒙/, 0, 'eye'], ['双手绑在身后，不许碰主人也不许碰自己', /自己撸|自己用|自己捏|自己掰|你的手|双手|抱着腿|捧|绑/, 0, 'hand'],
       ['戴上项圈，全程被主人拽着项圈', /项圈/], ['全程跪着，眼睛只许看着主人', /仰躺|躺|趴|蒙|骑在你脸|蹲|站|蜷/, 0, 'eye'],
@@ -2645,7 +2665,7 @@ function punView(box, res, lv, why){
       h('div', {class: 'hf', text: '暂停词随时有效，喊了就真的停'})); };
   const unhappy = () => { goHard(); P.doubled = true; P.card = hardCard(); P.stage = 'dare'; };
   const hardFail = () => { P.why = ' 二次惩罚没让人满意'; P.kind = 'climax'; P.forced = ' 二次惩罚还是没让' + (pup ? '主人' : Wn + ' ') + '满意'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; };
-  const goHard = () => { if (!P.hard){ P.hard = true; P.rules = hardRules(loser); if (navigator.vibrate) try { navigator.vibrate([80, 60, 80, 60, 220]); } catch {} } };
+  const goHard = () => { if (!P.hard){ P.hard = true; P.rules = hardRules(loser); if (pup) P.rules.unshift(PUP_ID); if (navigator.vibrate) try { navigator.vibrate([80, 60, 80, 60, 220]); } catch {} } };
   const breakRule = () => { P.why = ' 在二次惩罚里破了规则'; P.kind = P.kind === 'over' || P.cum ? 'over' : 'climax'; P.forced = ' 破了规则'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); };
   // 强制高潮里破了规则 → 大惩罚，罚完接着刚才那张；破得越多时间越长
   // 进大惩罚：原卡正在计时就先暂停，罚完回去接着剩下的时间；上一张大惩罚的计时直接作废
@@ -2662,6 +2682,11 @@ function punView(box, res, lv, why){
     const cp = c.filter(t => !poseClash(P.pose, t.replace(/\{w\}/g, Wn))); if (cp.length) c = cp;
     const t = c[Math.floor(Math.random() * c.length)]; used.push(t); P.breaks = (P.breaks || 0) + 1;
     P.bigAdd = 0; P.big = t.replace(/\{w\}/g, Wn) + (pup ? '。不许躲、不许射，躲了或射了就再来一张大惩罚' : '。不许躲、不许到，躲了或到了就再来一张大惩罚'); P.stage = 'big'; haptic(); render(); };
+  const SLIP = ['主人拍一下蛋蛋', '主人用掌心多磨 30 秒龟头', '主人狠狠拧一下乳头'];
+  const slipBtn = () => pup && P.hard ? h('button', {class: 'btn block dfail', style: {marginTop: '8px'},
+    text: '✋ 漏了一下 → 当场挨一下（已漏 ' + (P.slip || 0) + '/3' + (P.slipPen ? '，刚才：' + P.slipPen : '') + '）',
+    onclick: () => { P.slip = (P.slip || 0) + 1; P.slipPen = SLIP[Math.floor(Math.random() * SLIP.length)];
+      if (P.slip >= 3){ P.slip = 0; P.slipPen = ''; if (P.stage === 'final') bigBreak(); else breakRule(); return; } haptic(); render(); }}) : '';
   const bigBtn = () => h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '❌ 破了规则 → 大惩罚（罚完接着这张）', onclick: bigBreak});
   const breakBtn = () => P.hard ? h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '❌ 破了规则 → 强制高潮', onclick: breakRule}) : '';
   const cumBtn = () => P.kind === 'nip' ? h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '💦 罚的时候' + come + '了 → 继续强制高潮', onclick: () => { P.cum = true; P.kind = 'over'; P.forced = ' 在' + nipName + '里' + come + '了'; P.again = 0; P.opts = pick3(listOf()); P.card = null; haptic(); render(); }}) : '';
@@ -2720,7 +2745,7 @@ function punView(box, res, lv, why){
         : h('div', {class: 'prow'},
           h('button', {class: 'btn dgo', text: '✅ ' + L + ' 撑住了', onclick: () => { P.stage = 'passed'; haptic(); render(); }}),
           h('button', {class: 'btn dfail', text: '❌ 又没撑住', onclick: next})),
-      lv >= 4 ? (P.hard ? breakBtn() : rl() ? h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: P.graced ? '❌ 破了规则 → 直接二次惩罚' : '❌ 破了规则（先小惩罚）', onclick: () => { if (!P.graced){ P.graced = true; P.stage = 'mini'; } else { P.why = ' 在惩罚里破了规则'; P.broke = true; unhappy(); } haptic(); render(); }}) : '') : '',
+      lv >= 4 ? (P.hard ? h('div', {}, slipBtn(), breakBtn()) : rl() ? h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: P.graced ? '❌ 破了规则 → 直接二次惩罚' : '❌ 破了规则（先小惩罚）', onclick: () => { if (!P.graced){ P.graced = true; P.stage = 'mini'; } else { P.why = ' 在惩罚里破了规则'; P.broke = true; unhappy(); } haptic(); render(); }}) : '') : '',
       hideBtn(() => { diceHideAdd(hkey(P.raw, loser)); P.card = P.doubled ? hardCard() : punCard(lv); render(); }));
   } else if (P.stage === 'mini'){
     wrap.append(miniBox(pup, Wn, L, () => { P.stage = 'dare'; haptic(); render(); },
@@ -2762,7 +2787,7 @@ function punView(box, res, lv, why){
           h('button', {class: 'btn dgo', text: '😊 满意，去照顾' + pron(loser), onclick: () => { toCare(); haptic(); render(); }}),
           h('button', {class: 'btn dfail', text: '😤 不满意，再罚一张', onclick: () => { P.card = null; P.again = (P.again || 0) + 1; P.ruleLog = null; if (P.again >= 2) addRule(); P.extra = pickExtra(''); P.exFor = null; P.opts = pick3(listOf()); haptic(); render(); }}))
         : h('button', {class: 'btn block dgo', text: '结束这一局', onclick: () => { P.stage = 'over'; haptic(); render(); }}),
-      lv >= 4 ? cumBtn() : '', lv >= 4 ? bigBtn() : '',
+      lv >= 4 ? cumBtn() : '', lv >= 4 ? slipBtn() : '', lv >= 4 ? bigBtn() : '',
       hideBtn(() => { if (lv >= 4){ diceHideAdd(P.card); P.card = null; P.opts = pick3(listOf()); } else { diceHideAdd(hkey(P.raw, loser)); P.card = punCard(lv + 1); } render(); }));
   } else if (P.stage === 'big'){
     // 大惩罚：没写次数的 1 分钟、有次数的不计时；破得越多越重：第 N 次时间或次数 ×(1 + 0.5 × (N - 1))，不封顶；卡面直接写乘完的数
