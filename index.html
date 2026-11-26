@@ -1705,7 +1705,7 @@ function duelView(lv){
           d.pick = null; d.ch = null; render(); });
         if (lv >= 4){
           const run = chalView(box, d.ch || (d.ch = {}), lv, {loser: other(d.win), win: d.win, text: fill(d.opts[d.pick]), onFail: (why, cum) => { d.fail = true; d.why = why; d.cum = cum; }});
-          if (d.ch.st === 'ok') box.append(h('button', {class: 'btn block dgo', text: '下一局', onclick: roll}));
+          if (d.ch.st === 'ok' || d.ch.st === 'done') box.append(h('button', {class: 'btn block dgo', text: '下一局', onclick: roll}));
           else if (!run){ box.append(hide()); box.append(h('button', {class: 'dskip', text: '换一张', onclick: () => { d.pick = null; d.ch = null; render(); }})); }
         } else {
         const cdb = cdBtn(fill(d.opts[d.pick])); if (cdb) box.append(cdb);
@@ -1754,15 +1754,13 @@ function diceTurn(){ if (!S.diceTurn) S.diceTurn = S.me; return S.diceTurn; }
 // 谁是男生：只存这台手机；名字里有「大宝宝 / 小宝宝」就自动认出来
 // 限制级开局生成安全词：男女不一样，又长又羞耻；喊出来就真的停
 const SAFE_W = {
-  m: [['主人', '我的好主人', '主人大人'], ['小狗下贱的骚狗鸡巴', '发情公狗的贱屌', '小狗流着骚水的贱鸡巴', '小狗只配给主人玩的狗鸡巴'],
-    ['被主人玩得流了一床骚水', '硬得一跳一跳就想往主人手里射', '被磨得龟头又酸又麻还在流水', '憋着一肚子狗精射不出来'],
-    ['小狗是只配舔主人骚逼和脚趾的贱狗', '求主人把小狗当成发情的公狗随便玩', '小狗只配跪着给主人舔干净', '小狗想射想得只会对着主人摇屁股'],
-    ['，汪汪汪', '，求主人饶了贱狗，汪', '，贱狗认输了，汪汪']],
-  f: [['爸爸', '我的好爸爸', '亲爱的爸爸'], ['骚母狗的小穴', '母狗下面那张贱嘴', '你的骚母狗', '母狗湿透的骚逼'],
-    ['已经被爸爸玩到流了一床水', '痒得一直往外流水', '被玩得一抽一抽合不上'],
-    ['求爸爸可怜可怜下贱的小母狗', '母狗是爸爸专用的骚货', '母狗再也不敢跟爸爸顶嘴了'],
-    ['，求爸爸停一下', '，母狗认输了', '，求爸爸饶了母狗']]};
-const safeMake = k => { const P = SAFE_W[k], r = a => a[Math.floor(Math.random() * a.length)]; return r(P[0]) + '，' + r(P[1]) + r(P[2]) + '，' + r(P[3]) + r(P[4]); };
+  m: [['汪汪汪！', '汪！汪！', '呜……汪汪！'], ['贱狗的骚屌又流水了', '贱狗的狗鸡巴硬得发疼', '贱狗的龟头被主人玩得一抽一抽', '贱狗憋着一肚子狗精'], ['，汪，', '，汪汪，'],
+    ['贱狗只配跪着舔主人的骚逼', '贱狗只配给主人舔脚趾', '贱狗是主人养的发情公狗', '贱狗的鸡巴只给主人玩'],
+    ['，求主人别让贱狗射', '，贱狗想射想疯了', '，求主人狠狠玩坏贱狗'], ['，汪汪！', '，汪……汪汪汪！']],
+  f: [['爸爸', '好爸爸', '亲爸爸'], ['，你的小母狗下面湿得合不上了', '，母狗的骚逼一直在流水', '，母狗被爸爸玩得腿都软了还在流水'],
+    ['，一直求爸爸操进来', '，痒得只想被爸爸填满', '，骚得只想被爸爸干到哭'],
+    ['，母狗是爸爸专用的骚货', '，母狗这辈子只给爸爸一个人玩', '，母狗以后天天张开腿等爸爸']]};
+const safeMake = k => SAFE_W[k].map(a => a[Math.floor(Math.random() * a.length)]).join('');
 function safeWords(){ if (!S.safe){ try { S.safe = JSON.parse(sessionStorage.getItem('od_safe') || 'null'); } catch {} }
   if (!S.safe || !S.safe.m) S.safe = {m: safeMake('m'), f: safeMake('f'), ok: false};
   try { sessionStorage.setItem('od_safe', JSON.stringify(S.safe)); } catch {} return S.safe; }
@@ -2455,7 +2453,7 @@ const ruleSlots = r => { const s = [], t = r[1];
   if (r[0] === 'body' && /送上去|往前挺|送到|挺上去/.test(t)) s.push('push'); return s; };
 // 两条放一起做不到：要摇/晃/挺送 × 不许挺腰/不许晃；伸舌头 × 叼着
 const RULE_MOVE = /摇屁股|晃着|送上去|往前挺|送到|挺上去|蹭|挺给|迎上去|摇一下|说「摇」/;
-const pairBad = (a, b) => (RULE_MOVE.test(a[1]) && /不许挺腰|不许晃|僵住|都不许动|一动不动/.test(b[1])) || (/舌头/.test(a[1]) && /叼/.test(b[1])) || (/僵住|都不许动|一动不动|不许挺腰/.test(a[1]) && /僵住|都不许动|一动不动/.test(b[1]));
+const pairBad = (a, b) => (RULE_MOVE.test(a[1]) && /不许挺腰|不许晃|僵住|都不许动|一动不动/.test(b[1])) || (/舌头/.test(a[1]) && /叼|舔/.test(b[1])) || (/僵住|都不许动|一动不动|不许挺腰/.test(a[1]) && /僵住|都不许动|一动不动/.test(b[1]));
 const slotFree = (x, R, skip) => { const a = ruleSlots(x); return !R.some((y, j) => j !== skip && y[1] !== x[1] && (ruleSlots(y).some(v => a.includes(v)) || pairBad(x, y) || pairBad(y, x))); };
 function hardRules(loser, text){
   const t = text || '', L = HARD_RULE[loser === diceMale() ? 'm' : 'f'], rnd = a => a[Math.floor(Math.random() * a.length)];
@@ -2511,6 +2509,45 @@ const MINI = {
     '{w} 用舌头快速舔你的乳头（或用手指轻轻捏）30 秒，最后轻轻咬一下，你要说「谢谢爸爸」']
 };
 // 强制高潮加码里破了规则：大惩罚，比小惩罚更狠，罚完接着刚才那张；{w} = 罚人的一方
+// 严厉惩罚：安全词说错了才会来，最色、最严、最难撑；{w} = 罚人的一方。堵嘴（内裤、袜子）只用在男生身上
+const SEVERE = {
+  m: ['{w}把她穿过的内裤（或袜子）塞进你嘴里堵住，你只许隔着「呜呜」哼。她用抹满润滑的掌心包住你的龟头转着磨 3 分钟，每过 30 秒就握紧快速撸到你快射再停住，吊在边缘数到 15；你鸡巴跳一下她就拍打你的蛋蛋五下，你不许射',
+    '你四肢着地跪趴、屁股撅高，{w}从后面一只手撸你、一只手抹着润滑揉你后面，5 分钟里寸止你十次，每次停下都打你屁股十下，你要「汪」着报第几次，报错一次就多寸止两次，你不许射',
+    '{w}坐在你胸口上，把她的袜子塞进你嘴里，用两根手指捏着你的冠状沟只撸龟头 4 分钟，越来越快，你一挺腰她就停下扇你的龟头三下再接着撸，你不许射',
+    '你仰躺露出肚子、腿张到最开，{w}先舔湿你的龟头（或用口水抹湿），用掌心快速搓 2 分钟；再握紧根部不让你射，换成指尖只刮系带 2 分钟；最后再搓 2 分钟。你每求饶一句她就多加 30 秒，你不许射',
+    '你跪着舔{w}的手指，她另一只手寸止你八次，每次停下你都要把她的手指舔干净，说一句「贱狗想射，求主人可怜」，说得她不满意就多寸止一次，你不许射',
+    '{w}把你撸到快射就停，停 20 秒再撸，6 分钟里一直这样吊着你；每次停下你都要自己掰开腿让她拍打你的蛋蛋三下，「汪」着说「谢谢主人不让贱狗射」，你不许射',
+    '{w}让你自己握着鸡巴，她说快你就撸快、说停你就停，4 分钟里要寸止自己十二次；你慢一秒，她就拧你的乳头一下、再加一次寸止，你不许射',
+    '{w}用润滑的丝袜包住你的龟头来回拉着磨 3 分钟，再把她的袜子塞进你嘴里堵住，换掌心磨 2 分钟；你只许隔着袜子「呜呜」，腰往回缩一下就多加 30 秒，你不许射',
+    '你跪直、双手背在身后，{w}一边骂你「发情的贱狗」一边用掌心拍你的龟头 60 下，每拍十下就握紧快速撸到你快射停住，吊在边缘数到 10，你每躲一下就多拍十下，你不许射',
+    '{w}含住你的龟头快速吞吐（或用手快速撸）30 秒，再停下用指尖只揉冠状沟 30 秒，来回 6 分钟；每到快射她就整个停住，让你看着自己一跳一跳地流水，你要一直「汪」着求她，求得不够下贱她就多来一轮，你不许射'],
+  f: ['你自己掰开腿躺好，{w}用舌头慢慢舔你的阴蒂（或用手指揉），快到了就停，停 20 秒再舔，5 分钟里寸止你八次；每次停下你都要说一句更骚的话求爸爸，说得不够骚就多停 10 秒，你不许到',
+    '{w}把玩具开到最高档贴着你的阴蒂，同时两根手指在你下面里面勾着揉，3 分钟里你快到了他就全部拿开，等你不抖了再贴上去；你要一直说「爸爸，母狗想要」，不许到',
+    '你跪趴撅起屁股，{w}从后面一边舔你的阴唇和阴蒂一边用手指慢慢进出，4 分钟里越来越快，你快到了要求「爸爸让母狗到」，他说不行就马上停下，你不许到',
+    '{w}一边含着你的乳头吸，一边用手指快速揉你的阴蒂 1 分钟，再换成玩具贴着阴蒂 1 分钟，来回 6 分钟；每次换的时候你都要自己张开腿说「母狗的骚逼是爸爸的」，你不许到',
+    '你躺好自己揉着乳头，{w}用玩具一档一档调高贴着你的阴蒂，每档 30 秒，到最高档压 1 分钟再一档档调回来；你手停一下、腿并一下就多压 30 秒，你不许到',
+    '{w}让你自己用手指揉阴蒂给他看，他说快就快、说停就停，5 分钟里要寸止自己八次；每次停下你都要把手指伸给他看有多湿，说「母狗湿成这样了」，你不许到',
+    '{w}从后面抱着你，一只手揉你的阴蒂，一只手的手指在你下面进出，嘴贴着你耳朵骂你「骚母狗」，4 分钟里每到快到就停，你要一直叫「爸爸」，一声都不许停，你不许到',
+    '{w}舔你的阴蒂（或用手指揉）到你快到，停下来让你自己掰开腿对着他说「母狗求爸爸操」，说完他再接着弄，6 分钟里来回，你不许到']
+};
+const SEVERE_RULE = {
+  m: [['body', '嘴里要一直叼着主人的内裤（或袜子），只许隔着「呜呜」哼，掉出来一次就加 1 分钟', '掉出来了', /舔|含|说|报|求|喊|回答|「汪/],
+    ['talk', '每被寸止一次都要说一句比上一句更下贱的话，说重复了就加 1 分钟', '说重复了'],
+    ['body', '鸡巴软一下，主人就从这张卡最狠的那一步重新来', '软了'],
+    ['body', '主人没说「好」就射出来，直接再来一张严厉惩罚', '没允许就射了'],
+    ['body', '腿要一直张到最开，蛋蛋露给主人拍，并一下腿就多拍十下', '并腿了', /趴|四肢|跪直/],
+    ['woof', '每被弄一下都要「汪」一声，漏一下就多寸止一次', '漏汪了'],
+    ['body', '手要一直背在身后，主人没让你碰的地方一下都不许碰，碰一下就多寸止一次', '碰了', /自己|你的手|抱着|掰/],
+    ['body', '快射的时候不许躲、不许缩，只能挺着让主人停在边缘', '躲了 / 缩了']],
+  f: [['talk', '每被寸止一次都要说一句比上一句更骚的话求爸爸，说重复了就多停 10 秒', '说重复了'],
+    ['body', '腿要一直张到最开，下面被玩到发抖也不许并一下', '并腿了', /趴|四肢/],
+    ['body', '爸爸没说「可以」就到了，直接再来一张严厉惩罚', '没允许就到了'],
+    ['talk', '要一直叫「爸爸」，一声都不许停', '停了'],
+    ['body', '手只许自己揉着乳头给爸爸看，停一下就多寸止一次', '手停了', /自己|你的手|抱着|掰|捧/],
+    ['body', '流出来的水不许擦，要张着给爸爸看清楚', '擦了', /趴|四肢/],
+    ['body', '腰要自己往爸爸手里（或嘴里）送，往后躲一下就多寸止一次', '躲了'],
+    ['body', '眼睛要一直看着爸爸，最想到的时候也不许闭眼', '闭眼了', /蒙|趴|后面/]]
+};
 const BIG = {
   m: ['{w} 抹满润滑，一根手指轻轻按着你后面打圈，另一只手握着你慢慢撸 1 分钟，你要放松受着，不许躲（不舒服就喊安全词）',
     '{w} 把你撸到最边缘就停，停 10 秒再撸，来回做满 1 分钟，最后宣布这一张不许射，你只能挺着等她',
@@ -2584,6 +2621,37 @@ function chalView(box, c, lv, o){
   const rtext = c.rules.map(r => r[1]).join('；同时') + (pup && !c.rules.some(r => /快射|想射/.test(r[1]) || r[0] === 'quiet') && !RULE_SILENT.test(o.text || '') && !/快射/.test(o.text || '') && !(RULE_ONLY.test(o.text || '') && !/汪/.test(o.text || '')) ? '；快射了要先「汪」着报告，没报告就算输' : '');
   if (!c.st) c.st = 'ready';
   const w = h('div', {class: 'pun'});
+  // 挑战里说安全词：对了→不放过 / 放过去照顾；错了→严厉惩罚 / 回到挑战（安全词作废：规则多 2 条、剩下的时间翻倍）
+  const dogN = pup ? '小狗' : '母狗', pr = pup ? '他' : '她';
+  const back = () => { const sv = c.sv; c.sv = null; c.st = sv.from; if (sv.from === 'run'){ c.end = Date.now() + sv.left; chalTick(c); } };
+  if (c.void && ['ready', 'run', 'mini'].includes(c.st) && !c.sv)
+    w.append(h('div', {class: 'phard'}, h('div', {class: 'ht', text: '🚫 安全词已经无效！'}), h('div', {class: 'hf', text: c.void})));
+  if (c.sv){ const sv = c.sv, word = safeWords()[pup ? 'm' : 'f'];
+    if (sv.step === 'ask') w.append(h('div', {class: 'pl', text: '🛑 ' + L + ' 说安全词了！' + Wn + ' 对照着听，一个字都不能错：'}),
+      h('div', {class: 'dcard show', style: {margin: '0 0 10px', minHeight: '120px'}}, h('div', {class: 'tag', text: '🛑 ' + L + ' 的安全词'}), h('div', {class: 't', text: word})),
+      h('div', {class: 'prow'}, h('button', {class: 'btn dgo', text: '✅ 说对了', onclick: () => { sv.step = 'ok'; haptic(); render(); }}),
+        h('button', {class: 'btn dfail', text: '❌ 说错了', onclick: () => { sv.step = 'bad'; haptic(); render(); }})));
+    else if (sv.step === 'ok') w.append(h('div', {class: 'pl', text: '✅ 说对了。' + Wn + ' 决定要不要放过' + pr + '：'}),
+      h('div', {class: 'prow'}, h('button', {class: 'btn dfail', text: '😈 不放过' + pr, onclick: () => { back(); haptic(); render(); }}),
+        h('button', {class: 'btn dgo', text: '💗 放过' + dogN + '，去照顾', onclick: () => { const cl = AFTERCARE[pup ? 'm' : 'f']; c.care = cl[Math.floor(Math.random() * cl.length)].replace(/\{w\}/g, Wn).replace(/\{l\}/g, L); c.sv = null; c.st = 'spared'; haptic(); render(); }})));
+    else w.append(h('div', {class: 'pl', text: '❌ 说错了！' + Wn + ' 选怎么罚：'}),
+      h('button', {class: 'btn block dfail', text: '🔥 严厉惩罚（最色、最严、最难撑）', onclick: () => { c.sv = null; c.sev = true; c.st = 'fail'; o.onFail(' 安全词说错了', false); haptic(); render(); }}),
+      h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '⚠️ 回到挑战：安全词已经无效，规则变多、时间翻倍', onclick: () => {
+        const all = HARD_RULE[pup ? 'm' : 'f'].slice().sort(() => Math.random() - 0.5); let n = 0;
+        for (const x of all){ if (n >= 2) break; if (x[0] === 'body' && !c.rules.some(y => y[1] === x[1]) && slotFree(x, c.rules) && !ruleClash(x, o.text || '')){ c.rules.push(x); n++; } }
+        if (sv.from === 'run') sv.left *= 2; else if (sv.from === 'mini') c.left *= 2; else c.sec *= 2;
+        c.void = '规则多了 ' + n + ' 条，' + (sv.from === 'ready' ? '挑战时间翻倍' : '剩下的时间翻倍'); back(); haptic(); render(); }}));
+    box.append(w); return true;
+  }
+  if (c.st === 'spared'){
+    w.append(h('div', {class: 'pl', text: '💗 ' + L + ' 被放过了，换 ' + Wn + ' 好好照顾 ' + L + '：'}),
+      h('div', {class: 'dcard show', style: {margin: '0 0 10px', minHeight: '120px'}}, h('div', {class: 'tag', text: '💗 事后照顾'}), h('div', {class: 't', text: c.care})),
+      h('button', {class: 'btn block dgo', text: '💗 照顾好了，这一局结束', onclick: () => { c.st = 'done'; haptic(); render(); }}));
+    box.append(w); return true;
+  }
+  if (c.st === 'done'){ w.append(h('div', {class: 'pres', text: '这一局结束，再来一局？'})); box.append(w); return false; }
+  const svBtn = () => lv >= 4 ? h('button', {class: 'btn block ghost', style: {marginTop: '12px'}, text: (pup ? '🐶 小狗' : '🌸 母狗') + '说安全词了', onclick: () => {
+    const sv = {from: c.st, step: 'ask'}; if (c.st === 'run'){ clearInterval(S.chTimer); sv.left = Math.max(1000, c.end - Date.now()); } c.sv = sv; haptic(); render(); }}) : '';
   if (c.st === 'ready'){
     w.append(h('div', {class: 'pl', text: L + ' 要撑住 ' + fmt(c.sec) + '：' + rtext + '；不许躲、不许推开、不许' + come + '。守不住规则或者没撑住，就进惩罚' + (!span && /\d+ ?(秒|分钟)/.test(o.text || '') ? '（卡上写的是每一段的时间，整个挑战以计时为准）' : '')}));
     const chips = h('div', {class: 'psec'});
@@ -2612,6 +2680,7 @@ function chalView(box, c, lv, o){
   } else if (c.st === 'ok'){
     w.append(h('div', {class: 'pres', text: '🎉 ' + L + ' 撑满了 ' + fmt(c.sec + (c.add || 0)) + '，挑战过关'}));
   }
+  if (['ready', 'run', 'mini'].includes(c.st)) w.append(svBtn());
   box.append(w);
   return c.st === 'run' || c.st === 'mini';
 }
@@ -2635,7 +2704,7 @@ function punView(box, res, lv, why){
   // 惩罚里的计时：离开这张卡就停
   const cdSeen = []; const pcd = (t, f, m) => { cdSeen.push(t); return cdBtn(t, f, m); };
   let P = S.pun && S.pun.key === res.key ? S.pun : null;
-  if (!P){ P = S.pun = {key: res.key, stage: why ? 'dare' : 'ready', rules: res.rules, graced: !!(res.ch && res.ch.graced), toHard: !!(res.ch && res.ch.hard)}; if (res.cum){ P.stage = 'choose'; P.cum = true; P.why = why; } }
+  if (!P){ P = S.pun = {key: res.key, stage: why ? 'dare' : 'ready', rules: res.rules, graced: !!(res.ch && res.ch.graced), toHard: !!(res.ch && res.ch.hard)}; if (res.cum){ P.stage = 'choose'; P.cum = true; P.why = why; } if (res.ch && res.ch.sev) P.sevInit = true; }
   if (!S.punSec) S.punSec = [30, 60, 60, 90][lv - 1];
   const wrap = h('div', {class: 'pun'});
   const card = (tag, t) => h('div', {class: 'dcard show', style: {margin: '0 0 10px', minHeight: '120px'}}, h('div', {class: 'tag', text: tag}), h('div', {class: 't', text: t}));
@@ -2677,7 +2746,7 @@ function punView(box, res, lv, why){
   const UP = pup ? {edge: a => Math.min(10, a + 1), mul: a => 1.5 + 0.5 * a, max: 4} : {edge: a => Math.min(6, a), mul: a => 1 + 0.5 * a, max: 3};
   const EXTRA = pup ? [
       ['蒙上眼睛，你看不到下一下是什么', /看着|眼睛|镜子|蒙/, 0, 'eye'], ['双手绑在身后，不许碰主人也不许碰自己', /自己撸|自己用|自己捏|自己掰|你的手|双手|抱着腿|捧|绑/, 0, 'hand'],
-      ['戴上项圈，全程被主人拽着项圈', /项圈/], ['全程跪着，眼睛只许看着主人', /仰躺|躺|趴|蒙|骑在你脸|蹲|站|蜷/, 0, 'eye'],
+      ['戴上项圈，全程被主人拽着项圈', /项圈/], ['嘴里塞着主人的内裤（或袜子），只许隔着「呜呜」哼', /说|报|求|喊|舔|含|叼|回答|「汪/, 0, 'mouth'], ['全程跪着，眼睛只许看着主人', /仰躺|躺|趴|蒙|骑在你脸|蹲|站|蜷/, 0, 'eye'],
       ['射之前要「汪」着说十遍「小狗的鸡巴是主人的」，主人点头才许射', /^$/, 1], ['只许射在主人指定的地方', /^$/, 1], ['射完主人还要继续磨你的龟头 20 秒，你要「汪汪」受着', /^$/, 1]]
     : [['到之前要叫三声「爸爸」求着，爸爸点头才许到', /^$/, 1], ['要一边被弄一边说十遍「我是你的母狗」', /不许出声/, 0, 'mouth'],
       ['要自己张开腿给爸爸看，不许并', /趴|并腿|跪/, 0, 'pose'], ['玩具开到最高档贴着阴蒂', /玩具[^，；]{0,6}最高档/], ['到了以后玩具再贴 10 秒才拿开', /^$/, 1]];
@@ -2704,7 +2773,7 @@ function punView(box, res, lv, why){
       h('div', {class: 'hf', text: '安全词随时有效，喊了就真的停'})); };
   const unhappy = () => { goHard(); P.doubled = true; P.card = hardCard(); P.stage = 'dare'; };
   const hardFail = () => { P.why = ' 二次惩罚没让人满意'; P.kind = 'climax'; P.forced = ' 二次惩罚还是没让' + (pup ? '主人' : Wn + ' ') + '满意'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; };
-  const goHard = () => { if (!P.hard){ P.hard = true; P.rules = hardRules(loser); if (navigator.vibrate) try { navigator.vibrate([80, 60, 80, 60, 220]); } catch {} } };
+  const goHard = () => { if (!P.hard){ P.hard = true; P.rules = hardRules(loser); (P.voidAdd || []).forEach(x => { if (!P.rules.some(y => y[1] === x[1]) && slotFree(x, P.rules)) P.rules.push(x); }); if (navigator.vibrate) try { navigator.vibrate([80, 60, 80, 60, 220]); } catch {} } };
   const breakRule = () => { P.why = ' 在二次惩罚里破了规则'; P.kind = P.kind === 'over' || P.cum ? 'over' : 'climax'; P.forced = ' 破了规则'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); };
   // 二次惩罚或强制高潮里破了规则 → 大惩罚，罚完接着刚才那张；破得越多时间越长
   // 进大惩罚：原卡正在计时就先暂停，罚完回去接着剩下的时间；上一张大惩罚的计时直接作废
@@ -2731,7 +2800,48 @@ function punView(box, res, lv, why){
   const punCard = l => { const r = dicePick(Object.assign(PUN_DARE.filter(x => x[1] === l && (typeof x[0] !== 'object' || x[0][pup ? 'm' : 'f'])).map(x => [x[0], lv]), {mode: 'pun' + l}), loser); P.raw = r; return gtext(r, loser).replace(/\{w\}/g, Wn); };
   if (P.toHard){ P.toHard = false; P.broke = P.dodge = true; P.why = ' 在小惩罚里躲了'; unhappy(); }
   if (P.stage === 'dare' && !P.card) P.card = punCard(lv);
-  if (lv >= 4 && ['ready', 'run', 'ok'].includes(P.stage)){
+  // 说安全词：每一页都能点；对了→不放过 / 放过去照顾；错了→严厉惩罚 / 回到刚才（安全词作废，规则多 2 条、这张翻倍、加料）
+  const sword = lv >= 4 ? safeWords()[loser === diceMale() ? 'm' : 'f'] : '', dogN = pup ? '小狗' : '母狗';
+  const dbl = t => t.replace(/(?<!最多加到\s?)(\d+)\s*(分钟|秒|下|次|口|轮|遍)/g, (m, v, u) => (+v * 2) + ' ' + u);
+  const inChal = () => lv >= 4 && ['ready', 'run', 'ok'].includes(P.stage) && P.ch;
+  const svOpen = () => { const sv = {from: P.stage, step: 'ask'};
+    if (inChal()){ const c = P.ch; sv.cst = c.st; if (c.st === 'run'){ clearInterval(S.chTimer); sv.left = Math.max(1000, c.end - Date.now()); } }
+    S.cd = null; P.sv = sv; haptic(); render(); };
+  const harsher = () => { P.void = (P.void || 0) + 1; const chal = inChal();
+    const t = chal ? '' : P.stage === 'big' ? P.big : P.stage === 'severe' ? P.sev : (P.card || '');
+    const Rr = chal ? (P.ch.rules || (P.ch.rules = [])) : P.stage === 'severe' ? (P.sevRules || (P.sevRules = [])) : (P.rules || (P.rules = []));
+    const all = HARD_RULE[pup ? 'm' : 'f'].slice().sort(() => Math.random() - 0.5); let n = 0;
+    for (const x of all){ if (n >= 2) break; if (x[0] === 'body' && !Rr.some(y => y[1] === x[1]) && slotFree(x, Rr) && !ruleClash(x, t)){ Rr.push(x); if (!chal && P.stage !== 'severe') (P.voidAdd || (P.voidAdd = [])).push(x); n++; } }
+    const ex = pickExtra(t), add = ex ? '。加料：' + ex : ''; let d = false;
+    if (P.stage === 'dare' || (P.stage === 'final' && P.card)){ P.card = dbl(P.card) + add; d = true; }
+    else if (P.stage === 'big'){ P.big = dbl(P.big) + add; d = true; }
+    else if (P.stage === 'severe'){ P.sev = dbl(P.sev) + add; d = true; }
+    P.voidMsg = '规则多了 ' + n + ' 条' + (chal ? '，剩下的时间翻倍' : d ? '，这张的时间和次数翻倍' : '') + (ex && d ? '，还加了料：' + ex : ''); };
+  const svBack = harsh => { const sv = P.sv; P.sv = null; P.stage = sv.from;
+    if (sv.cst){ const c = P.ch; c.st = sv.cst; if (sv.cst === 'run'){ c.end = Date.now() + sv.left * (harsh ? 2 : 1); chalTick(c); } }
+    if (harsh) harsher(); haptic(); render(); };
+  const sevCard = () => { const all = SEVERE[pup ? 'm' : 'f'], used = P.sevUsed || (P.sevUsed = []); let c = all.filter(t => !used.includes(t)); if (!c.length) c = all;
+    const t = c[Math.floor(Math.random() * c.length)]; used.push(t); return t.replace(/\{w\}/g, Wn); };
+  const sevRules = t => { const all = SEVERE_RULE[pup ? 'm' : 'f'], rnd = a => a[Math.floor(Math.random() * a.length)], ok = x => !ruleClash(x, t);
+    const m = all.filter(x => x[0] !== 'body' && ok(x)), out = m.length ? [rnd(m)] : [];
+    for (let k = 0; k < 2; k++){ const b = all.filter(x => x[0] === 'body' && ok(x) && !out.includes(x) && slotFree(x, out)); if (b.length) out.push(rnd(b)); }
+    return out; };
+  const sevNew = () => { S.cd = null; P.sev = sevCard(); P.sevRules = sevRules(P.sev); P.sevN = (P.sevN || 0) + 1; };
+  if (P.sevInit){ P.sevInit = false; sevNew(); P.stage = 'severe'; }
+  const toSevere = () => { clearInterval(S.chTimer); P.sv = null; sevNew(); P.stage = 'severe'; haptic(); render(); };
+  if (P.void && lv >= 4 && !P.sv && !['care', 'over', 'good', 'passed', 'ok'].includes(P.stage))
+    wrap.append(h('div', {class: 'phard'}, h('div', {class: 'ht', text: '🚫 安全词已经无效！'}), h('div', {class: 'hf', text: P.voidMsg || '规则变多了，罚得更狠'})));
+  if (P.sv){ const sv = P.sv;
+    if (sv.step === 'ask') wrap.append(h('div', {class: 'pl', text: '🛑 ' + L + ' 说安全词了！' + Wn + ' 对照着听，一个字都不能错：'}), card('🛑 ' + L + ' 的安全词', sword),
+      h('div', {class: 'prow'}, h('button', {class: 'btn dgo', text: '✅ 说对了', onclick: () => { sv.step = 'ok'; haptic(); render(); }}),
+        h('button', {class: 'btn dfail', text: '❌ 说错了', onclick: () => { sv.step = 'bad'; haptic(); render(); }})));
+    else if (sv.step === 'ok') wrap.append(h('div', {class: 'pl', text: '✅ 说对了。' + Wn + ' 决定要不要放过' + pron(loser) + '：'}),
+      h('div', {class: 'prow'}, h('button', {class: 'btn dfail', text: '😈 不放过' + pron(loser), onclick: () => svBack(false)}),
+        h('button', {class: 'btn dgo', text: '💗 放过' + dogN + '，去照顾', onclick: () => { P.sv = null; S.cd = null; clearInterval(S.chTimer); toCare(); haptic(); render(); }})));
+    else wrap.append(h('div', {class: 'pl', text: '❌ 说错了！' + Wn + ' 选怎么罚：'}),
+      h('button', {class: 'btn block dfail', text: '🔥 严厉惩罚（最色、最严、最难撑）', onclick: toSevere}),
+      h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '⚠️ 回到刚才的惩罚：安全词已经无效，规则变多、罚得更狠', onclick: () => svBack(true)}));
+  } else if (lv >= 4 && ['ready', 'run', 'ok'].includes(P.stage)){
     const c = P.ch || (P.ch = {});
     chalView(wrap, c, lv, {loser, win: res.win, text: Array.isArray(res.v) ? res.v.join('，') : '', onFail: (w2, cum) => {
       P.why = w2; P.rules = c.rules; P.graced = !!c.graced; if (c.hard){ P.broke = P.dodge = true; unhappy(); } else if (cum){ P.stage = 'choose'; P.cum = true; } else { P.stage = 'dare'; P.card = punCard(lv); } }});
@@ -2838,16 +2948,30 @@ function punView(box, res, lv, why){
       h('div', {class: 'prow'},
         h('button', {class: 'btn dgo', text: P.cumBig ? '✅ 答应了，做完继续强制高潮' : '✅ 答应了，做完接着刚才那张', onclick: () => { S.cd = null; backFinal(); haptic(); render(); }}),
         h('button', {class: 'btn dfail', text: '❌ 不答应 → 继续大惩罚', onclick: () => { P.stage = 'big'; haptic(); render(); }})));
+  } else if (P.stage === 'severe'){
+    wrap.append(h('div', {class: 'pl', text: '🔥 ' + L + ' 安全词说错了！严厉惩罚' + (P.sevN > 1 ? '（第 ' + P.sevN + ' 张）' : '') + '：' + Wn + ' 来做，' + L + ' 受着'}),
+      h('div', {class: 'phard'}, h('div', {class: 'ht', text: '⚠️ 严厉规则：最严、最难撑'}), h('ol', {}, ...(P.sevRules || []).map(r => h('li', {text: r[1]}))),
+        h('div', {class: 'hf', text: '破了任何一条 → 再来一张严厉惩罚'})),
+      card('🔥 严厉惩罚', P.sev), pcd(P.sev, totSecs(P.sev), Infinity) || '',
+      h('div', {class: 'prow'}, h('button', {class: 'btn dgo', text: '✅ 撑住了', onclick: () => { S.cd = null; P.stage = 'sevjudge'; haptic(); render(); }}),
+        h('button', {class: 'btn dfail', text: '❌ 没撑住 → 再来一张', onclick: () => { sevNew(); haptic(); render(); }})),
+      h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '💦 ' + come + '了 → 继续强制高潮', onclick: () => { S.cd = null; P.cum = true; P.kind = 'over'; P.forced = ' 在严厉惩罚里' + come + '了'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); }}));
+  } else if (P.stage === 'sevjudge'){
+    wrap.append(h('div', {class: 'pl', text: '严厉惩罚撑住了。' + (pup ? '主人' : Wn + ' ') + '决定：'}),
+      h('div', {class: 'prow'}, h('button', {class: 'btn dgo', text: '💗 放过' + pron(loser) + '，去照顾', onclick: () => { toCare(); haptic(); render(); }}),
+        h('button', {class: 'btn dfail', text: '🔥 继续强制高潮', onclick: () => { P.kind = 'climax'; P.forced = ' 严厉惩罚罚完了'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); }})));
   } else if (P.stage === 'care'){
     wrap.append(h('div', {class: 'pl', text: '💗 刚才辛苦了，换 ' + Wn + ' 好好照顾 ' + L + '：'}), card('💗 事后照顾', P.care),
       h('button', {class: 'btn block dgo', text: '💗 照顾好了，这一局结束', onclick: () => { P.stage = 'over'; haptic(); render(); }}));
   } else if (P.stage === 'over'){
     wrap.append(h('div', {class: 'pres', text: '这一局结束，再来一局？'}));
   }
+  if (lv >= 4 && !P.sv && !['care', 'over', 'good', 'passed', 'ok', 'sevjudge'].includes(P.stage) && !(P.ch && P.ch.st === 'ok' && ['ready', 'run', 'ok'].includes(P.stage)))
+    wrap.append(h('button', {class: 'btn block ghost', style: {marginTop: '12px'}, text: (pup ? '🐶 小狗' : '🌸 母狗') + '说安全词了', onclick: svOpen}));
   box.append(wrap);
   const ks = P.cdKeys || (P.cdKeys = []); cdSeen.forEach(k => { if (!ks.includes(k)) ks.push(k); });
   if (S.cd && ks.includes(S.cd.key) && !cdSeen.includes(S.cd.key)) S.cd = null;
-  return ['run', 'mini', 'dare', 'judge', 'choose', 'final', 'care'].includes(P.stage) || (lv >= 4 && P.stage === 'good');
+  return !!P.sv || ['run', 'mini', 'dare', 'judge', 'choose', 'final', 'care', 'big', 'bigdeal', 'bigcond', 'severe', 'sevjudge'].includes(P.stage) || (lv >= 4 && P.stage === 'good');
 }
 
 function diceView(p){
