@@ -1499,7 +1499,7 @@ function duelView(lv){
     box.append(h('div', {class: 'dsent', text: '平了！再摇一次'}));
     box.append(h('button', {class: 'btn block dgo', text: '再摇一次', onclick: roll}));
   } else {
-    const W = nameOf(d.win), L = nameOf(other(d.win)), fill = t => gtext(t, other(d.win)).replace(/\{w\}/g, W);
+    const W = nameOf(d.win), L = nameOf(other(d.win)), fill = t => { const x = gtext(t, other(d.win)).replace(/\{w\}/g, W); return lv >= 4 ? noTot(x) : x; };
     if (d.pick == null){
       box.append(h('div', {class: 'dsent', text: W + ' 赢了！挑一张，用来罚 ' + L}));
       d.opts.forEach((t, i) => box.append(h('button', {class: 'dopt', text: fill(t), onclick: () => { d.pick = i; haptic(); render(); }})));
@@ -1647,6 +1647,15 @@ function totSpan(t){
   const clause = m => c.slice(0, m.index).split(/[，；]/).pop();  // 同一句前面有「每 / 换成 / 停」，说明是一小段
   if (!mins.length && secs.length === 1 && !/来回|轮|各|换边|换另一边|每边|两边/.test(after(secs[0])) && !/每|换成|停/.test(clause(secs[0]))) return {sec: +secs[0][1], at: secs[0].index, len: secs[0][0].length};
   return null;
+}
+// 限制级挑战卡：总时长由计时器随机定，卡上的总时长去掉，免得卡上写的和点进去的不一样
+function noTot(t){
+  const m = totSpan(t); if (!m) return t;
+  let x = t.slice(0, m.at) + '§' + t.slice(m.at + m.len);
+  x = x.replace(/ ?§就停/, '到时间就停').replace(/，([含舔撸磨贴])\s*§$/, '，一直$1').replace(/到最高档贴 ?§/, '到最高档一直贴着').replace(/在 ?§ ?里/, '').replace(/接下来 ?§/, '接下来').replace(/§ ?里/, '').replace(/坚持 ?§/, '坚持住')
+    .replace(/([一-龥]{1,2})满 ?§/, (a, v) => v === '快速撸' || v === '速撸' ? '一直快速撸' : '一直' + v.replace(/^[撸舔扯咬转绕磨含]?/, w => w))
+    .replace(/[，,]? ?满 ?§/, '').replace(/来回 ?§/, '来回轮着').replace(/[，,]? ?§换一边/, '，一会儿换一边').replace(/ ?§ ?/, '');
+  return x.replace(/，，/g, '，').replace(/^，/, '').replace(/\s+([，。；）])/g, '$1').replace(/([）])\s+/g, '$1');
 }
 function totSecs(t){ const m = totSpan(t); return m ? m.sec : 0; }
 function cdSecs(t){
@@ -2162,7 +2171,7 @@ function diceView(p){
   } else {
     const card = h('div', {class: 'dcard' + (res ? ' show' : '')},
       h('div', {class: 'tag', text: S.diceMode === 'dare' ? (res ? nameOf(other(res.actor)) + ' 对 ' + nameOf(res.actor) + ' 做' : '挑战') : (res ? nameOf(other(res.actor)) + ' 问 ' + nameOf(res.actor) : '真心话')}),
-      h('div', {class: 't', text: res ? res.v : (S.diceMode === 'dare' ? '抽一张，撑住才算过关' : '抽一个问题，念给对方听，不许说谎')}));
+      h('div', {class: 't', text: res ? (lv >= 4 && S.diceMode === 'dare' ? noTot(res.v) : res.v) : (S.diceMode === 'dare' ? '抽一张，撑住才算过关' : '抽一个问题，念给对方听，不许说谎')}));
     dice = [card];
     box.append(card);
     if (res && S.diceMode === 'dare' && !res.fail && lv < 4){ const cdb = cdBtn(res.v); if (cdb) box.append(cdb); }
@@ -2177,7 +2186,7 @@ function diceView(p){
         if (res.raw) box.append(hideBtn(() => { diceHideAdd(hkey(res.raw, res.actor)); S.punBusy = false; go.onclick(null, true); }));
         S.punBusy = true; } }
     else if (res && S.diceMode === 'dare' && lv >= 4)
-      S.punBusy = chalView(box, res.ch || (res.ch = {}), lv, {loser: res.actor, win: other(res.actor), text: res.v, onFail: (why, cum) => { res.fail = true; res.why = why; res.cum = cum; }});
+      S.punBusy = chalView(box, res.ch || (res.ch = {}), lv, {loser: res.actor, win: other(res.actor), text: noTot(res.v), onFail: (why, cum) => { res.fail = true; res.why = why; res.cum = cum; }});
     else if (res){ const cum = S.diceMode === 'dare' && lv >= 4 && res.actor === diceMale() && /不许射/.test(res.v);
       box.append(h('button', {class: 'btn block dfail', style: {marginTop: '10px'}, text: S.diceMode === 'truth' ? '🤐 ' + nameOf(res.actor) + ' 不想说，接受惩罚' : cum ? '💦 ' + nameOf(res.actor) + ' 射了，接受惩罚' : '❌ ' + nameOf(res.actor) + ' 没撑住，接受惩罚',
       onclick: () => { res.fail = true; if (cum) res.why = ' 射了'; haptic(); render(); }})); }
