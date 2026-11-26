@@ -1865,6 +1865,14 @@ function beep(){
     o.connect(g); g.connect(a.destination); o.start(t0 + d); o.stop(t0 + d + 0.25); }); } catch {}
   try { navigator.vibrate && navigator.vibrate([200, 120, 200, 120, 200]); } catch {}
 }
+// 时间到：一直滴滴滴，直到点一下屏幕（这一下只用来停响，不会点到按钮）
+let RING = null;
+function ring(){ stopRing(); beep(); RING = setInterval(beep, 1600);
+  const d = document.createElement('div'); d.id = 'ringBar'; d.textContent = '⏰ 时间到！点一下屏幕停止响铃';
+  d.style.cssText = 'position:fixed;left:12px;right:12px;top:calc(env(safe-area-inset-top) + 10px);z-index:9999;padding:14px;border-radius:14px;background:#e5484d;color:#fff;font-weight:700;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.25)';
+  document.body.append(d); }
+function stopRing(){ if (RING){ clearInterval(RING); RING = null; } const d = document.getElementById('ringBar'); if (d) d.remove(); try { navigator.vibrate && navigator.vibrate(0); } catch {} }
+document.addEventListener('click', e => { if (RING){ stopRing(); e.stopPropagation(); e.preventDefault(); } }, true);
 // 卡上写的「多 / 加 N 秒」，没写就 0
 const CNUM = {'五': 5, '十': 10, '二十': 20, '三十': 30, '一': 1, '两': 2};
 function addStep(t){ const m = String(t || '').replace(/最多加到 ?\d+ ?(秒|分钟)/g, '').match(/(?:多|加)[^，；、。]{0,4}?(\d+|三十|二十|十|五|一|两) ?(秒|分钟)/); return m ? (+m[1] || CNUM[m[1]] || 0) * (m[2] === '分钟' ? 60 : 1) : 0; }
@@ -1904,7 +1912,7 @@ function cdTick(){
     const c = S.cd;
     document.querySelectorAll('[data-cd]').forEach(b => { if (b._label){ const v = b._label(); if (typeof v === 'string') b.textContent = v; } });
     if (!c){ clearInterval(S.cdTimer); return; }
-    if (!c.done && Date.now() >= c.end){ c.done = true; clearInterval(S.cdTimer); beep(); document.querySelectorAll('[data-cd]').forEach(b => { if (b._label){ const v = b._label(); if (typeof v === 'string') b.textContent = v; } }); }
+    if (!c.done && Date.now() >= c.end){ c.done = true; clearInterval(S.cdTimer); ring(); document.querySelectorAll('[data-cd]').forEach(b => { if (b._label){ const v = b._label(); if (typeof v === 'string') b.textContent = v; } }); }
   }, 250);
 }
 
@@ -2073,7 +2081,7 @@ function punTick(){
     const left = Math.max(0, Math.ceil((P.end - Date.now()) / 1000));
     const el = document.getElementById('punLeft'); if (el) el.textContent = String(left);
     if (left <= 0){
-      clearInterval(S.punTimer); P.stage = 'ok'; beep();
+      clearInterval(S.punTimer); P.stage = 'ok'; ring();
       if (S.tab === 'together' && S.togetherSeg === 'dice' && !S.busy) render();
     }
   }, 250);
@@ -2554,7 +2562,7 @@ function chalTick(c){
     const left = Math.max(0, Math.ceil((c.end - Date.now()) / 1000));
     const el = document.getElementById('chLeft'); if (el) el.textContent = String(left);
     if (left <= 0){
-      clearInterval(S.chTimer); c.st = 'ok'; beep();
+      clearInterval(S.chTimer); c.st = 'ok'; ring();
       if (S.tab === 'together' && S.togetherSeg === 'dice' && !S.busy) render();
     }
   }, 250);
@@ -2603,7 +2611,7 @@ function punView(box, res, lv, why){
     ? h('div', {}, hardBox(), h('div', {class: 'prule sm', text: tail(extra)}))
     : h('div', {class: 'prule', text: '📌 规则：' + (rl() ? rl() + '（惩罚时照样要守）；' : '') + tail(extra)});
   // 强制高潮里「再罚一张」层层加码：一张比一张狠，每张再加一样色的加料；他比她更狠
-  // 不设张数上限：寸止每张多一次（他最多 10 次、她最多 6 次），时间倍数一直涨（总时长最多 30 分钟）；规则他最多 4 条、她最多 3 条，满了就换掉最早的一条
+  // 不设张数上限：寸止每张多一次（他最多 10 次、她最多 6 次），时间倍数一直涨（不封顶）；规则他最多 4 条、她最多 3 条，满了就换掉最早的一条
   const UP = pup ? {edge: a => Math.min(10, a + 1), mul: a => 1.5 + 0.5 * a, max: 4} : {edge: a => Math.min(6, a), mul: a => 1 + 0.5 * a, max: 3};
   const EXTRA = pup ? [
       ['蒙上眼睛，你看不到下一下是什么', /看着|眼睛|镜子|蒙/, 0, 'eye'], ['双手绑在身后，不许碰主人也不许碰自己', /自己撸|自己用|自己捏|自己掰|你的手|双手|抱着腿|捧|绑/, 0, 'hand'],
@@ -2622,12 +2630,12 @@ function punView(box, res, lv, why){
     let c = all.filter(x => base(x) && !seen.includes(x[1])); if (!c.length) c = all.filter(base);
     if (c.length){ const x = c[Math.floor(Math.random() * c.length)]; R.push(x); seen.push(x[1]); P.ruleLog = gone ? {gone: gone[1], add: x[1]} : {add: x[1]}; }
     else { if (gone) R.push(gone); P.ruleLog = null; } };
-  const upSecs = t => { const n = totSecs(t || ''); return n && lv >= 4 && P.again ? Math.min(ADD_MAX, Math.round(n * UP.mul(P.again))) : n; };
+  const upSecs = t => { const n = totSecs(t || ''); return n && lv >= 4 && P.again ? Math.round(n * UP.mul(P.again)) : n; };
   const upBox = () => { if (!(lv >= 4 && P.again)) return '';
     // 卡选好以后，加料和这张卡打架就换一样
     if (P.card && P.exFor !== P.card){ P.exFor = P.card; const bad = EXTRA.find(e => e[0] === P.extra); if (!P.extra || (bad && exBad(bad, P.card))){ if (P.extra) P.exUsed = (P.exUsed || []).filter(x => x !== P.extra); P.extra = pickExtra(P.card); } }
     const n = UP.edge(P.again), m = UP.mul(P.again), lg = P.ruleLog;
-    const what = P.kind === 'climax' ? come + '之前要多寸止 ' + n + ' 次' : '有计时的卡时间变成 ' + m + ' 倍（最多 30 分钟），没计时的' + (pup ? '整张做两遍' : '最后一段再做一遍');
+    const what = P.kind === 'climax' ? come + '之前要多寸止 ' + n + ' 次' : '有计时的卡时间变成 ' + m + ' 倍（不封顶），没计时的' + (pup ? '整张做两遍' : '最后一段再做一遍');
     return h('div', {class: 'phard'}, h('div', {class: 'ht', text: '🔥 ' + (pup ? '主人' : Wn + ' ') + '还不满意！第 ' + (P.again + 1) + ' 张'}),
       h('ol', {}, h('li', {text: what}), P.extra ? h('li', {text: '加料：' + P.extra}) : '',
         P.again >= 2 && lg ? h('li', {text: lg.gone ? '规则满了，换掉一条：「' + lg.gone + '」→「' + lg.add + '」' : '二次规则再加一条：「' + lg.add + '」（现在 ' + (P.rules || []).length + ' 条，最多 ' + UP.max + ' 条）'}) : ''),
@@ -2731,7 +2739,7 @@ function punView(box, res, lv, why){
     const what = P.kind === 'nip' ? nipName : (P.kind === 'over' ? '继续' : '') + (pup ? '强制小狗高潮' : '强制高潮');
     wrap.append(h('div', {class: 'pl', text: lv >= 4 ? (P.forced && !P.again ? L + P.forced + '，直接' : P.again ? (pup ? '主人' : Wn + ' ') + '还不满意，再来一张' : (P.cum ? L + ' ' + come + '了，' : L + ' 接受')) + what + '：' : L + ' 又没撑住，再罚一张更大胆的：'}),
       upBox(), banner(''),
-      card(lv >= 4 ? what : Wn + ' 罚 ' + L, P.card), lv >= 4 && P.kind === 'climax' ? '' : (cdBtn(P.card, lv >= 4 ? upSecs(P.card) : null) || ''),
+      card(lv >= 4 ? what : Wn + ' 罚 ' + L, P.card), lv >= 4 && P.kind === 'climax' ? '' : (cdBtn(P.card, lv >= 4 ? upSecs(P.card) : null, lv >= 4 && P.again ? Infinity : 0) || ''),
       lv >= 4 ? h('div', {class: 'pl', style: {marginTop: '4px'}, text: '罚完了，' + (pup ? '主人' : Wn + ' ') + '满意吗？'}) : '',
       lv >= 4 ? h('div', {class: 'prow'},
           h('button', {class: 'btn dgo', text: '😊 满意，去照顾' + pron(loser), onclick: () => { toCare(); haptic(); render(); }}),
