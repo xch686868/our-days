@@ -2478,16 +2478,21 @@ const BIG = {
     '{w} 用力掐住你的两边乳头往上提，让你自己挺着鸡巴往她腿上蹭，蹭满 1 分钟，蹭慢了她就拧得更狠，你每蹭一下都要「汪」',
     '{w} 用掌心拍你的龟头 20 下，每拍一下就用掌心包住狠磨一圈，你每下都要「汪」着说「小狗错了」',
     '{w} 一边骂你「坏小狗」一边拍打你的蛋蛋 50 下，每拍十下就狠狠拧一下你的乳头，你每下都要「汪」着报数，躲一下就从头数'],
-  f: ['{w} 把玩具开到最高档贴着你的阴蒂 1 分钟，同时轻轻吸你的乳头，你要一直说「我是你的母狗」',
-    '{w} 用舌头舔你的阴蒂（或用手指揉）1 分钟，同时用手指轻轻捏你的乳头，你每被舔一下都要叫「爸爸」',
-    '你自己把腿掰到最开，{w} 用手指慢慢进出你下面 1 分钟，越来越快，你每被弄一下都要叫「爸爸」',
-    '{w} 轮着轻轻咬你的乳头，同时用玩具贴着你的阴蒂 1 分钟，你只许叫「爸爸」',
+  f: ['{w} 把玩具开到最高档贴着你的阴蒂 1 分钟，同时轻轻吸你的乳头，你每被吸一下都要说「我是你的母狗」',
+    '{w} 用舌头舔你的阴蒂（或用手指揉）1 分钟，越舔越快，你每被舔一下都要叫「爸爸」',
+    '{w} 用手指慢慢进出你下面，越来越快，做满 1 分钟，你每被弄一下都要叫「爸爸」，腿不许并',
+    '{w} 轮着轻轻咬你的乳头，同时用玩具贴着你的阴蒂 1 分钟，你每被咬一下都要说「谢谢爸爸」',
     '{w} 用手指快速揉你的阴蒂 1 分钟，同时舔你的乳头，你每被揉一下都要软软地说「母狗错了」',
-    '你跪趴着、屁股撅高，{w} 从后面用手指揉你的阴蒂 1 分钟，一边轻轻拍你的屁股，你每被拍一下都要说「我是你的母狗」',
-    '{w} 把玩具一档一档往上调，调到最高档贴着你的阴蒂压 1 分钟，你不许并腿，要一直叫「爸爸」',
-    '{w} 一边舔你的乳头一边用手指揉你的阴蒂 1 分钟，你要一直看着爸爸，说出现在下面有多湿',
-    '{w} 抱着你，用玩具贴着你的阴蒂 1 分钟，你要自己挺胸把乳头送到他嘴边，他吸一下你就叫一声「爸爸」',
-    '{w} 一边用玩具贴着你的阴蒂，一边用手指揉你的阴唇 1 分钟，你要一直说「爸爸，母狗错了」']
+    '{w} 把玩具一档一档往上调，调到最高档贴着你的阴蒂压 1 分钟，你不许并腿，每抖一下都要叫「爸爸」',
+    '{w} 一边舔你的乳头一边用手指揉你的阴蒂 1 分钟，你要看着爸爸，说出现在下面有多湿',
+    '{w} 用玩具贴着你的阴蒂 1 分钟，你要自己挺胸把乳头送到他嘴边，他吸一下你就叫一声「爸爸」',
+    '{w} 一边用玩具贴着你的阴蒂，一边用手指揉你的阴唇 1 分钟，你每被揉一下都要说「爸爸，母狗错了」',
+    '{w} 用手指轻轻拍你的阴蒂 30 下，每拍一下就揉一圈，你每下都要叫「爸爸」',
+    '{w} 用两根手指在你下面里面勾着揉，同时用拇指揉你的阴蒂，揉满 1 分钟，你每被勾一下都要说「我是你的母狗」',
+    '{w} 把玩具开到最高档压着你的阴蒂 1 分钟，你腿不许并、腰不许躲，下面被弄到发抖也要张着',
+    '{w} 用舌头快速舔你的阴蒂（或用手指快速揉）1 分钟，越来越快，你要张着腿受着，不许往后缩',
+    '{w} 用手指在你下面快速进出 1 分钟，同时用玩具贴着你的阴蒂，你要挺着腰迎上去，不许往后缩',
+    '{w} 用玩具贴着你的阴蒂慢慢画圈，越画越快，画满 1 分钟，你眼睛要看着他，腿不许并']
 };
 // 限制级容错：一局里第一次破规则先来个小惩罚；小惩罚里躲了、动了就直接二次惩罚
 const miniCard = (pup, Wn, L, st) => { const l = MINI[pup ? 'm' : 'f'];
@@ -2593,7 +2598,7 @@ function punView(box, res, lv, why){
     return h('div', {class: 'phard'}, h('div', {class: 'ht', text: '⚠️ 规则换了！二次惩罚更严、更色'}),
       h('ol', {}, ...R.map(r => clash(r, t) ? h('li', {class: 'off', text: r[1] + '（这张卡先不算）'}) : h('li', {text: r[1]}))),
       sw.length ? h('div', {class: 'hsw', text: '🔄 有 ' + sw.length + ' 条和这张卡冲突，已自动换掉（原来是：' + sw.join('；') + '）'}) : '',
-      h('div', {class: 'hf', text: '破了任何一条 → 直接强制高潮'})); };
+      h('div', {class: 'hf', text: P.stage === 'final' ? '破了任何一条 → 大惩罚（罚完接着这张）' : '破了任何一条 → 直接强制高潮'})); };
   const banner = extra => lv < 4 ? '' : P.hard
     ? h('div', {}, hardBox(), h('div', {class: 'prule sm', text: tail(extra)}))
     : h('div', {class: 'prule', text: '📌 规则：' + (rl() ? rl() + '（惩罚时照样要守）；' : '') + tail(extra)});
@@ -2632,7 +2637,14 @@ function punView(box, res, lv, why){
   const goHard = () => { if (!P.hard){ P.hard = true; P.rules = hardRules(loser); if (navigator.vibrate) try { navigator.vibrate([80, 60, 80, 60, 220]); } catch {} } };
   const breakRule = () => { P.why = ' 在二次惩罚里破了规则'; P.kind = P.kind === 'over' || P.cum ? 'over' : 'climax'; P.forced = ' 破了规则'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); };
   // 强制高潮里破了规则 → 大惩罚，罚完接着刚才那张；破得越多时间越长
-  const bigBreak = () => { const all = BIG[pup ? 'm' : 'f'], used = P.bigUsed || (P.bigUsed = []);
+  // 进大惩罚：原卡正在计时就先暂停，罚完回去接着剩下的时间；上一张大惩罚的计时直接作废
+  const pauseCd = () => { const c = S.cd; if (!c) return;
+    if (P.stage === 'final' && c.key === P.card && !c.done && c.end > Date.now()) P.cdPause = {key: c.key, left: c.end - Date.now(), add: c.add || 0};
+    S.cd = null; };
+  const backFinal = () => { if (P.cumBig){ P.cumBig = false; P.cdPause = null; P.kind = 'over'; P.forced = ' 在大惩罚里' + come + '了'; P.again = 0; P.opts = pick3(listOf()); P.card = null; }
+    else if (P.cdPause && P.cdPause.key === P.card){ S.cd = {key: P.card, end: Date.now() + P.cdPause.left, done: false, add: P.cdPause.add}; cdTick(); }
+    P.cdPause = null; P.stage = 'final'; };
+  const bigBreak = () => { pauseCd(); const all = BIG[pup ? 'm' : 'f'], used = P.bigUsed || (P.bigUsed = []);
     const ok = t => { const x = t.replace(/\{w\}/g, Wn), pose = /跪|趴|仰躺|躺着|掰|双手|撅/.test(x);  // 卡上有姿势的，规则里有姿势或占着手就不抽它
       return !(P.rules || []).some(r => ruleClash(r, x) || (pose && ruleSlots(r).some(v => v === 'pose' || v === 'hand'))); };
     let c = all.filter(t => !used.includes(t) && ok(t)); if (!c.length) c = all.filter(ok); if (!c.length) c = all;
@@ -2736,17 +2748,18 @@ function punView(box, res, lv, why){
     wrap.append(h('div', {class: 'pl', text: '💥 ' + L + ' 破了规则！这一局第 ' + n + ' 次，来一张大惩罚（比小惩罚更狠）：'}),
       n >= 2 ? h('div', {class: 'phard'}, h('div', {class: 'ht', text: '🔥 破得越多罚得越重：这次' + (base ? '时间' : '次数') + ' ×' + mul + '，卡上已经算好了'})) : '',
       R.length ? h('div', {class: 'prule sm', text: '📌 规则照样要守：' + R.join('；') + '。只有喊暂停词才真的停'}) : '',
-      card('💥 大惩罚', bigT), secs ? cdBtn(P.big, secs, Infinity) :
+      card('💥 大惩罚', bigT), secs ? cdBtn(P.big + ' #' + n, secs, Infinity) :
         h('button', {class: 'btn block dadd', text: '➕ 不听话 +10 下' + (P.bigAdd ? '（已经加了 ' + P.bigAdd + ' 下）' : ''), onclick: () => { P.bigAdd = (P.bigAdd || 0) + 10; haptic(); render(); }}),
       h('div', {class: 'prow'},
-        h('button', {class: 'btn dgo', text: '✅ 罚完了，接着刚才那张', onclick: () => { P.stage = 'final'; haptic(); render(); }}),
+        h('button', {class: 'btn dgo', text: P.cumBig ? '✅ 罚完了 → 继续强制高潮' : '✅ 罚完了，接着刚才那张', onclick: () => { S.cd = null; backFinal(); haptic(); render(); }}),
         h('button', {class: 'btn dfail', text: '❌ 又破了 → 再来一张', onclick: bigBreak})),
+      P.cumBig ? '' : h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '💦 罚的时候' + come + '了 → 再来一张，罚完继续强制高潮', onclick: () => { P.cum = true; P.cumBig = true; bigBreak(); }}),
       h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '😣 坚持不住了 → ' + Wn + ' 提一个条件', onclick: () => { P.stage = 'bigdeal'; haptic(); render(); }}));
   } else if (P.stage === 'bigdeal'){
     wrap.append(h('div', {class: 'pl', text: '😣 ' + L + ' 坚持不住了'}),
       card('🤝 ' + Wn + ' 提条件', Wn + ' 现在当场说一个条件，想怎么罚、想让' + pron(loser) + '做什么都行。' + L + ' 必须答应并且做到；不答应，就回去接着做完这张大惩罚'),
       h('div', {class: 'prow'},
-        h('button', {class: 'btn dgo', text: '✅ 答应了，做完接着刚才那张', onclick: () => { P.stage = 'final'; haptic(); render(); }}),
+        h('button', {class: 'btn dgo', text: P.cumBig ? '✅ 答应了，做完继续强制高潮' : '✅ 答应了，做完接着刚才那张', onclick: () => { S.cd = null; backFinal(); haptic(); render(); }}),
         h('button', {class: 'btn dfail', text: '❌ 不答应 → 继续大惩罚', onclick: () => { P.stage = 'big'; haptic(); render(); }})));
   } else if (P.stage === 'care'){
     wrap.append(h('div', {class: 'pl', text: '💗 刚才辛苦了，换 ' + Wn + ' 好好照顾 ' + L + '：'}), card('💗 事后照顾', P.care),
