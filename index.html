@@ -2413,7 +2413,22 @@ const HARD_RULE = {
 };
 // 规则和卡冲不冲突：quiet 碰上要出声的卡、talk 碰上不许出声或「只许…」的卡、woof 碰上不许出声的卡、或卡里出现第 4 项
 const RULE_TALK = /说|报数|数到|数出|求|喊|叫|回答|答|讲|汪|呜/, RULE_SILENT = /不许出声|不许说话|不许发出|咬着嘴唇|憋着|叼/, RULE_ONLY = /只许|只能「|只能用/;
-const ruleClash = (r, t) => !!t && ((r[3] && r[3].test(t)) || (r[0] === 'quiet' && RULE_TALK.test(t)) || (r[0] === 'talk' && (RULE_SILENT.test(t) || RULE_ONLY.test(t) || (/一直/.test(r[1]) && /一直(说|求|报|喊)/.test(t)))) || (r[0] === 'woof' && RULE_SILENT.test(t)) || (r[0] !== 'talk' && /摇屁股|晃着|送上去|往前挺|送到|挺上去|蹭/.test(r[1]) && /不许(挺腰|动|乱动|晃|扭)/.test(t)));
+const ruleClash0 = (r, t) => !!t && ((r[3] && r[3].test(t)) || (r[0] === 'quiet' && RULE_TALK.test(t)) || (r[0] === 'talk' && (RULE_SILENT.test(t) || RULE_ONLY.test(t) || (/一直/.test(r[1]) && /一直(说|求|报|喊)/.test(t)))) || (r[0] === 'woof' && RULE_SILENT.test(t)) || (r[0] !== 'talk' && /摇屁股|晃着|送上去|往前挺|送到|挺上去|蹭/.test(r[1]) && /不许(挺腰|动|乱动|晃|扭)/.test(t)));
+// 规则要和卡对得上：① 规则里说的事卡上要有（被拍屁股、寸止停下、握根部…）；② 嘴：伸舌头的不和要说话、嘴被占的卡一起（「汪」「呜」可以）；舔她的不和嘴被占的卡一起；③ 看眼睛的不和趴着、从后面、蒙眼的卡一起；④ 要动的不和别动、按住、抱头的卡一起
+const RULE_TRIG = [[/被拍一下屁股|拍一下蛋蛋或屁股/, /拍|打/], [/蛋蛋被拍/, /蛋蛋/], [/乳头被拧|乳头被舔、被揉/, /乳头/],
+  [/被寸止停下|主人每次停手|主人停手的时候|手一停/, /寸止|停|快射就|快到就|快到了就|拿开|边缘/], [/主人的手一停/, t => !/自己撸|自己用手/.test(t)],
+  [/握住你的根部/, /根部|握紧|握住/], [/让你用手撸自己/, /自己撸|自己用手|你自己/], [/跟着爸爸的手/, /手指|揉|手掌|撸/]];
+const MOUTH_BUSY = /你(要)?舔|让你舔|舔她|舔主人|舔爸爸|骑在你脸|叼|含住她/, MOUTH_TALK = /说|报数|数到|数出|喊|回答|讲|念/;
+const RULE_EYE = /看着(他|她|爸爸|主人)的眼睛|睁着看爸爸/, CARD_BACK = /跪趴|趴着|趴好|趴在|从后面|蒙|骑在你脸/;
+const RULE_GO = /往他那边送|往爸爸手里|摇屁股|摇着|摇一下屁股|跟着爸爸的手一起扭|挺上去|送上去|迎上去|送到哪|爬到她脚边/, CARD_STILL = /别动|不许动|不许乱动|一动不动|按住|按着|抱头|不许挺腰|不许扭/;
+const ruleMiss = (r, t) => { const x = r[1];
+  if (RULE_TRIG.some(([a, b]) => a.test(x) && !(typeof b === 'function' ? b(t) : b.test(t)))) return true;
+  if (r[0] === 'body' && /舌头/.test(x) && (MOUTH_TALK.test(t) || MOUTH_BUSY.test(t))) return true;
+  if (r[0] === 'body' && /舔/.test(x) && MOUTH_BUSY.test(t)) return true;
+  if (RULE_EYE.test(x) && CARD_BACK.test(t)) return true;
+  return RULE_GO.test(x) && CARD_STILL.test(t); };
+// noTrig：挑大惩罚卡时只看真打架，不看「卡上有没有这件事」
+const ruleClash = (r, t, noTrig) => ruleClash0(r, t) || (!noTrig && !!t && ruleMiss(r, t));
 const rulePose = r => /双手|跪|腰|屁股|掰开|腿|四肢|仰躺|趴|蹲|膝盖/.test(r[1]);
 // 规则按部位分格子：嘴、手、眼睛、姿势，同一个部位只能有一条规则
 const ruleSlots = r => { const s = [], t = r[1];
@@ -2686,7 +2701,7 @@ function punView(box, res, lv, why){
     P.cdPause = null; P.stage = P.bigFrom || 'final'; };  // 回到进大惩罚之前那一步（二次惩罚或强制高潮）
   const bigBreak = again => { if (P.stage !== 'big' && P.stage !== 'bigdeal' && P.stage !== 'bigcond') P.bigFrom = P.stage; pauseCd(); const all = BIG[pup ? 'm' : 'f'], used = P.bigUsed || (P.bigUsed = []);
     const ok = t => { const x = t.replace(/\{w\}/g, Wn), pose = /跪|趴|仰躺|躺着|掰|双手|撅/.test(x);  // 卡上有姿势的，规则里有姿势或占着手就不抽它
-      return !(P.rules || []).some(r => ruleClash(r, x) || (pose && ruleSlots(r).some(v => v === 'pose' || v === 'hand'))); };
+      return !(P.rules || []).some(r => ruleClash(r, x, true) || (pose && ruleSlots(r).some(v => v === 'pose' || v === 'hand'))); };
     let c = all.filter(t => !used.includes(t) && ok(t)); if (!c.length) c = all.filter(ok); if (!c.length) c = all;
     const t = c[Math.floor(Math.random() * c.length)]; used.push(t); if (again !== 'swap') P.breaks = (P.breaks || 0) + 1;
     P.bigAdd = 0; P.big = t.replace(/\{w\}/g, Wn) + (pup ? '。不许躲、不许射，躲了或射了就再来一张大惩罚' : '。不许躲、不许到，躲了或到了就再来一张大惩罚'); P.stage = 'big'; haptic(); render(); };
