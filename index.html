@@ -2398,7 +2398,7 @@ const HARD_RULE = {
 };
 // 规则和卡冲不冲突：quiet 碰上要出声的卡、talk 碰上不许出声或「只许…」的卡、woof 碰上不许出声的卡、或卡里出现第 4 项
 const RULE_TALK = /说|报数|数到|数出|求|喊|叫|回答|答|讲|汪|呜/, RULE_SILENT = /不许出声|不许说话|不许发出|咬着嘴唇|憋着|叼/, RULE_ONLY = /只许|只能「|只能用/;
-const RULE_LICK = /让你(一根一根)?舔|你(要)?(先|跪着|趴着|一边|一根一根)?舔(?!你)|坐(到|在)你脸上|骑在你脸上|舔她|舔主人|69 姿势/;
+const RULE_LICK = /一根一根舔|舔(?!你)[^，。；你]{0,5}的(手指|手心|脚|乳头|下面)|让你(一根一根)?舔|你(要)?(先|跪着|趴着|一边|一根一根)?舔(?!你)|坐(到|在)你脸上|骑在你脸上|舔她|舔主人|69 姿势/;
 const ruleClash = (r, t) => !!t && ((r[3] && r[3].test(t)) || (r[0] === 'quiet' && RULE_TALK.test(t)) || (r[0] === 'talk' && (RULE_SILENT.test(t) || RULE_ONLY.test(t) || (/一直/.test(r[1]) && /一直(说|求|报|喊)/.test(t)))) || (r[0] === 'woof' && RULE_SILENT.test(t)) || (r[0] === 'body' && RULE_SPEAK.test(r[1]) && (RULE_SILENT.test(t) || RULE_ONLY.test(t))) || (RULE_MOVE.test(r[1]) && /不许(挺腰|动|乱动|晃|扭)/.test(t))
   || (RULE_LICK.test(t) && ((r[0] !== 'body' || RULE_SPEAK.test(r[1])) && /一直|每被|每喘|每撸|每次/.test(r[1]) || /叼/.test(r[1]))));
 const rulePose = r => /双手|跪|四肢|仰躺|趴|蹲|撅|掰/.test(r[1]);  // 固定姿势（规则里已经基本没有，姿势交给开局姿势和卡）
@@ -2560,7 +2560,7 @@ function chalView(box, c, lv, o){
     if (POSE_WORD.test(tx)) c.poseOpts = [];
     else { let a = POSE.m.filter(x => !c.rules.some(r => r[3] && r[3].test(x[0])) && !poseClash(x, tx)); if (a.length < 3) a = POSE.m.slice();
       for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } c.poseOpts = a.slice(0, 3); c.pose = c.poseOpts[0]; } }
-  const rtext = c.rules.map(r => r[1]).join('；同时') + (pup && !c.rules.some(r => /快射/.test(r[1]) || r[0] === 'quiet') && !RULE_SILENT.test(o.text || '') && !/快射/.test(o.text || '') && !(RULE_ONLY.test(o.text || '') && !/汪/.test(o.text || '')) ? '；快射了要先「汪」着报告，没报告就算输' : '') + (c.pose ? '。🐶 姿势：' + c.pose[0] : '');
+  const rtext = c.rules.map(r => r[1]).join('；同时') + (pup && !c.rules.some(r => /快射/.test(r[1]) || r[0] === 'quiet') && !RULE_SILENT.test(o.text || '') && !RULE_LICK.test(o.text || '') && !/快射/.test(o.text || '') && !(RULE_ONLY.test(o.text || '') && !/汪/.test(o.text || '')) ? '；快射了要先「汪」着报告，没报告就算输' : '') + (c.pose ? '。🐶 姿势：' + c.pose[0] : '');
   if (!c.st) c.st = 'ready';
   const w = h('div', {class: 'pun'});
   if (c.st === 'ready'){
