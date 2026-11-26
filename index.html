@@ -1637,6 +1637,18 @@ function lockView(p){
 }
 
 /* ---------- 卡片里的倒计时：内容里写了几秒 / 几分钟，就给一个计时按钮 ---------- */
+// 限制级卡的「总时长」：只认整张卡一共多久。按次数 / 按轮来的、分好几段的（吸 30 秒再咬 30 秒）、加时的，都不算总时长
+function totSpan(t){
+  const c = String(t).replace(/最多加到 ?\d+ ?(秒|分钟)/g, m => '#'.repeat(m.length)).replace(/(多|加|再)[^，；、]{0,4}?\d+ ?(秒|分钟)/g, m => '#'.repeat(m.length))
+    .replace(/每 ?\d+ ?(秒|分钟)/g, m => '#'.repeat(m.length));
+  const mins = [...c.matchAll(/(\d+) ?分钟/g)], secs = [...c.matchAll(/(\d+) ?秒/g)];
+  const after = m => c.slice(m.index + m[0].length);
+  if (mins.length === 1 && !/来回|轮|换边|换另一边|每边/.test(after(mins[0]))) return {sec: +mins[0][1] * 60, at: mins[0].index, len: mins[0][0].length};
+  const clause = m => c.slice(0, m.index).split(/[，；]/).pop();  // 同一句前面有「每 / 换成 / 停」，说明是一小段
+  if (!mins.length && secs.length === 1 && !/来回|轮|各|换边|换另一边|每边|两边/.test(after(secs[0])) && !/每|换成|停/.test(clause(secs[0]))) return {sec: +secs[0][1], at: secs[0].index, len: secs[0][0].length};
+  return null;
+}
+function totSecs(t){ const m = totSpan(t); return m ? m.sec : 0; }
 function cdSecs(t){
   const m = String(t).replace(/每 ?\d+\s*(秒|分钟)/g, '').match(/(\d+)\s*(秒|分钟)|([一两三四五])分钟|数到 ?(\d+)/);
   if (!m) return 0;
@@ -1644,8 +1656,8 @@ function cdSecs(t){
   if (m[3]) return ('一两三四五'.indexOf(m[3]) + 1) * 60;
   return +m[4];
 }
-function cdBtn(t){
-  const sec = cdSecs(t); if (!sec) return null;
+function cdBtn(t, force){
+  const sec = force == null ? cdSecs(t) : force; if (!sec) return null;
   const fmt = n => n >= 60 ? Math.floor(n / 60) + ':' + String(n % 60).padStart(2, '0') : n + ' 秒';
   const label = () => {
     const c = S.cd && S.cd.key === t ? S.cd : null;
@@ -1902,11 +1914,14 @@ function chalView(box, c, lv, o){
   const secs = pup ? [120, 180, 240, 300] : [60, 120, 180];  // 她 1-3 分钟，他 2-5 分钟，随机
   if (!c.sec) c.sec = secs[Math.floor(Math.random() * secs.length)];
   if (!c.rules) c.rules = chalRules(o.loser, o.text);
+  const span = o.text && !Array.isArray(o.text) ? totSpan(o.text) : null;
+  const tn = span && box.querySelector('.dcard .t');
+  if (tn) tn.textContent = o.text.slice(0, span.at) + fmt(c.sec) + o.text.slice(span.at + span.len);
   const rtext = c.rules.map(r => r[1]).join('；同时') + (pup ? '；快射了要先「汪」着报告，没报告就算输' : '');
   if (!c.st) c.st = 'ready';
   const w = h('div', {class: 'pun'});
   if (c.st === 'ready'){
-    w.append(h('div', {class: 'pl', text: L + ' 要撑住 ' + fmt(c.sec) + '：' + rtext + '；不许躲、不许推开、不许' + come + '。守不住规则或者没撑住，就进惩罚' + (cdSecs(o.text) ? '（卡上写的时间不算，以计时为准）' : '')}));
+    w.append(h('div', {class: 'pl', text: L + ' 要撑住 ' + fmt(c.sec) + '：' + rtext + '；不许躲、不许推开、不许' + come + '。守不住规则或者没撑住，就进惩罚' + (!span && /\d+ ?(秒|分钟)/.test(o.text || '') ? '（卡上写的是每一段的时间，整个挑战以计时为准）' : '')}));
     const chips = h('div', {class: 'psec'});
     secs.forEach(n => chips.append(h('button', {'aria-pressed': String(c.sec === n), text: fmt(n), onclick: () => { c.sec = n; render(); }})));
     w.append(chips, h('button', {class: 'btn block dgo', text: '⏱ 开始计时，' + Wn + ' 动手', onclick: () => { c.st = 'run'; c.t0 = Date.now(); c.end = c.t0 + c.sec * 1000; chalTick(c); haptic(); render(); }}),
@@ -1987,7 +2002,7 @@ function punView(box, res, lv, why){
   } else if (P.stage === 'dare'){
     wrap.append(h('div', {class: 'pl', text: P.doubled ? '🐶 主人不满意！加倍惩罚：' + Wn + ' 来做，' + L + ' 受着' : L + (P.why || why || ' 没撑住') + '，罚一张：' + Wn + ' 来做，' + L + ' 受着'}),
       banner('这一张不许' + come + '，' + come + '了就由 ' + Wn + ' 选继续强制高潮还是' + nipName + '。'),
-      card(P.doubled ? '🔥 加倍惩罚' : Wn + ' 罚 ' + L, P.card), cdBtn(P.card) || '',
+      card(P.doubled ? '🔥 加倍惩罚' : Wn + ' 罚 ' + L, P.card), cdBtn(P.card, lv >= 4 ? totSecs(P.card) : null) || '',
       lv >= 4 ? h('div', {class: 'prow'},
           h('button', {class: 'btn dgo', text: '✅ 罚完了，没' + come, onclick: () => { P.stage = 'judge'; haptic(); render(); }}),
           h('button', {class: 'btn dfail', text: '💦 ' + come + '了', onclick: () => { P.stage = 'choose'; P.cum = true; P.why = ' 在惩罚里' + come + '了'; haptic(); render(); }}))
@@ -2019,7 +2034,7 @@ function punView(box, res, lv, why){
     const what = P.kind === 'nip' ? nipName : (P.kind === 'over' ? '继续' : '') + (pup ? '强制小狗高潮' : '强制高潮');
     wrap.append(h('div', {class: 'pl', text: lv >= 4 ? (P.cum ? L + ' ' + come + '了，' : L + ' 接受') + what + '：' : L + ' 又没撑住，再罚一张更大胆的：'}),
       banner(''),
-      card(lv >= 4 ? what : Wn + ' 罚 ' + L, P.card), lv >= 4 && P.kind === 'climax' ? '' : (cdBtn(P.card) || ''),
+      card(lv >= 4 ? what : Wn + ' 罚 ' + L, P.card), lv >= 4 && P.kind === 'climax' ? '' : (cdBtn(P.card, lv >= 4 ? totSecs(P.card) : null) || ''),
       h('button', {class: 'btn block dgo', text: lv >= 4 ? '罚完了，' + Wn + ' 来照顾 ' + L : '结束这一局', onclick: () => {
         if (lv >= 4){ const cl = AFTERCARE[pup ? 'm' : 'f']; P.care = cl[Math.floor(Math.random() * cl.length)].replace(/\{w\}/g, Wn).replace(/\{l\}/g, L); P.stage = 'care'; }
         else P.stage = 'over'; haptic(); render(); }}),
