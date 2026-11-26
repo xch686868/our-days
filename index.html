@@ -354,6 +354,14 @@ svg{display:block}
 .psec button[aria-pressed="true"]{background:#fff;color:#B3123E}
 .pcount{font-family:var(--f-title);font-size:68px;font-weight:700;text-align:center;line-height:1.1;margin-bottom:4px}
 .dfail{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.55)}
+.phard{text-align:left;background:linear-gradient(135deg,#ff3b5c,#ff7a1a);color:#fff;border:2px solid #fff;border-radius:16px;padding:12px 14px;margin:0 0 10px;box-shadow:0 0 0 3px rgba(255,59,92,.35),0 6px 18px rgba(0,0,0,.25);animation:phardIn .6s ease-out}
+.phard .ht{font-size:17px;font-weight:800;letter-spacing:.5px;margin-bottom:6px;text-align:center}
+.phard ol{margin:0;padding-left:22px}
+.phard li{font-size:15.5px;font-weight:700;line-height:1.5;margin:4px 0}
+.phard .hf{margin-top:8px;padding-top:7px;border-top:1px dashed rgba(255,255,255,.7);font-size:14.5px;font-weight:800;text-align:center}
+.phard-mini{text-align:center;font-size:14px;font-weight:800;color:#fff;background:#ff3b5c;border-radius:12px;padding:7px 10px;margin:0 0 10px}
+.prule.sm{font-size:12.5px;font-weight:500;opacity:.9}
+@keyframes phardIn{0%{transform:scale(.92);opacity:0}60%{transform:scale(1.03);opacity:1}100%{transform:scale(1)}}
 .prule{text-align:left;font-size:13.5px;line-height:1.55;font-weight:600;background:rgba(255,255,255,.16);border:1px dashed rgba(255,255,255,.6);border-radius:12px;padding:8px 11px;margin:0 0 10px}
 .pres{text-align:center;font-weight:700;font-size:16px;padding:4px 0;line-height:1.5}
 .prow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -2076,17 +2084,19 @@ const CHAL_RULE = {
 };
 // 二次惩罚的规则：更严、更色；守不住直接强制高潮
 const HARD_RULE = {
-  m: [['talk', '每被弄一下都要「汪」一声再说「谢谢主人」，漏一下就算破规则', '漏了'], ['talk', '要一直求「主人让小狗射」，主人没说可以就不许射', '停下没求'],
-    ['talk', '要一直说「小狗的鸡巴是主人的玩具」', '停下没说'], ['talk', '要一直报告龟头有多难受：好痒、好酸、受不了了，一句都不许停', '停下没报告'],
-    ['talk', '每说一句话前面都要加「主人」，忘了一次就算破规则', '忘了叫主人'], ['quiet', '只许喘，不许出任何声音，也不许咬嘴唇憋着', '出声 / 咬嘴唇了'],
-    ['body', '双手抱头、腿张到最开，一下都不许动，龟头被磨也不许缩', '动了 / 缩了', /手|绑|跪|趴|站|坐/], ['body', '腰要一直往上挺，把龟头送到主人手里，不许往回缩', '缩了', /跪|趴|站|坐/],
-    ['body', '要跪直、双手背在身后，身子不许晃，倒下就算破规则', '晃了 / 倒下了', /躺|坐|站|跪|趴|绑|手/], ['body', '要一直伸着舌头像小狗一样喘，口水流下来也不许擦、不许合嘴', '合嘴 / 擦了'],
-    ['body', '眼睛要一直看着自己被玩的地方，一眼都不许移开', '移开眼了', /眼|趴|后面/], ['body', '要自己用手掰开腿把下面全露给主人，手不许松', '松手了', /手|绑|坐|站|跪|趴/]],
-  f: [['talk', '要一直说「爸爸，母狗好湿」', '停下没说'], ['talk', '每被弄一下都要说「谢谢爸爸」，漏一下就算破规则', '漏了'],
-    ['talk', '要一直求「爸爸让母狗到」，爸爸没说可以就不许到', '停下没求'], ['talk', '要一直说爸爸在弄你哪里、你有多舒服，一句都不许停', '停下没说'],
-    ['quiet', '不许出声，也不许咬嘴唇、捂嘴憋着', '出声 / 捂嘴了'], ['body', '要自己掰开腿到最开给爸爸看，手不许松', '松手了', /手|绑|坐|站|跪|趴/],
-    ['body', '要跪着挺胸、双手背在身后，不许趴下、不许躲', '趴下 / 躲了', /躺|坐|站|跪|趴|绑|手/], ['body', '屁股要一直往上抬着送给爸爸，不许落下', '落下了', /坐|站|跪|趴/],
-    ['body', '要一直看着爸爸弄你的地方，一眼都不许移开', '移开眼了', /眼|趴|后面/], ['body', '腿要一直张到最开，碰一下也不许并', '并腿了', /并腿|跪|站|趴/], ['body', '手不许碰爸爸、不许抓床单，也不许捂嘴憋着', '碰了 / 抓了']]
+  m: [['talk', '每被弄一下都要「汪」一声，再说「小狗的鸡巴是主人的」，漏一下就算破规则', '漏了'], ['talk', '要一直求「主人玩坏小狗吧」，主人没说可以就不许射', '停下没求'],
+    ['talk', '要一直说主人在玩你哪里、龟头有多酸多胀，一句都不许停', '停下没说'], ['talk', '每句话前面都要加「主人」、后面都要加「汪」，忘了一次就算破规则', '忘了'],
+    ['talk', '要一直报告离射还有多远，还要说想射在主人哪里', '停下没报告'], ['quiet', '只许喘和「呜呜」，不许说话，也不许咬嘴唇憋着', '说话 / 咬嘴唇了'],
+    ['body', '双手抱头、腿张到最开，龟头被磨也不许缩一下', '缩了 / 动了', /手|绑|跪|趴|站|坐/], ['body', '腰要一直往上挺，把鸡巴送到主人手里（或嘴里），不许往回缩', '缩了', /跪|趴|站|坐/],
+    ['body', '要跪直、双手背在身后、挺着下面给主人玩，身子不许晃', '晃了 / 倒下了', /躺|坐|站|跪|趴|绑|手/], ['body', '要一直伸着舌头像发情的小狗一样喘，口水流下来也不许擦', '合嘴 / 擦了'],
+    ['body', '眼睛要一直盯着自己被玩的鸡巴，一眼都不许移开', '移开眼了', /眼|趴|后面/], ['body', '要自己用手掰开腿，把蛋蛋和下面全露给主人，手不许松', '松手了', /手|绑|坐|站|跪|趴/],
+    ['body', '屁股要一直撅着翘给主人，被打也不许落下', '落下了', /躺|仰|坐|站/]],
+  f: [['talk', '要一直说「爸爸，母狗下面好湿，想被爸爸玩坏」', '停下没说'], ['talk', '每被弄一下都要说「谢谢爸爸玩母狗」，漏一下就算破规则', '漏了'],
+    ['talk', '要一直求「爸爸让母狗到」，爸爸没说可以就不许到', '停下没求'], ['talk', '要一直说爸爸在玩你哪里、你下面有多湿多想要，一句都不许停', '停下没说'],
+    ['quiet', '只许喘，不许说话，也不许咬嘴唇、捂嘴憋着', '说话 / 捂嘴了'], ['body', '要自己掰开腿到最开，把下面全露给爸爸看，手不许松', '松手了', /手|绑|坐|站|跪|趴/],
+    ['body', '要跪着挺胸、双手背后，把乳头送到爸爸嘴边，不许躲', '躲了 / 趴下了', /躺|坐|站|跪|趴|绑|手/], ['body', '屁股要一直撅着翘给爸爸，被打也不许落下', '落下了', /躺|仰|坐|站/],
+    ['body', '眼睛要一直盯着爸爸玩你的地方，一眼都不许移开', '移开眼了', /眼|趴|后面/], ['body', '腿要一直张到最开，下面被玩也不许并一下', '并腿了', /并腿|跪|站|趴/],
+    ['body', '手不许碰爸爸、不许抓床单，只许自己揉自己的乳头', '碰了 / 抓了', /绑|手|乳/], ['body', '手不许碰爸爸、不许抓床单，也不许捂嘴憋着', '碰了 / 抓了']]
 };
 function hardRules(loser, text){
   const t = text || '', L = HARD_RULE[loser === diceMale() ? 'm' : 'f'], rnd = a => a[Math.floor(Math.random() * a.length)];
@@ -2176,11 +2186,19 @@ function punView(box, res, lv, why){
   const nipName = pup ? '乳头折磨' : '乳头惩罚';
   const toCare = () => { const cl = AFTERCARE[pup ? 'm' : 'f']; P.care = cl[Math.floor(Math.random() * cl.length)].replace(/\{w\}/g, Wn).replace(/\{l\}/g, L); P.stage = 'care'; };
   // 挑战时的规则带进惩罚；跟这张卡冲突的（比如卡上蒙眼、卡上要说话）这张先不算
-  const rl = () => { const t = P.card || ''; if (P.hard && P.card && P.rulesFor !== P.card){ P.rules = hardRules(loser, P.card); P.rulesFor = P.card; } const talk = /说|报数|数到|数出|求|喊|叫|回答|答|讲|汪|不许出声|只许/.test(t);
-    return (P.rules || []).filter(r => !(r[3] && r[3].test(t)) && !(talk && r[0] !== 'body')).map(r => r[1]).join('；同时'); };
-  const banner = extra => lv >= 4 ? h('div', {class: 'prule', text: (P.hard ? '📌 二次惩罚，规则换了：' + (rl() ? rl() + '；破了规则就直接强制高潮；' : '') : '📌 规则：' + (rl() ? rl() + '（惩罚时照样要守）；' : '')) + extra + (pup ? '🐶 小狗' : '') + '求饶、反抗都不算数；只有喊暂停词才真的停'}) : '';
+  const rlist = () => { const t = P.card || ''; if (P.hard && P.card && P.rulesFor !== P.card){ P.rules = hardRules(loser, P.card); P.rulesFor = P.card; } const talk = /说|报数|数到|数出|求|喊|叫|回答|答|讲|汪|不许出声|只许/.test(t);
+    return (P.rules || []).filter(r => !(r[3] && r[3].test(t)) && !(talk && r[0] !== 'body')).map(r => r[1]); };
+  const rl = () => rlist().join('；同时');
+  const tail = extra => extra + (pup ? '🐶 小狗' : '') + '求饶、反抗都不算数；只有喊暂停词才真的停';
+  const hardBox = () => { const L2 = rlist(); if (!L2.length) return '';
+    return h('div', {class: 'phard'}, h('div', {class: 'ht', text: '⚠️ 规则换了！二次惩罚更严、更色'}),
+      h('ol', {}, ...L2.map(t => h('li', {text: t}))), h('div', {class: 'hf', text: '破了任何一条 → 直接强制高潮'})); };
+  const banner = extra => lv < 4 ? '' : P.hard
+    ? h('div', {}, hardBox(), h('div', {class: 'prule sm', text: tail(extra)}))
+    : h('div', {class: 'prule', text: '📌 规则：' + (rl() ? rl() + '（惩罚时照样要守）；' : '') + tail(extra)});
+  const hardMini = force => lv >= 4 && (P.hard || force) ? h('div', {class: 'phard-mini', text: '⚠️ 接下来是二次惩罚，规则会换成更严、更色的，选好卡就能看到'}) : '';
   const unhappy = () => { goHard(); if (pup && !P.doubled){ P.doubled = true; P.card = hardCard(); P.stage = 'dare'; } else P.stage = 'choose'; };
-  const goHard = () => { if (!P.hard){ P.hard = true; P.rules = hardRules(loser); } };
+  const goHard = () => { if (!P.hard){ P.hard = true; P.rules = hardRules(loser); if (navigator.vibrate) try { navigator.vibrate([80, 60, 80, 60, 220]); } catch {} } };
   const breakRule = () => { P.why = ' 在二次惩罚里破了规则'; P.kind = P.kind === 'over' || P.cum ? 'over' : 'climax'; P.forced = ' 破了规则'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); };
   const breakBtn = () => P.hard ? h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '❌ 破了规则 → 强制高潮', onclick: breakRule}) : '';
   const cumBtn = () => P.kind === 'nip' ? h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '💦 罚的时候' + come + '了 → 继续强制高潮', onclick: () => { P.cum = true; P.kind = 'over'; P.forced = ' 在' + nipName + '里' + come + '了'; P.again = 0; P.opts = pick3(listOf()); P.card = null; haptic(); render(); }}) : '';
@@ -2234,6 +2252,7 @@ function punView(box, res, lv, why){
       lv >= 4 ? h('button', {class: 'btn block dgo', style: {marginTop: '10px'}, text: '💗 ' + Wn + ' 去照顾 ' + L, onclick: () => { toCare(); haptic(); render(); }}) : '');
   } else if (P.stage === 'choose'){
     const ov = P.cum ? 'over' : 'climax';
+    wrap.append(hardMini(true));
     wrap.append(h('div', {class: 'pl', text: P.cum ? L + (P.why || ' ' + come + '了') + '！' + Wn + ' 来选怎么罚：' : (P.broke ? L + ' 破了规则，' : '') + (pup ? '主人' : Wn + ' ') + '不满意！' + Wn + ' 选一个罚法：'}),
       h('button', {class: 'btn block dfail', text: '💦 ' + (P.cum ? '继续' : '') + (pup ? '强制小狗高潮' : '强制高潮'), onclick: () => { goHard(); P.kind = ov; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); }}),
       h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: pup ? '🔥 乳头折磨' : '🌸 乳头惩罚', onclick: () => { goHard(); P.kind = 'nip'; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); }}));
@@ -2242,6 +2261,7 @@ function punView(box, res, lv, why){
   } else if (P.stage === 'final' && !P.card){
     const what = P.kind === 'nip' ? nipName : (P.kind === 'over' ? '继续' : '') + (pup ? '强制小狗高潮' : '强制高潮');
     wrap.append(h('div', {class: 'pl', text: (P.forced && !P.again ? L + P.forced + '，直接' : P.again ? (pup ? '主人' : Wn + ' ') + '还不满意！再来一张' : P.cum ? L + ' ' + come + '了，' + Wn + ' 选了' : L + ' 接受') + what + '！' + Wn + ' 从三个里挑一个：'}));
+    wrap.append(hardMini());
     P.opts.forEach(t => wrap.append(h('button', {class: 'dopt', text: t, onclick: () => { P.card = t; haptic(); render(); }})));
     wrap.append(h('button', {class: 'dskip', text: '三个都不想要，换三个', onclick: () => { P.opts = pick3(listOf()); haptic(); render(); }}));
   } else if (P.stage === 'final'){
