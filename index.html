@@ -367,6 +367,8 @@ svg{display:block}
 .phard .hsw{margin-top:6px;font-size:12.5px;font-weight:600;opacity:.9;line-height:1.4}
 .phard .hf{margin-top:8px;padding-top:7px;border-top:1px dashed rgba(255,255,255,.7);font-size:14.5px;font-weight:800;text-align:center}
 .phard-mini{text-align:center;font-size:14px;font-weight:800;color:#fff;background:#ff3b5c;border-radius:12px;padding:7px 10px;margin:0 0 10px}
+
+.rlist{text-align:left;font-size:14px;line-height:1.55;background:rgba(255,255,255,.16);border:1px dashed rgba(255,255,255,.6);border-radius:12px;padding:8px 11px;margin:0 0 10px}.rlist .ri{margin:4px 0}.rlist .ri b{font-weight:700}.rlist .rs{font-size:12.5px;opacity:.85;margin-left:1.4em}.rlist details{margin-left:1.4em;font-size:12.5px;opacity:.85}.rlist summary{cursor:pointer}.rnote{font-size:12px;opacity:.8;text-align:center;margin:8px 0 0;line-height:1.5}
 .prule.sm{font-size:12.5px;font-weight:500;opacity:.9}
 @keyframes phardIn{0%{transform:scale(.92);opacity:0}60%{transform:scale(1.03);opacity:1}100%{transform:scale(1)}}
 .prule{text-align:left;font-size:13.5px;line-height:1.55;font-weight:600;background:rgba(255,255,255,.16);border:1px dashed rgba(255,255,255,.6);border-radius:12px;padding:8px 11px;margin:0 0 10px}
@@ -1754,7 +1756,7 @@ function duelView(lv){
     const W = nameOf(d.win), L = nameOf(other(d.win)), fill = t => { const x = gtext(t, other(d.win)).replace(/\{w\}/g, W); return lv >= 4 ? noTot(x) : x; };
     if (d.pick == null){
       box.append(h('div', {class: 'dsent', text: W + ' 赢了！挑一张，用来罚 ' + L}));
-      if (d.pose) box.append(h('div', {class: 'prule', text: '📌 这一局小狗要：' + ruleTxt(d.pose)}));
+      if (d.pose) box.append(h('div', {class: 'prule', text: '🐶 这一局姿势：' + (poseShort(d.pose) ? poseShort(d.pose).how : d.pose[1])}));
       d.opts.forEach((t, i) => box.append(h('button', {class: 'dopt', text: fill(t), onclick: () => { d.pick = i; haptic(); render(); }})));
       box.append(h('button', {class: 'dskip', text: '三张都不想要，换三张', onclick: () => { d.opts = duelOpts(lv, other(d.win), d.pose); haptic(); render(); }}));
     } else {
@@ -1768,7 +1770,7 @@ function duelView(lv){
           if (!d.opts.length) d.opts = duelOpts(lv, other(d.win), d.pose);
           d.pick = null; d.ch = null; render(); });
         if (lv >= 4){
-          const run = chalView(box, d.ch || (d.ch = {pre: d.pose}), lv, {loser: other(d.win), win: d.win, text: fill(d.opts[d.pick]), onFail: (why, cum) => { d.fail = true; d.why = why; d.cum = cum; }});
+          const run = chalView(box, d.ch || (d.ch = {pre: d.pose}), lv, {duel: true, loser: other(d.win), win: d.win, text: fill(d.opts[d.pick]), onFail: (why, cum) => { d.fail = true; d.why = why; d.cum = cum; }});
           if (d.ch.st === 'ok' || d.ch.st === 'done') box.append(h('button', {class: 'btn block dgo', text: '下一局', onclick: roll}));
           else if (!run){ box.append(hide()); box.append(h('button', {class: 'dskip', text: '换一张', onclick: () => { d.pick = null; d.ch = null; render(); }})); }
         } else {
@@ -2878,6 +2880,37 @@ const POSE_RE = /^(仰面躺下，两只手从膝盖下面抱住|两只脚踩在
 const POSE_TIED = /^(两只手被绑在身后跪直|手被绑在身后，脸和肩膀|被绑着仰躺的时候)/;
 const isPose = r => !!r && POSE_RE.test(r[1]);
 const ruleTxt = r => (isPose(r) ? '【强制】' : '') + r[1];
+// 强制姿势的短说法：怎么做 / 做不到会怎样，原文点「细节」才看
+const POSE_SHORT = [
+  ['仰面躺下，两只手从膝盖下面抱住', '仰躺，两手抱腿往胸口拉，腿分最开', '拧龟头半圈、加 30 秒'],
+  ['两只脚踩在床上蹲下，膝盖往两边分开，两只手撑', '蹲着，两手撑床，屁股不许坐', '指甲刮系带、加 30 秒'],
+  ['两个膝盖和两只手肘撑在床上趴好，小臂贴着床，腰往下压', '手肘撑床趴好，屁股翘最高', '拍一下蛋蛋，翘回去摇一摇'],
+  ['跪在床上，屁股坐在脚后跟上', '跪坐，爪子放胸前，伸舌头哈气', '拧乳头半圈，「汪」一声举回去'],
+  ['两个膝盖和两只手肘撑在床上趴好，小臂贴着床；主人从后面', '手肘撑床趴好，被玩时屁股要摇', '晾你 30 秒，自己摇着求她'],
+  ['每次被寸止停下，都要两个膝盖', '每次停下都趴好、翘屁股摇', '摇得不欢，多寸止一次'],
+  ['直着身子跪好，两个膝盖往两边分到最开', '跪直，膝盖分开，爪子举胸前', '扇一下龟头'],
+  ['两只脚踩在床上蹲下，膝盖往两边分到最开', '蹲着，爪子放胸前，屁股不许坐', '攥紧龟头数到 30、加 30 秒'],
+  ['两个膝盖和两只手肘撑在床上趴好，小臂贴着床，把一条腿', '趴好，一条腿往旁边抬（公狗抬腿）', '弹龟头三下'],
+  ['仰面躺下，两只手当爪子', '仰躺翻肚皮，爪子缩胸前，脚悬空', '咬乳头数到 30'],
+  ['两个膝盖和两只手肘撑在床上趴好，腿分开让蛋蛋', '手肘撑床趴好，蛋蛋垂着', '缩一下多寸止一次、加 30 秒'],
+  ['两只手被绑在身后跪直', '手绑身后跪直，膝盖分最开', '扇一下龟头'],
+  ['手被绑在身后，脸和肩膀', '手绑身后，脸贴床，屁股翘最高', '打屁股五下'],
+  ['被绑着仰躺的时候', '绑着仰躺，腿张最开', '打一下大腿、加 30 秒'],
+  ['要像公狗一样抬起一条后腿', '一条后腿抬着不许放（整张卡）', '加 1 分钟'],
+  ['整张卡都要两个膝盖和两只手肘撑在床上趴好，小臂贴着床，腰往下压', '趴好翘高，伸舌头哈气不许合嘴（整张卡）', '晾你 1 分钟'],
+  ['整张卡都要两只脚踩在床上蹲着', '蹲着，爪子放胸前，屁股一下都不许坐（整张卡）', '多寸止一次、加 1 分钟'],
+  ['直着身子跪好，膝盖分开', '跪直举爪，每被弄一下就挺腰送', '掌心磨龟头十圈'],
+  ['整张卡都要两个膝盖和两只手肘撑在床上趴好，蛋蛋垂', '趴好，蛋蛋垂着（整张卡）', '拍蛋蛋五下、加 1 分钟']];
+const poseShort = r => { const x = isPose(r) && POSE_SHORT.find(p => r[1].startsWith(p[0])); return x ? {how: x[1], fail: x[2]} : null; };
+// 规则里她又换一种玩法的（比大小里不配，卡上写什么就玩什么）
+const RULE_PLAY = /她就把跳蛋|塞进丝袜里|伸出舌尖|手指|坐在你脸|坐到你脸|俯下来|咬住你|攥着你的龟头不让动|把手拿开|另一只手把跳蛋/;
+// 规则一条一行、编号显示
+function ruleList(R, extra){ const N = '①②③④⑤⑥⑦⑧'; let i = 0; const box = h('div', {class: 'rlist'});
+  R.forEach(r => { const ps = poseShort(r);
+    box.append(ps ? h('div', {class: 'ri'}, h('b', {text: N[i++] + ' 姿势：'}), ps.how, h('div', {class: 'rs', text: '做不到：' + ps.fail}), h('details', {}, h('summary', {text: '细节'}), h('div', {class: 'rs', text: r[1]})))
+      : h('div', {class: 'ri'}, h('b', {text: N[i++] + ' '}), ruleTxt(r))); });
+  if (extra) box.append(h('div', {class: 'ri'}, h('b', {text: N[i++] + ' '}), extra));
+  return box; }
 function poseForce(R, t, pools, skip, want){ if (!R) return; t = t || '';
   const chal = pools.length === 1 && pools[0] === CHAL_RULE.m;
   const cand = (chal ? [...CHAL_RULE.m, ...HARD_RULE.m] : [...CHAL_RULE.m, ...HARD_RULE.m, ...SEVERE_RULE.m]).filter(r => isPose(r) && (t || !POSE_TIED.test(r[1])) && !ruleClash(r, t));
@@ -3357,17 +3390,20 @@ function chalView(box, c, lv, o){
   const fmt = n => n >= 60 ? Math.floor(n / 60) + ' 分' + (n % 60 ? ' ' + (n % 60) + ' 秒' : '钟') : n + ' 秒';
   const secs = pup ? [120, 180, 240, 300] : [120, 180, 240];  // 她 2-4 分钟，他 2-5 分钟，随机
   if (!c.sec) c.sec = secs[Math.floor(Math.random() * secs.length)];
-  if (!c.rules){ c.rules = chalRules(o.loser, o.text); if (pup){ if (c.pre) c.rules = c.rules.filter(r => !isPose(r)); poseForce(c.rules, o.text, [CHAL_RULE.m], c.gone, c.pre); } }
+  if (!c.rules){ c.rules = chalRules(o.loser, o.text); if (pup){ if (c.pre) c.rules = c.rules.filter(r => !isPose(r)); poseForce(c.rules, o.text, [CHAL_RULE.m], c.gone, c.pre); }
+    if (o.duel && pup){ const rest = c.rules.filter(r => !isPose(r) && !RULE_PLAY.test(r[1])); c.rules = c.rules.filter(isPose).concat(rest.slice(0, 1));
+      if (!rest.length) ruleAdd1(c.rules, CHAL_RULE.m.filter(r => !isPose(r) && !RULE_PLAY.test(r[1])), o.text, c.gone); } }
   const span = o.text && !Array.isArray(o.text) ? totSpan(o.text) : null;
   const tn = span && box.querySelector('.dcard .t');
   if (tn) tn.textContent = o.text.slice(0, span.at) + fmt(c.sec) + o.text.slice(span.at + span.len);
   const step = addStep(o.text) || 30;
-  const rtext = c.rules.map(ruleTxt).join('；同时') + (pup && !c.rules.some(r => /快射|想射/.test(r[1]) || r[0] === 'quiet') && !RULE_SILENT.test(o.text || '') && !/快射/.test(o.text || '') && !(RULE_ONLY.test(o.text || '') && !/汪/.test(o.text || '')) ? '；快射了要先「汪」着报告，没报告就算输' : '');
+  const rep = pup && !c.rules.some(r => /快射|想射/.test(r[1]) || r[0] === 'quiet') && !RULE_SILENT.test(o.text || '') && !/快射/.test(o.text || '') && !(RULE_ONLY.test(o.text || '') && !/汪/.test(o.text || '')) ? '快射了要先「汪」着报告，没报告就算输' : '';
+  const rtext = c.rules.map(ruleTxt).join('；同时') + (rep ? '；' + rep : '');
   if (!c.st) c.st = 'ready';
   // 挑战里换规则：挑战没有上一级，换掉的那条补一条、再多一条（最多 5 条），时间 ×1.5
   const chalSwap = () => lv >= 4 ? swapBox(c, c.rules, '挑战没有上一级，所以规则多一条，' + (c.st === 'run' ? '剩下的时间' : '挑战时间') + ' ×1.5', r => {
     const g = c.gone || (c.gone = []); g.push(r[1]); c.rules = c.rules.filter(y => y[1] !== r[1]);
-    ruleGrow(c.rules, [CHAL_RULE[pup ? 'm' : 'f']], o.text, 2, g); if (pup) poseForce(c.rules, o.text, [CHAL_RULE.m], g); c.upN = (c.upN || 0) + 1;
+    ruleGrow(c.rules, [o.duel && pup ? CHAL_RULE.m.filter(r => !RULE_PLAY.test(r[1])) : CHAL_RULE[pup ? 'm' : 'f']], o.text, 2, g); if (pup) poseForce(c.rules, o.text, [CHAL_RULE.m], g); c.upN = (c.upN || 0) + 1;
     if (c.st === 'run'){ const left = Math.max(0, c.end - Date.now()), x = Math.round(left * 0.5 / 1000); c.end += x * 1000; c.xadd = (c.xadd || 0) + x; }
     else c.sec = Math.round(c.sec * 1.5);
     c.upMsg = '🔄 换掉了「' + r[1] + '」：规则现在 ' + c.rules.length + ' 条，' + (c.st === 'run' ? '剩下的时间' : '时间') + ' ×1.5（第 ' + c.upN + ' 次换）'; }) : '';
@@ -3405,18 +3441,19 @@ function chalView(box, c, lv, o){
     const sv = {from: c.st, step: 'ask'}; if (c.st === 'run'){ clearInterval(S.chTimer); sv.left = Math.max(1000, c.end - Date.now()); } c.sv = sv; haptic(); render(); }}) : '';
   if (c.st === 'ready'){
     if (c.upMsg) w.append(h('div', {class: 'phard'}, h('div', {class: 'hf', style: {marginTop: 0, paddingTop: 0, border: 0}, text: c.upMsg})));
-    w.append(h('div', {class: 'pl', text: L + ' 要撑住 ' + fmt(c.sec) + '：' + rtext + '；不许躲、不许推开、不许' + come + '。守不住规则或者没撑住，就进惩罚' + (!span && /\d+ ?(秒|分钟)/.test(o.text || '') ? '（卡上写的是每一段的时间，整个挑战以计时为准）' : '')}));
+    const rnote = '不许躲、不许推开、不许' + come + '。破一条先小惩罚；再破或没撑住，就进惩罚' + (!span && /\d+ ?(秒|分钟)/.test(o.text || '') ? '（卡上写的是每一段的时间，整个挑战以计时为准）' : '');
+    w.append(h('div', {class: 'pl', text: L + ' 要撑住 ' + fmt(c.sec) + '，守住这 ' + (c.rules.length + (rep ? 1 : 0)) + ' 条：'}), ruleList(c.rules, rep));
     const chips = h('div', {class: 'psec'});
     if (!c.upN) secs.forEach(n => chips.append(h('button', {'aria-pressed': String(c.sec === n), text: fmt(n), onclick: () => { c.sec = n; render(); }})));
     w.append(c.upN ? '' : chips, h('button', {class: 'btn block dgo', text: '⏱ 开始计时，' + Wn + ' 动手', onclick: () => { c.st = 'run'; c.t0 = Date.now(); c.end = c.t0 + c.sec * 1000; chalTick(c); haptic(); render(); }}),
-      chalSwap());
+      h('div', {class: 'rnote', text: rnote}), chalSwap());
   } else if (c.st === 'run'){
     const fail = (why, cum) => { clearInterval(S.chTimer); const held = Math.floor((Date.now() - c.t0) / 1000); c.st = 'fail'; o.onFail(' 只撑了 ' + held + ' 秒就' + why, cum); haptic(); render(); };
     w.append(h('div', {class: 'pcount', id: 'chLeft', text: String(Math.max(0, Math.ceil((c.end - Date.now()) / 1000)))}),
       (() => { const room = ADD_MAX - c.sec - (c.add || 0), n = Math.min(step, room);
         return h('button', {class: 'btn block dadd', disabled: room <= 0, text: room <= 0 ? '已经加满 30 分钟（已加 ' + c.add + ' 秒）' : '➕ 不听话 +' + n + ' 秒' + (c.add ? '（已加 ' + c.add + ' 秒）' : ''),
           onclick: () => { c.add = (c.add || 0) + n; c.end += n * 1000; haptic(); render(); }}); })(),
-      h('div', {class: 'prule', text: '📌 ' + L + '：' + rtext}), c.upMsg ? h('div', {class: 'prule sm', text: c.upMsg}) : '', chalSwap(),
+      ruleList(c.rules, rep), c.upMsg ? h('div', {class: 'prule sm', text: c.upMsg}) : '', chalSwap(),
       !c.graced ? h('div', {class: 'prow'},
         h('button', {class: 'btn dfail', text: '❌ 破了规则（先小惩罚）', onclick: () => { c.graced = true; c.left = Math.max(1000, c.end - Date.now()); clearInterval(S.chTimer); c.st = 'mini'; haptic(); render(); }}),
         h('button', {class: 'btn dfail', text: '😣 没撑住', onclick: () => fail('没撑住')})) : '',
