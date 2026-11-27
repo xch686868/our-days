@@ -2869,12 +2869,12 @@ function punView(box, res, lv, why){
   const rlR = () => { const x = rlist(); return (P.rules || []).filter(r => x.includes(r[1])); };
   const tail = extra => extra + (pup ? '🐶 小狗' : '') + '求饶、反抗都不算数；只有喊安全词才真的停';
   // 二次惩罚的规则换一次就固定，后面换卡也不变；跟这张卡冲突的那条灰掉、这张先不算
-  const hardBox = () => { const t = P.card || ''; fixRules(t); const R = P.rules || []; if (!R.length) return '';
+  const hardBox = (t0, head, foot) => { const t = t0 || P.card || ''; fixRules(t); const R = P.rules || []; if (!R.length) return '';
     const sw = P.swap && P.swap.t === t ? P.swap.gone : [];
-    return h('div', {class: 'phard'}, h('div', {class: 'ht', text: '⚠️ 规则换了！二次惩罚更严、更色'}),
+    return h('div', {class: 'phard'}, h('div', {class: 'ht', text: head || '⚠️ 规则换了！二次惩罚更严、更色'}),
       h('ol', {}, ...R.map(r => clash(r, t) ? h('li', {class: 'off', text: r[1] + '（这张卡先不算）'}) : h('li', {text: r[1]}))),
       sw.length ? h('div', {class: 'hsw', text: '🔄 有 ' + sw.length + ' 条和这张卡冲突，已自动换掉（原来是：' + sw.join('；') + '）'}) : '',
-      h('div', {class: 'hf', text: '破了任何一条 → 大惩罚（罚完接着这张）'})); };
+      h('div', {class: 'hf', text: foot || '破了任何一条 → 大惩罚（罚完接着这张）'})); };
   const banner = extra => lv < 4 ? '' : P.hard
     ? h('div', {}, upLine(P.card), hardBox(), swapUI((P.rules || []).filter(r => !clash(r, P.card || ''))), h('div', {class: 'prule sm', text: tail(extra)}))
     : h('div', {}, h('div', {class: 'prule', text: '📌 规则：' + (rl() ? rl() + '（惩罚时照样要守）；' : '') + tail(extra)}), swapUI(rlR()));
@@ -3092,10 +3092,9 @@ function punView(box, res, lv, why){
     const n = P.breaks || 1, mul = 1 + 0.5 * (n - 1), base = totSecs(P.big), secs = base ? Math.round(base * mul) : 0;
     const tf = x => x % 60 ? (x >= 60 ? Math.floor(x / 60) + ' 分 ' : '') + x % 60 + ' 秒' : x / 60 + ' 分钟';
     const bigT = mul === 1 ? P.big : base ? P.big.replace(/1 分钟/, tf(secs)) : P.big.replace(/(\d+) 下/g, (x, v) => Math.round(+v * mul) + ' 下');
-    const R = (P.rules || []).filter(r => !ruleClash(r, P.big)).map(r => r[1]);
     wrap.append(upLine(P.big), h('div', {class: 'pl', text: upOn(P.big) ? '💥 大惩罚（这一局第 ' + n + ' 张）：' + Wn + ' 来做，' + L + ' 受着' : '💥 ' + L + ' 破了规则！这一局第 ' + n + ' 次，来一张大惩罚（比小惩罚更狠）：'}),
       n >= 2 ? h('div', {class: 'phard'}, h('div', {class: 'ht', text: '🔥 破得越多罚得越重：这次' + (base ? '时间' : '次数') + ' ×' + mul + '，卡上已经算好了'})) : '',
-      R.length ? h('div', {class: 'prule sm', text: '📌 规则照样要守：' + R.join('；') + '。只有喊安全词才真的停'}) : '',
+      hardBox(P.big, '💥 大惩罚里规则照样要守', '破了任何一条 → 再来一张大惩罚；只有喊安全词才真的停'),
       swapUI((P.rules || []).filter(r => !ruleClash(r, P.big))),
       card('💥 大惩罚', bigT), secs ? pcd(P.big + ' #' + n, secs, Infinity) :
         h('button', {class: 'btn block dadd', text: '➕ 不听话 +10 下' + (P.bigAdd ? '（已经加了 ' + P.bigAdd + ' 下）' : ''), onclick: () => { P.bigAdd = (P.bigAdd || 0) + 10; haptic(); render(); }}),
