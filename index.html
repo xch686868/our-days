@@ -343,6 +343,10 @@ svg{display:block}
 .die.win{background:rgba(255,255,255,.36);border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.5)}
 .dopt{display:block;width:100%;text-align:left;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:16px;padding:12px 14px;color:#fff;font-size:15px;line-height:1.5;font-weight:600;margin-top:8px}
 .dopt:active{background:rgba(255,255,255,.3)}
+.swbox{margin:8px 0 10px;padding:10px 12px;border:1px dashed rgba(255,255,255,.6);border-radius:14px}
+.swbox .swt{font-size:13.5px;font-weight:700;line-height:1.45;margin-bottom:6px}
+.swbox .dopt{font-size:14px;padding:9px 12px;margin-top:6px}
+.swbtn{display:block;margin:6px auto 10px;color:#fff;font-size:14px;font-weight:700;opacity:.92;text-decoration:underline}
 .dpts{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:14px;font-size:14px;font-weight:600}
 .dpts b{font-family:var(--f-title);font-size:22px;min-width:36px;text-align:center;background:rgba(255,255,255,.2);border-radius:10px;padding:2px 8px}
 .dpts b.w{background:#fff;color:#B3123E}
@@ -2488,13 +2492,42 @@ const ruleSlots = r => { const s = [], t = r[1];
   if (/眼睛|盯着|看着/.test(t)) s.push('eye');
   if (rulePose(r)) s.push('pose');
   if (r[0] === 'body' && /舔/.test(t)) s.push('lick', 'pose');
-  if (r[0] === 'body' && /送上去|往前挺|送到|挺上去/.test(t)) s.push('push'); return s; };
+  if (r[0] === 'body' && /送上去|往前挺|送到|挺上去|送一下/.test(t)) s.push('push'); return s; };
 // 两条放一起做不到：要摇/晃/挺送 × 不许挺腰/不许晃；伸舌头 × 叼着
 const RULE_MOVE = /摇屁股|晃着|送上去|往前挺|送到|挺上去|蹭|挺给|迎上去|摇一下|说「摇」/;
 const pairBad = (a, b) => (RULE_MOVE.test(a[1]) && /不许挺腰|不许晃|僵住|都不许动|一动不动/.test(b[1])) || (/舌头/.test(a[1]) && /叼|舔/.test(b[1])) || (/僵住|都不许动|一动不动|不许挺腰/.test(a[1]) && /僵住|都不许动|一动不动/.test(b[1]));
 const slotFree = (x, R, skip) => { const a = ruleSlots(x); return !R.some((y, j) => j !== skip && y[1] !== x[1] && (ruleSlots(y).some(v => a.includes(v)) || pairBad(x, y) || pairBad(y, x))); };
-function hardRules(loser, text){
-  const t = text || '', L = HARD_RULE[loser === diceMale() ? 'm' : 'f'], rnd = a => a[Math.floor(Math.random() * a.length)];
+// 换规则：不喜欢哪条就换掉，惩罚升一级、规则多一条；最多 6 条。新加的规则不和卡、不和已有的规则打架，换掉的这一局不再出
+const RULE_MAX = 6, RULE_TALKCARD = /说|报数|数到|数出|求|喊|叫|回答|答|讲|汪|不许出声|只许/;
+function ruleAdd(R, pools, t, skip){
+  for (const pool of pools){ const x = ruleAdd1(R, pool, t, skip); if (x) return x; } return null; }
+function ruleAdd1(R, pool, t, skip){
+  const c = pool.filter(x => !R.some(y => y[1] === x[1]) && !(skip || []).includes(x[1]) && !ruleClash(x, t || '') && !(RULE_TALKCARD.test(t || '') && x[0] !== 'body') && slotFree(x, R));
+  if (!c.length) return null; const x = c[Math.floor(Math.random() * c.length)]; R.push(x); return x; }
+function ruleGrow(R, pool, t, k, skip){ let n = 0; for (let i = 0; i < k && R.length < RULE_MAX; i++){ if (!ruleAdd(R, pool, t, skip)) break; n++; } return n; }
+// 最高一级再换：时间和次数 ×1.5（「最多加到」「每 N 秒」不乘；中文的「二十次」「十下」也乘，一两下的不动）
+const CN15 = {一: 1, 两: 2, 二: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9};
+const cnNum = x => { if (x === '十') return 10; const i = x.indexOf('十'); if (i < 0) return x.length === 1 ? CN15[x] || 0 : 0; return (i ? CN15[x[0]] || 0 : 1) * 10 + (x[i + 1] ? CN15[x[i + 1]] || 0 : 0); };
+const mul15 = t => t.replace(/(?<!最多加到\s?|每[^，；。\d]{0,2}\s?)(\d+)\s*(分钟|秒|下|次|口|轮|遍)/g, (m, v, u) => Math.round(+v * 1.5) + ' ' + u)
+  .replace(/(?<!每[^，；。\d一两二三四五六七八九十]{0,2}|第|最多加到)([一两二三四五六七八九十]{1,3})(次|下|口|遍|轮)/g, (m, v, u) => { const n = cnNum(v); return n >= 3 ? ' ' + Math.round(n * 1.5) + ' ' + u : m; }).replace(/([，；、。（「])\s+(\d)/g, '$1$2');
+// 换规则的框：先点开，再点要换的那条，再确认
+function swapBox(st, R, what, go){
+  if (!R || !R.length) return '';
+  if (st.swOpen == null) return h('button', {class: 'swbtn', text: '🔄 不喜欢哪条规则？换掉它（惩罚升一级）', onclick: () => { st.swOpen = true; st.swPick = null; haptic(); render(); }});
+  const box = h('div', {class: 'swbox'});
+  if (st.swPick == null){
+    box.append(h('div', {class: 'swt', text: '点要换掉的那条。换了以后：' + what}));
+    R.forEach((r, i) => box.append(h('button', {class: 'dopt', text: '🔄 ' + r[1], onclick: () => { st.swPick = i; haptic(); render(); }})));
+    box.append(h('button', {class: 'dskip', text: '算了，不换', onclick: () => { st.swOpen = null; haptic(); render(); }}));
+  } else {
+    const r = R[st.swPick];
+    box.append(h('div', {class: 'swt', text: '确定换掉「' + r[1] + '」吗？换了以后：' + what}),
+      h('div', {class: 'prow'}, h('button', {class: 'btn dfail', text: '🔄 确定换', onclick: () => { st.swOpen = st.swPick = null; go(r); haptic(); render(); }}),
+        h('button', {class: 'btn dgo', text: '算了', onclick: () => { st.swOpen = st.swPick = null; haptic(); render(); }})));
+  }
+  return box; }
+function hardRules(loser, text, skip){
+  const t = text || '', L = HARD_RULE[loser === diceMale() ? 'm' : 'f'].filter(r => !(skip || []).includes(r[1])), rnd = a => a[Math.floor(Math.random() * a.length)];
   const talk = /说|报数|数到|数出|求|喊|叫|回答|答|讲|汪|不许出声|只许/.test(t);
   let body = L.filter(r => r[0] === 'body' && !ruleClash(r, t));
   if (!body.length) body = L.filter(r => r[0] === 'body' && !r[3]);
@@ -2715,6 +2748,13 @@ function chalView(box, c, lv, o){
   const step = addStep(o.text) || 30;
   const rtext = c.rules.map(r => r[1]).join('；同时') + (pup && !c.rules.some(r => /快射|想射/.test(r[1]) || r[0] === 'quiet') && !RULE_SILENT.test(o.text || '') && !/快射/.test(o.text || '') && !(RULE_ONLY.test(o.text || '') && !/汪/.test(o.text || '')) ? '；快射了要先「汪」着报告，没报告就算输' : '');
   if (!c.st) c.st = 'ready';
+  // 挑战里换规则：挑战没有上一级，换掉的那条补一条、再多一条（最多 6 条），时间 ×1.5
+  const chalSwap = () => lv >= 4 ? swapBox(c, c.rules, '挑战没有上一级，所以规则多一条，' + (c.st === 'run' ? '剩下的时间' : '挑战时间') + ' ×1.5', r => {
+    const g = c.gone || (c.gone = []); g.push(r[1]); c.rules = c.rules.filter(y => y[1] !== r[1]);
+    ruleGrow(c.rules, [CHAL_RULE[pup ? 'm' : 'f']], o.text, 2, g); c.upN = (c.upN || 0) + 1;
+    if (c.st === 'run'){ const left = Math.max(0, c.end - Date.now()), x = Math.round(left * 0.5 / 1000); c.end += x * 1000; c.xadd = (c.xadd || 0) + x; }
+    else c.sec = Math.round(c.sec * 1.5);
+    c.upMsg = '🔄 换掉了「' + r[1] + '」：规则现在 ' + c.rules.length + ' 条，' + (c.st === 'run' ? '剩下的时间' : '时间') + ' ×1.5（第 ' + c.upN + ' 次换）'; }) : '';
   const w = h('div', {class: 'pun'});
   // 挑战里说安全词：对了→不放过 / 放过去照顾；错了→严厉惩罚 / 回到挑战（安全词作废：规则多 2 条、剩下的时间翻倍）
   const dogN = pup ? '小狗' : '母狗', pr = pup ? '他' : '她';
@@ -2748,18 +2788,19 @@ function chalView(box, c, lv, o){
   const svBtn = () => lv >= 4 ? h('button', {class: 'btn block dfail', style: {marginBottom: '12px'}, text: '🛑 ' + (pup ? '小狗' : '母狗') + '说安全词了', onclick: () => {
     const sv = {from: c.st, step: 'ask'}; if (c.st === 'run'){ clearInterval(S.chTimer); sv.left = Math.max(1000, c.end - Date.now()); } c.sv = sv; haptic(); render(); }}) : '';
   if (c.st === 'ready'){
+    if (c.upMsg) w.append(h('div', {class: 'phard'}, h('div', {class: 'hf', style: {marginTop: 0, paddingTop: 0, border: 0}, text: c.upMsg})));
     w.append(h('div', {class: 'pl', text: L + ' 要撑住 ' + fmt(c.sec) + '：' + rtext + '；不许躲、不许推开、不许' + come + '。守不住规则或者没撑住，就进惩罚' + (!span && /\d+ ?(秒|分钟)/.test(o.text || '') ? '（卡上写的是每一段的时间，整个挑战以计时为准）' : '')}));
     const chips = h('div', {class: 'psec'});
-    secs.forEach(n => chips.append(h('button', {'aria-pressed': String(c.sec === n), text: fmt(n), onclick: () => { c.sec = n; render(); }})));
-    w.append(chips, h('button', {class: 'btn block dgo', text: '⏱ 开始计时，' + Wn + ' 动手', onclick: () => { c.st = 'run'; c.t0 = Date.now(); c.end = c.t0 + c.sec * 1000; chalTick(c); haptic(); render(); }}),
-      h('button', {class: 'dskip', text: '换规则', onclick: () => { c.rules = chalRules(o.loser, o.text); haptic(); render(); }}));
+    if (!c.upN) secs.forEach(n => chips.append(h('button', {'aria-pressed': String(c.sec === n), text: fmt(n), onclick: () => { c.sec = n; render(); }})));
+    w.append(c.upN ? '' : chips, h('button', {class: 'btn block dgo', text: '⏱ 开始计时，' + Wn + ' 动手', onclick: () => { c.st = 'run'; c.t0 = Date.now(); c.end = c.t0 + c.sec * 1000; chalTick(c); haptic(); render(); }}),
+      chalSwap());
   } else if (c.st === 'run'){
     const fail = (why, cum) => { clearInterval(S.chTimer); const held = Math.floor((Date.now() - c.t0) / 1000); c.st = 'fail'; o.onFail(' 只撑了 ' + held + ' 秒就' + why, cum); haptic(); render(); };
     w.append(h('div', {class: 'pcount', id: 'chLeft', text: String(Math.max(0, Math.ceil((c.end - Date.now()) / 1000)))}),
       (() => { const room = ADD_MAX - c.sec - (c.add || 0), n = Math.min(step, room);
         return h('button', {class: 'btn block dadd', disabled: room <= 0, text: room <= 0 ? '已经加满 30 分钟（已加 ' + c.add + ' 秒）' : '➕ 不听话 +' + n + ' 秒' + (c.add ? '（已加 ' + c.add + ' 秒）' : ''),
           onclick: () => { c.add = (c.add || 0) + n; c.end += n * 1000; haptic(); render(); }}); })(),
-      h('div', {class: 'prule', text: '📌 ' + L + '：' + rtext}),
+      h('div', {class: 'prule', text: '📌 ' + L + '：' + rtext}), c.upMsg ? h('div', {class: 'prule sm', text: c.upMsg}) : '', chalSwap(),
       !c.graced ? h('div', {class: 'prow'},
         h('button', {class: 'btn dfail', text: '❌ 破了规则（先小惩罚）', onclick: () => { c.graced = true; c.left = Math.max(1000, c.end - Date.now()); clearInterval(S.chTimer); c.st = 'mini'; haptic(); render(); }}),
         h('button', {class: 'btn dfail', text: '😣 没撑住', onclick: () => fail('没撑住')})) : '',
@@ -2773,7 +2814,7 @@ function chalView(box, c, lv, o){
       miniBox(pup, Wn, L, () => { c.st = 'run'; c.end = Date.now() + c.left; chalTick(c); haptic(); render(); },
         () => { c.st = 'fail'; c.hard = true; o.onFail(' 在小惩罚里躲了', false); haptic(); render(); }, c));
   } else if (c.st === 'ok'){
-    w.append(h('div', {class: 'pres', text: '🎉 ' + L + ' 撑满了 ' + fmt(c.sec + (c.add || 0)) + '，挑战过关'}));
+    w.append(h('div', {class: 'pres', text: '🎉 ' + L + ' 撑满了 ' + fmt(c.sec + (c.add || 0) + (c.xadd || 0)) + '，挑战过关'}));
   }
   if (['ready', 'run', 'mini'].includes(c.st)) w.prepend(svBtn());
   box.append(w);
@@ -2799,7 +2840,7 @@ function punView(box, res, lv, why){
   // 惩罚里的计时：离开这张卡就停
   const cdSeen = []; const pcd = (t, f, m) => { cdSeen.push(t); return cdBtn(t, f, m); };
   let P = S.pun && S.pun.key === res.key ? S.pun : null;
-  if (!P){ P = S.pun = {key: res.key, stage: why ? 'dare' : 'ready', rules: res.rules, graced: !!(res.ch && res.ch.graced), toHard: !!(res.ch && res.ch.hard)}; if (res.cum){ P.stage = 'choose'; P.cum = true; P.why = why; } if (res.ch && res.ch.sev) P.sevInit = true; }
+  if (!P){ P = S.pun = {key: res.key, stage: why ? 'dare' : 'ready', rules: res.rules, graced: !!(res.ch && res.ch.graced), toHard: !!(res.ch && res.ch.hard), swGone: res.ch && res.ch.gone ? res.ch.gone.slice() : []}; if (res.cum){ P.stage = 'choose'; P.cum = true; P.why = why; } if (res.ch && res.ch.sev) P.sevInit = true; }
   if (!S.punSec) S.punSec = [30, 60, 60, 90][lv - 1];
   const wrap = h('div', {class: 'pun'});
   const card = (tag, t) => h('div', {class: 'dcard show', style: {margin: '0 0 10px', minHeight: '120px'}}, h('div', {class: 'tag', text: tag}), h('div', {class: 't', text: t}));
@@ -2813,10 +2854,10 @@ function punView(box, res, lv, why){
   const toPraise = () => { const cl = PRAISE[pup ? 'm' : 'f']; P.care = cl[Math.floor(Math.random() * cl.length)].replace(/\{w\}/g, Wn).replace(/\{l\}/g, L); P.stage = 'good'; };
   const toCare = () => { const cl = AFTERCARE[pup ? 'm' : 'f']; P.care = cl[Math.floor(Math.random() * cl.length)].replace(/\{w\}/g, Wn).replace(/\{l\}/g, L); P.stage = 'care'; };
   // 挑战时的规则带进惩罚；跟这张卡冲突的（比如卡上蒙眼、卡上要说话）这张先不算
-  const clash = ruleClash;
+  const clash = ruleClash, notGone = x => !(P.swGone || []).includes(x[1]);
   // 二次规则平时固定；哪条跟这张卡真撞上了，就自动换成一条不冲突的同类规则（不再划横线）
   const fits = t => !P.hard || !(P.rules || []).some(r => clash(r, t));
-  const fixRules = t => { const R = P.rules; if (!t || !R) return; const all = HARD_RULE[pup ? 'm' : 'f'], gone = [];
+  const fixRules = t => { const R = P.rules; if (!t || !R) return; const all = HARD_RULE[pup ? 'm' : 'f'].filter(notGone), gone = [];
     R.forEach((r, i) => { if (!clash(r, t)) return;
       const ok = x => !R.some(y => y[1] === x[1]) && !clash(x, t) && slotFree(x, R, i) && !(x[0] === 'body' && /舌头/.test(x[1]) && R.some(y => y[0] !== 'body'));
       let c = all.filter(x => (x[0] === 'body') === (r[0] === 'body') && ok(x)); if (!c.length) c = all.filter(ok);
@@ -2825,6 +2866,7 @@ function punView(box, res, lv, why){
   const rlist = () => { const t = P.card || ''; const talk = /说|报数|数到|数出|求|喊|叫|回答|答|讲|汪|不许出声|只许/.test(t);
     return (P.rules || []).filter(r => !ruleClash(r, t) && !(talk && r[0] !== 'body')).map(r => r[1]); };
   const rl = () => rlist().join('；同时');
+  const rlR = () => { const x = rlist(); return (P.rules || []).filter(r => x.includes(r[1])); };
   const tail = extra => extra + (pup ? '🐶 小狗' : '') + '求饶、反抗都不算数；只有喊安全词才真的停';
   // 二次惩罚的规则换一次就固定，后面换卡也不变；跟这张卡冲突的那条灰掉、这张先不算
   const hardBox = () => { const t = P.card || ''; fixRules(t); const R = P.rules || []; if (!R.length) return '';
@@ -2834,8 +2876,8 @@ function punView(box, res, lv, why){
       sw.length ? h('div', {class: 'hsw', text: '🔄 有 ' + sw.length + ' 条和这张卡冲突，已自动换掉（原来是：' + sw.join('；') + '）'}) : '',
       h('div', {class: 'hf', text: '破了任何一条 → 大惩罚（罚完接着这张）'})); };
   const banner = extra => lv < 4 ? '' : P.hard
-    ? h('div', {}, hardBox(), h('div', {class: 'prule sm', text: tail(extra)}))
-    : h('div', {class: 'prule', text: '📌 规则：' + (rl() ? rl() + '（惩罚时照样要守）；' : '') + tail(extra)});
+    ? h('div', {}, upLine(P.card), hardBox(), swapUI((P.rules || []).filter(r => !clash(r, P.card || ''))), h('div', {class: 'prule sm', text: tail(extra)}))
+    : h('div', {}, h('div', {class: 'prule', text: '📌 规则：' + (rl() ? rl() + '（惩罚时照样要守）；' : '') + tail(extra)}), swapUI(rlR()));
   // 强制高潮里「再罚一张」层层加码：一张比一张狠，每张再加一样色的加料；他比她更狠
   // 不设张数上限：寸止每张多一次（他最多 10 次、她最多 6 次），时间倍数一直涨（不封顶）；规则他最多 4 条、她最多 3 条，满了就换掉最早的一条
   const UP = pup ? {edge: a => Math.min(10, a + 1), mul: a => 1.5 + 0.5 * a, max: 4} : {edge: a => Math.min(6, a), mul: a => 1 + 0.5 * a, max: 3};
@@ -2850,7 +2892,7 @@ function punView(box, res, lv, why){
     let c = EXTRA.filter(e => !used.includes(e[0]) && !(e[2] && P.kind === 'nip') && !exBad(e, t)); if (!c.length) c = EXTRA.filter(e => !(e[2] && P.kind === 'nip') && !exBad(e, t));
     if (!c.length) return ''; const e = c[Math.floor(Math.random() * c.length)][0]; used.push(e); return e; };
   // 规则没满就加一条；满了就把最早的一条换成一条这一局还没出过的；新规则的部位不能和别的规则撞
-  const addRule = () => { const R = P.rules || (P.rules = []), all = HARD_RULE[pup ? 'm' : 'f'], seen = P.ruleSeen || (P.ruleSeen = R.map(r => r[1]));
+  const addRule = () => { const R = P.rules || (P.rules = []), all = HARD_RULE[pup ? 'm' : 'f'].filter(notGone), seen = P.ruleSeen || (P.ruleSeen = R.map(r => r[1]));
     let gone = null; if (R.length >= UP.max){ const i = R.findIndex(r => r[0] === 'body'); gone = R.splice(i < 0 ? 0 : i, 1)[0]; }
     const base = x => x[0] === 'body' && (!gone || x[1] !== gone[1]) && slotFree(x, R) && !(P.card && ruleClash(x, P.card));
     let c = all.filter(x => base(x) && !seen.includes(x[1])); if (!c.length) c = all.filter(base);
@@ -2868,7 +2910,7 @@ function punView(box, res, lv, why){
       h('div', {class: 'hf', text: '安全词随时有效，喊了就真的停'})); };
   const unhappy = () => { goHard(); P.doubled = true; P.card = hardCard(); P.stage = 'dare'; };
   const hardFail = () => { P.why = ' 二次惩罚没让人满意'; P.kind = 'climax'; P.forced = ' 二次惩罚还是没让' + (pup ? '主人' : Wn + ' ') + '满意'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; };
-  const goHard = () => { if (!P.hard){ P.hard = true; P.rules = hardRules(loser); (P.voidAdd || []).forEach(x => { if (!P.rules.some(y => y[1] === x[1]) && slotFree(x, P.rules)) P.rules.push(x); }); if (navigator.vibrate) try { navigator.vibrate([80, 60, 80, 60, 220]); } catch {} } };
+  const goHard = () => { if (!P.hard){ P.hard = true; P.rules = hardRules(loser, '', P.swGone); (P.voidAdd || []).forEach(x => { if (!P.rules.some(y => y[1] === x[1]) && slotFree(x, P.rules)) P.rules.push(x); }); if (navigator.vibrate) try { navigator.vibrate([80, 60, 80, 60, 220]); } catch {} } };
   const breakRule = () => { P.why = ' 在二次惩罚里破了规则'; P.kind = P.kind === 'over' || P.cum ? 'over' : 'climax'; P.forced = ' 破了规则'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); };
   // 二次惩罚或强制高潮里破了规则 → 大惩罚，罚完接着刚才那张；破得越多时间越长
   // 进大惩罚：原卡正在计时就先暂停，罚完回去接着剩下的时间；上一张大惩罚的计时直接作废
@@ -2905,8 +2947,8 @@ function punView(box, res, lv, why){
   const harsher = () => { P.void = (P.void || 0) + 1; const chal = inChal();
     const t = chal ? '' : P.stage === 'big' ? P.big : P.stage === 'severe' ? P.sev : P.stage === 'ultra' ? P.ul : (P.card || '');
     const Rr = chal ? (P.ch.rules || (P.ch.rules = [])) : P.stage === 'severe' ? (P.sevRules || (P.sevRules = [])) : P.stage === 'ultra' ? (P.ulRules || (P.ulRules = [])) : (P.rules || (P.rules = []));
-    const all = HARD_RULE[pup ? 'm' : 'f'].slice().sort(() => Math.random() - 0.5); let n = 0;
-    for (const x of all){ if (n >= 2) break; if (x[0] === 'body' && !Rr.some(y => y[1] === x[1]) && slotFree(x, Rr) && !ruleClash(x, t)){ Rr.push(x); if (!chal && P.stage !== 'severe' && P.stage !== 'ultra') (P.voidAdd || (P.voidAdd = [])).push(x); n++; } }
+    const all = HARD_RULE[pup ? 'm' : 'f'].filter(notGone).sort(() => Math.random() - 0.5); let n = 0;
+    for (const x of all){ if (n >= 2 || Rr.length >= RULE_MAX) break; if (x[0] === 'body' && !Rr.some(y => y[1] === x[1]) && slotFree(x, Rr) && !ruleClash(x, t)){ Rr.push(x); if (!chal && P.stage !== 'severe' && P.stage !== 'ultra') (P.voidAdd || (P.voidAdd = [])).push(x); n++; } }
     const ex = pickExtra(t), add = ex ? '。加料：' + ex : ''; let d = false;
     if (P.stage === 'dare' || (P.stage === 'final' && P.card)){ P.card = dbl(P.card) + add; d = true; }
     else if (P.stage === 'big'){ P.big = dbl(P.big) + add; d = true; }
@@ -2918,7 +2960,7 @@ function punView(box, res, lv, why){
     if (harsh) harsher(); haptic(); render(); };
   const sevCard = () => { const all = SEVERE[pup ? 'm' : 'f'], used = P.sevUsed || (P.sevUsed = []); let c = all.filter(t => !used.includes(t)); if (!c.length) c = all;
     const t = c[Math.floor(Math.random() * c.length)]; used.push(t); return t.replace(/\{w\}/g, Wn); };
-  const sevRules = t => { const all = SEVERE_RULE[pup ? 'm' : 'f'], rnd = a => a[Math.floor(Math.random() * a.length)], ok = x => !ruleClash(x, t);
+  const sevRules = t => { const all = SEVERE_RULE[pup ? 'm' : 'f'].filter(notGone), rnd = a => a[Math.floor(Math.random() * a.length)], ok = x => !ruleClash(x, t);
     const m = all.filter(x => x[0] !== 'body' && ok(x)), out = m.length ? [rnd(m)] : [];
     for (let k = 0; k < 2; k++){ const b = all.filter(x => x[0] === 'body' && ok(x) && !out.includes(x) && slotFree(x, out)); if (b.length) out.push(rnd(b)); }
     return out; };
@@ -2931,6 +2973,30 @@ function punView(box, res, lv, why){
     P.ulN = (P.ulN || 0) + 1; ulNew(); P.stage = 'ultra'; haptic(); render(); };
   const backSevere = () => { S.cd = null; if (P.sevPause){ S.cd = {key: P.sev, end: Date.now() + P.sevPause.left, done: false, add: P.sevPause.add}; cdTick(); } P.sevPause = null; P.stage = 'severe'; haptic(); render(); };
   const toSevere = () => { clearInterval(S.chTimer); P.sv = null; sevNew(); P.stage = 'severe'; haptic(); render(); };
+  // 换规则 → 惩罚升一级：第一张 → 二次；二次 / 强制高潮 → 大惩罚；大惩罚 → 严厉；严厉 → 大大；大大是最高，规则多一条、时间和次数 ×1.5
+  const upTag = (key, msg) => { P.up = {key, msg}; };
+  const upOn = key => P.up && P.up.key === key;
+  const upLine = key => upOn(key) ? h('div', {class: 'phard'}, h('div', {class: 'hf', style: {marginTop: 0, paddingTop: 0, border: 0}, text: P.up.msg})) : '';
+  const swapGo = r => { const g = P.swGone || (P.swGone = []); g.push(r[1]); const drop = R => { const i = (R || []).findIndex(y => y[1] === r[1]); if (i >= 0) R.splice(i, 1); };
+    const was = '🔄 ' + L + ' 换掉了「' + r[1] + '」，';
+    if (P.stage === 'dare' && !P.hard){ drop(P.rules); S.cd = null; goHard(); P.doubled = true; P.broke = P.dodge = false; P.card = hardCard(); ruleGrow(P.rules, [HARD_RULE[pup ? 'm' : 'f'], CHAL_RULE[pup ? 'm' : 'f']], P.card, 1, g); P.stage = 'dare';
+      upTag(P.card, was + '惩罚升一级：二次惩罚，规则现在 ' + P.rules.length + ' 条'); return; }
+    if (P.stage === 'dare' || P.stage === 'final'){ drop(P.rules); bigBreak('up'); ruleGrow(P.rules, [HARD_RULE[pup ? 'm' : 'f'], CHAL_RULE[pup ? 'm' : 'f']], P.big, 2, g);
+      upTag(P.big, was + '惩罚升一级：大惩罚（罚完回去接着刚才那张），规则现在 ' + P.rules.length + ' 条'); return; }
+    if (P.stage === 'big'){ drop(P.rules); S.cd = null; P.cdPause = null; P.cumBig = false; sevNew(); ruleGrow(P.sevRules, [SEVERE_RULE[pup ? 'm' : 'f'], HARD_RULE[pup ? 'm' : 'f']], P.sev, 1, g); P.stage = 'severe';
+      upTag(P.sev, was + '惩罚升一级：严厉惩罚，规则现在 ' + P.sevRules.length + ' 条'); return; }
+    if (P.stage === 'severe'){ drop(P.sevRules); toUltra(); ruleGrow(P.ulRules, [SEVERE_RULE[pup ? 'm' : 'f'], HARD_RULE[pup ? 'm' : 'f'], CHAL_RULE[pup ? 'm' : 'f']], P.ul, 1, g);
+      upTag(P.ul, was + '惩罚升一级：大大惩罚（撑住了回去接着严厉惩罚），规则现在 ' + P.ulRules.length + ' 条'); return; }
+    if (P.stage === 'ultra'){ drop(P.ulRules); const before = P.ulRules.length + 1; ruleGrow(P.ulRules, [SEVERE_RULE[pup ? 'm' : 'f'], HARD_RULE[pup ? 'm' : 'f'], CHAL_RULE[pup ? 'm' : 'f']], P.ul, 2, g);
+      const k0 = P.ul + ' #' + (P.ulRedo || 0), c = S.cd; P.ul = mul15(P.ul); P.ulX = (P.ulX || 0) + 1; const k1 = P.ul + ' #' + (P.ulRedo || 0);
+      if (c && c.key === k0){ if (!c.done && c.end > Date.now()){ S.cd = {key: k1, end: Date.now() + Math.round((c.end - Date.now()) * 1.5), done: false, add: c.add || 0}; cdTick(); } else S.cd = null; }
+      upTag(P.ul, was + '已经是最高一级：' + (P.ulRules.length > before ? '规则多一条（现在 ' + P.ulRules.length + ' 条），' : P.ulRules.length >= RULE_MAX ? '规则已经 ' + RULE_MAX + ' 条，满了不再加，' : '没有能和这张卡配上的新规则了，') + '卡上的时间和次数 ×1.5（第 ' + P.ulX + ' 次）'); } };
+  const swapWhat = () => P.stage === 'dare' && !P.hard ? '惩罚升一级 → 二次惩罚，规则多一条'
+    : P.stage === 'dare' || P.stage === 'final' ? '惩罚升一级 → 大惩罚（罚完回来接着这张），规则多一条'
+    : P.stage === 'big' ? '惩罚升一级 → 严厉惩罚，规则多一条'
+    : P.stage === 'severe' ? '惩罚升一级 → 大大惩罚（撑住了回来接着严厉），规则多一条'
+    : '已经是最高一级：规则多一条（最多 ' + RULE_MAX + ' 条），卡上的时间和次数 ×1.5';
+  const swapUI = R => { if (lv < 4) return ''; if (P.swAt !== P.stage){ P.swAt = P.stage; P.swOpen = P.swPick = null; } return swapBox(P, R, swapWhat(), swapGo); };
   if (P.void && lv >= 4 && !P.sv && !['care', 'over', 'good', 'passed', 'ok'].includes(P.stage))
     wrap.append(h('div', {class: 'phard'}, h('div', {class: 'ht', text: '🚫 安全词已经无效！'}), h('div', {class: 'hf', text: P.voidMsg || '规则变多了，罚得更狠'})));
   if (P.sv){ const sv = P.sv;
@@ -2946,7 +3012,7 @@ function punView(box, res, lv, why){
   } else if (lv >= 4 && ['ready', 'run', 'ok'].includes(P.stage)){
     const c = P.ch || (P.ch = {});
     chalView(wrap, c, lv, {loser, win: res.win, text: Array.isArray(res.v) ? res.v.join('，') : '', onFail: (w2, cum) => {
-      P.why = w2; P.rules = c.rules; P.graced = !!c.graced; if (c.hard){ P.broke = P.dodge = true; unhappy(); } else if (cum){ P.stage = 'choose'; P.cum = true; } else { P.stage = 'dare'; P.card = punCard(lv); } }});
+      P.why = w2; P.rules = c.rules; if (c.gone) P.swGone = c.gone.slice(); P.graced = !!c.graced; if (c.hard){ P.broke = P.dodge = true; unhappy(); } else if (cum){ P.stage = 'choose'; P.cum = true; } else { P.stage = 'dare'; P.card = punCard(lv); } }});
     if (c.st === 'run' || c.st === 'ok') P.stage = c.st;
   } else if (P.stage === 'ready'){
     wrap.append(h('div', {class: 'pl', text: L + ' 要撑住：不许躲、不许推开' + (pup ? '，嘴里要一直「汪汪汪」，停下来就算没撑住；不许射，射了直接强制乳头折磨' : '') + '，求饶也没用'}));
@@ -2968,7 +3034,7 @@ function punView(box, res, lv, why){
   } else if (P.stage === 'ok'){
     wrap.append(h('div', {class: 'pres', text: '🎉 ' + L + ' 撑住了 ' + (P.sec + (P.add || 0)) + ' 秒，这一局过关'}));
   } else if (P.stage === 'dare'){
-    wrap.append(h('div', {class: 'pl', text: P.doubled ? (P.broke ? (pup ? '🐶 ' : '') + L + (P.dodge ? ' 在小惩罚里躲了！' : ' 破了规则！') + '直接二次惩罚：' : (pup ? '🐶 主人' : Wn + ' ') + '不满意！二次惩罚：') + Wn + ' 来做，' + L + ' 受着' : L + (P.why || why || ' 没撑住') + '，罚一张：' + Wn + ' 来做，' + L + ' 受着'}),
+    wrap.append(h('div', {class: 'pl', text: upOn(P.card) ? '🔥 二次惩罚：' + Wn + ' 来做，' + L + ' 受着' : P.doubled ? (P.broke ? (pup ? '🐶 ' : '') + L + (P.dodge ? ' 在小惩罚里躲了！' : ' 破了规则！') + '直接二次惩罚：' : (pup ? '🐶 主人' : Wn + ' ') + '不满意！二次惩罚：') + Wn + ' 来做，' + L + ' 受着' : L + (P.why || why || ' 没撑住') + '，罚一张：' + Wn + ' 来做，' + L + ' 受着'}),
       banner(P.hard ? '这一张不许' + come + '，' + come + '了直接继续强制高潮。' : '这一张不许' + come + '，' + come + '了就由 ' + Wn + ' 选继续强制高潮还是' + nipName + '。'),
       card(P.doubled ? '🔥 二次惩罚' : Wn + ' 罚 ' + L, P.card), pcd(P.card, lv >= 4 ? totSecs(P.card) : null) || '',
       lv >= 4 ? h('div', {class: 'prow'},
@@ -3006,7 +3072,7 @@ function punView(box, res, lv, why){
     const what = P.kind === 'nip' ? nipName : (P.kind === 'over' ? '继续' : '') + (pup ? '强制小狗高潮' : '强制高潮');
     wrap.append(h('div', {class: 'pl', text: (P.forced && !P.again ? L + P.forced + '，直接' : P.again ? (pup ? '主人' : Wn + ' ') + '还不满意！再来一张' : P.cum ? L + ' ' + come + '了，' + Wn + ' 选了' : L + ' 接受') + what + '！' + Wn + ' 从三个里挑一个：'}));
     if (lv >= 4) goHard();
-    wrap.append(upBox(), lv >= 4 ? hardBox() : '');
+    wrap.append(upBox(), lv >= 4 ? hardBox() : '', lv >= 4 ? swapUI(P.rules || []) : '');
     P.opts.forEach(t => wrap.append(h('button', {class: 'dopt', text: t, onclick: () => { P.card = t; (P.used || (P.used = [])).push(t); haptic(); render(); }})));
     wrap.append(h('button', {class: 'dskip', text: '三个都不想要，换三个', onclick: () => { P.opts = pick3(listOf()); haptic(); render(); }}));
   } else if (P.stage === 'final'){
@@ -3027,9 +3093,10 @@ function punView(box, res, lv, why){
     const tf = x => x % 60 ? (x >= 60 ? Math.floor(x / 60) + ' 分 ' : '') + x % 60 + ' 秒' : x / 60 + ' 分钟';
     const bigT = mul === 1 ? P.big : base ? P.big.replace(/1 分钟/, tf(secs)) : P.big.replace(/(\d+) 下/g, (x, v) => Math.round(+v * mul) + ' 下');
     const R = (P.rules || []).filter(r => !ruleClash(r, P.big)).map(r => r[1]);
-    wrap.append(h('div', {class: 'pl', text: '💥 ' + L + ' 破了规则！这一局第 ' + n + ' 次，来一张大惩罚（比小惩罚更狠）：'}),
+    wrap.append(upLine(P.big), h('div', {class: 'pl', text: upOn(P.big) ? '💥 大惩罚（这一局第 ' + n + ' 张）：' + Wn + ' 来做，' + L + ' 受着' : '💥 ' + L + ' 破了规则！这一局第 ' + n + ' 次，来一张大惩罚（比小惩罚更狠）：'}),
       n >= 2 ? h('div', {class: 'phard'}, h('div', {class: 'ht', text: '🔥 破得越多罚得越重：这次' + (base ? '时间' : '次数') + ' ×' + mul + '，卡上已经算好了'})) : '',
       R.length ? h('div', {class: 'prule sm', text: '📌 规则照样要守：' + R.join('；') + '。只有喊安全词才真的停'}) : '',
+      swapUI((P.rules || []).filter(r => !ruleClash(r, P.big))),
       card('💥 大惩罚', bigT), secs ? pcd(P.big + ' #' + n, secs, Infinity) :
         h('button', {class: 'btn block dadd', text: '➕ 不听话 +10 下' + (P.bigAdd ? '（已经加了 ' + P.bigAdd + ' 下）' : ''), onclick: () => { P.bigAdd = (P.bigAdd || 0) + 10; haptic(); render(); }}),
       h('div', {class: 'prow'},
@@ -3051,18 +3118,18 @@ function punView(box, res, lv, why){
         h('button', {class: 'btn dgo', text: P.cumBig ? '✅ 答应了，做完继续强制高潮' : '✅ 答应了，做完接着刚才那张', onclick: () => { S.cd = null; backFinal(); haptic(); render(); }}),
         h('button', {class: 'btn dfail', text: '❌ 不答应 → 继续大惩罚', onclick: () => { P.stage = 'big'; haptic(); render(); }})));
   } else if (P.stage === 'severe'){
-    wrap.append(h('div', {class: 'pl', text: '🔥 ' + L + ' 安全词说错了！严厉惩罚' + (P.sevN > 1 ? '（第 ' + P.sevN + ' 张）' : '') + '：' + Wn + ' 来做，' + L + ' 受着'}),
+    wrap.append(upLine(P.sev), h('div', {class: 'pl', text: '🔥 ' + (upOn(P.sev) ? '' : L + ' 安全词说错了！') + '严厉惩罚' + (P.sevN > 1 ? '（第 ' + P.sevN + ' 张）' : '') + '：' + Wn + ' 来做，' + L + ' 受着'}),
       h('div', {class: 'phard'}, h('div', {class: 'ht', text: '⚠️ 严厉规则：最严、最难撑'}), h('ol', {}, ...(P.sevRules || []).map(r => h('li', {text: r[1]}))),
-        h('div', {class: 'hf', text: '破了任何一条 → 大大惩罚（罚完接着这张）'})),
+        h('div', {class: 'hf', text: '破了任何一条 → 大大惩罚（罚完接着这张）'})), swapUI(P.sevRules),
       card('🔥 严厉惩罚', P.sev), pcd(P.sev, totSecs(P.sev), Infinity) || '',
       h('div', {class: 'prow'}, h('button', {class: 'btn dgo', text: '✅ 撑住了', onclick: () => { S.cd = null; P.stage = 'sevjudge'; haptic(); render(); }}),
         h('button', {class: 'btn dfail', text: '❌ 没撑住 → 再来一张', onclick: () => { sevNew(); haptic(); render(); }})),
       h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '⚠️ 破了规则 → 大大惩罚（罚完接着这张）', onclick: toUltra}),
       h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '💦 ' + come + '了 → 继续强制高潮', onclick: () => { S.cd = null; P.cum = true; P.kind = 'over'; P.forced = ' 在严厉惩罚里' + come + '了'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); }}));
   } else if (P.stage === 'ultra'){
-    wrap.append(h('div', {class: 'pl', text: '💀 ' + L + ' 在严厉惩罚里破了规则！大大惩罚' + (P.ulRedo ? '（从头再来，第 ' + (P.ulRedo + 1) + ' 遍）' : '') + '：' + Wn + ' 来做，' + L + ' 受着'}),
+    wrap.append(upLine(P.ul), h('div', {class: 'pl', text: '💀 ' + (upOn(P.ul) ? '' : L + ' 在严厉惩罚里破了规则！') + '大大惩罚' + (P.ulRedo ? '（从头再来，第 ' + (P.ulRedo + 1) + ' 遍）' : '') + '：' + Wn + ' 来做，' + L + ' 受着'}),
       h('div', {class: 'phard'}, h('div', {class: 'ht', text: '☠️ 大大惩罚规则：比严厉还狠'}), h('ol', {}, ...(P.ulRules || []).map(r => h('li', {text: r[1]}))),
-        h('div', {class: 'hf', text: '破了规则 → 这张从头再来；撑住了 → 回去接着做完严厉惩罚'})),
+        h('div', {class: 'hf', text: '破了规则 → 这张从头再来；撑住了 → 回去接着做完严厉惩罚'})), swapUI(P.ulRules),
       card('💀 大大惩罚', P.ul), pcd(P.ul + ' #' + (P.ulRedo || 0), totSecs(P.ul), Infinity) || '',
       h('div', {class: 'prow'}, h('button', {class: 'btn dgo', text: '✅ 撑住了 → 接着严厉惩罚', onclick: backSevere}),
         h('button', {class: 'btn dfail', text: '❌ 又破了规则 → 从头再来', onclick: () => { S.cd = null; P.ulRedo = (P.ulRedo || 0) + 1; haptic(); render(); }})),
