@@ -2711,7 +2711,7 @@ const SEVERE_RULE = {
     ['body', '主人把手指放进你嘴里，你要像小狗一样用舌头裹着轻轻吮，她撸你的时候也不许松口', '松口了', /另一只手|两只手|两手|舔她|骑在你脸|坐在你脸|叼|塞|说|报|求|喊|回答|「汪|舔/],
     ['woof', '快射的时候只许「呜——」一声长的告诉主人，不许说人话', '说人话了', /说「|报数|报第|喊|回答/],
     ['body', '每次被寸止停下，都要撅高屁股、轻轻摇屁股，像小狗等主人下一口', '没摇', /仰躺|躺好|骑在你|坐在你|跪直|不许动|不许扭/],
-    ['woof', '主人每舔一下你的龟头，你都要「汪」一声谢主人', '漏汪了'],
+    ['woof', '主人每舔一下你的龟头，你都要「呜」一声谢主人', '漏了'],
     ['woof', '龟头被磨的时候只许「嗷呜」小声叫，像被欺负的小狗', '乱叫了'],
     ['woof', '主人每拍一下你的蛋蛋，你都要「汪」一声，再把腿张得更开迎上去', '没张开', /跪直|跪趴|趴着|四肢/],
     ['body', '主人叫「乖狗狗」的时候，你要把鸡巴往她手心里送一下，然后不许动', '没送'],
@@ -3081,7 +3081,9 @@ function punView(box, res, lv, why){
   const sevCard = () => { const all = SEVERE[pup ? 'm' : 'f'], used = P.sevUsed || (P.sevUsed = []); let c = all.filter(t => !used.includes(t)); if (!c.length) c = all;
     const t = c[Math.floor(Math.random() * c.length)]; used.push(t); return t.replace(/\{w\}/g, Wn); };
   const sevRules = t => { const all = SEVERE_RULE[pup ? 'm' : 'f'].filter(notGone), rnd = a => a[Math.floor(Math.random() * a.length)], ok = x => !ruleClash(x, t);
-    const m = all.filter(x => x[0] !== 'body' && ok(x)), out = m.length ? [rulePick(m)] : [];
+    // 叫的规则占着嘴，叼袜子、伸舌头、坐脸舔这些嘴上的规则就永远排不进来；所以有时先抽一条嘴上的，代替叫的那条
+    const mb = /「汪」|汪着|说|报|数出|喊|求/.test(t) ? [] : all.filter(x => x[0] === 'body' && ok(x) && ruleSlots(x).includes('mouth')), m = all.filter(x => x[0] !== 'body' && ok(x));
+    const out = mb.length && (!m.length || Math.random() < 0.35) ? [rulePick(mb)] : m.length ? [rulePick(m)] : [];
     for (let k = 0; k < 2; k++){ const b = all.filter(x => x[0] === 'body' && ok(x) && !out.includes(x) && slotFree(x, out)); if (b.length) out.push(rulePick(b)); }
     return out; };
   const sevPools = () => [SEVERE_RULE[pup ? 'm' : 'f'], HARD_RULE[pup ? 'm' : 'f']];
