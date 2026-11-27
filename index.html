@@ -2504,6 +2504,14 @@ function ruleAdd(R, pools, t, skip){
 function ruleAdd1(R, pool, t, skip){
   const c = pool.filter(x => !R.some(y => y[1] === x[1]) && !(skip || []).includes(x[1]) && !ruleClash(x, t || '') && !(RULE_TALKCARD.test(t || '') && x[0] !== 'body') && slotFree(x, R));
   if (!c.length) return null; const x = c[Math.floor(Math.random() * c.length)]; R.push(x); return x; }
+// 换卡时规则不重抽：和新卡冲突或用不上的那条，换成一条同类（嘴上 / 身体）能用的；换不了就这张先不算
+function ruleFix(R, t, pools, skip){ const gone = [];
+  R.forEach((r, i) => { if (!ruleClash(r, t)) return;
+    for (const pool of pools){
+      const c = pool.filter(x => !R.some(y => y[1] === x[1]) && !(skip || []).includes(x[1]) && !ruleClash(x, t) && !(RULE_TALKCARD.test(t) && x[0] !== 'body') && slotFree(x, R, i));
+      const same = c.filter(x => (x[0] === 'body') === (r[0] === 'body')), pick = same.length ? same : c;
+      if (pick.length){ R[i] = pick[Math.floor(Math.random() * pick.length)]; gone.push(r[1]); return; } } });
+  return gone; }
 function ruleGrow(R, pool, t, k, skip){ let n = 0; for (let i = 0; i < k && R.length < RULE_MAX; i++){ if (!ruleAdd(R, pool, t, skip)) break; n++; } return n; }
 // 最高一级再换：时间和次数 ×1.5（「最多加到」「每 N 秒」不乘；中文的「二十次」「十下」也乘，一两下的不动）
 const CN15 = {一: 1, 两: 2, 二: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9};
@@ -2964,11 +2972,18 @@ function punView(box, res, lv, why){
     const m = all.filter(x => x[0] !== 'body' && ok(x)), out = m.length ? [rnd(m)] : [];
     for (let k = 0; k < 2; k++){ const b = all.filter(x => x[0] === 'body' && ok(x) && !out.includes(x) && slotFree(x, out)); if (b.length) out.push(rnd(b)); }
     return out; };
-  const sevNew = () => { S.cd = null; P.sev = sevCard(); P.sevRules = sevRules(P.sev); P.sevN = (P.sevN || 0) + 1; };
+  const sevPools = () => [SEVERE_RULE[pup ? 'm' : 'f'], HARD_RULE[pup ? 'm' : 'f']];
+  // keep：换卡时规则留着（换规则多出来的、安全词作废加的都不丢），只把和新卡冲突的换掉
+  const sevNew = keep => { S.cd = null; P.sev = sevCard(); if (keep && P.sevRules && P.sevRules.length) P.sevSw = {t: P.sev, gone: ruleFix(P.sevRules, P.sev, sevPools(), P.swGone)}; else { P.sevRules = sevRules(P.sev); P.sevSw = null; } P.sevN = (P.sevN || 0) + 1; };
+  // 严厉 / 大大的规则框：冲突又换不掉的灰掉，这张先不算
+  const sevBox = (R, t, sw, head, foot) => h('div', {class: 'phard'}, h('div', {class: 'ht', text: head}),
+    h('ol', {}, ...(R || []).map(r => ruleClash(r, t) ? h('li', {class: 'off', text: r[1] + '（这张卡先不算）'}) : h('li', {text: r[1]}))),
+    sw && sw.t === t && sw.gone.length ? h('div', {class: 'hsw', text: '🔄 有 ' + sw.gone.length + ' 条和这张卡冲突，已自动换掉（原来是：' + sw.gone.join('；') + '）'}) : '',
+    h('div', {class: 'hf', text: foot}));
   if (P.sevInit){ P.sevInit = false; sevNew(); P.stage = 'severe'; }
   const ulCard = () => { const all = ULTRA[pup ? 'm' : 'f'], used = P.ulUsed || (P.ulUsed = []); let c = all.filter(t => !used.includes(t)); if (!c.length) c = all;
     const t = c[Math.floor(Math.random() * c.length)]; used.push(t); return t.replace(/\{w\}/g, Wn); };
-  const ulNew = () => { S.cd = null; P.ul = ulCard(); P.ulRules = sevRules(P.ul); P.ulRedo = 0; };
+  const ulNew = keep => { S.cd = null; P.ul = ulCard(); if (keep && P.ulRules && P.ulRules.length) P.ulSw = {t: P.ul, gone: ruleFix(P.ulRules, P.ul, [...sevPools(), CHAL_RULE[pup ? 'm' : 'f']], P.swGone)}; else { P.ulRules = sevRules(P.ul); P.ulSw = null; } P.ulRedo = 0; };
   const toUltra = () => { const c = S.cd; P.sevPause = c && c.key === P.sev && !c.done && c.end > Date.now() ? {left: c.end - Date.now(), add: c.add || 0} : null;
     P.ulN = (P.ulN || 0) + 1; ulNew(); P.stage = 'ultra'; haptic(); render(); };
   const backSevere = () => { S.cd = null; if (P.sevPause){ S.cd = {key: P.sev, end: Date.now() + P.sevPause.left, done: false, add: P.sevPause.add}; cdTick(); } P.sevPause = null; P.stage = 'severe'; haptic(); render(); };
@@ -3118,21 +3133,19 @@ function punView(box, res, lv, why){
         h('button', {class: 'btn dfail', text: '❌ 不答应 → 继续大惩罚', onclick: () => { P.stage = 'big'; haptic(); render(); }})));
   } else if (P.stage === 'severe'){
     wrap.append(upLine(P.sev), h('div', {class: 'pl', text: '🔥 ' + (upOn(P.sev) ? '' : L + ' 安全词说错了！') + '严厉惩罚' + (P.sevN > 1 ? '（第 ' + P.sevN + ' 张）' : '') + '：' + Wn + ' 来做，' + L + ' 受着'}),
-      h('div', {class: 'phard'}, h('div', {class: 'ht', text: '⚠️ 严厉规则：最严、最难撑'}), h('ol', {}, ...(P.sevRules || []).map(r => h('li', {text: r[1]}))),
-        h('div', {class: 'hf', text: '破了任何一条 → 大大惩罚（罚完接着这张）'})), swapUI(P.sevRules),
+      sevBox(P.sevRules, P.sev, P.sevSw, '⚠️ 严厉规则：最严、最难撑', '破了任何一条 → 大大惩罚（罚完接着这张）'), swapUI((P.sevRules || []).filter(r => !ruleClash(r, P.sev))),
       card('🔥 严厉惩罚', P.sev), pcd(P.sev, totSecs(P.sev), Infinity) || '',
       h('div', {class: 'prow'}, h('button', {class: 'btn dgo', text: '✅ 撑住了', onclick: () => { S.cd = null; P.stage = 'sevjudge'; haptic(); render(); }}),
-        h('button', {class: 'btn dfail', text: '❌ 没撑住 → 再来一张', onclick: () => { sevNew(); haptic(); render(); }})),
+        h('button', {class: 'btn dfail', text: '❌ 没撑住 → 再来一张', onclick: () => { sevNew(true); haptic(); render(); }})),
       h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '⚠️ 破了规则 → 大大惩罚（罚完接着这张）', onclick: toUltra}),
       h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '💦 ' + come + '了 → 继续强制高潮', onclick: () => { S.cd = null; P.cum = true; P.kind = 'over'; P.forced = ' 在严厉惩罚里' + come + '了'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); }}));
   } else if (P.stage === 'ultra'){
     wrap.append(upLine(P.ul), h('div', {class: 'pl', text: '💀 ' + (upOn(P.ul) ? '' : L + ' 在严厉惩罚里破了规则！') + '大大惩罚' + (P.ulRedo ? '（从头再来，第 ' + (P.ulRedo + 1) + ' 遍）' : '') + '：' + Wn + ' 来做，' + L + ' 受着'}),
-      h('div', {class: 'phard'}, h('div', {class: 'ht', text: '☠️ 大大惩罚规则：比严厉还狠'}), h('ol', {}, ...(P.ulRules || []).map(r => h('li', {text: r[1]}))),
-        h('div', {class: 'hf', text: '破了规则 → 这张从头再来；撑住了 → 回去接着做完严厉惩罚'})), swapUI(P.ulRules),
+      sevBox(P.ulRules, P.ul, P.ulSw, '☠️ 大大惩罚规则：比严厉还狠', '破了规则 → 这张从头再来；撑住了 → 回去接着做完严厉惩罚'), swapUI((P.ulRules || []).filter(r => !ruleClash(r, P.ul))),
       card('💀 大大惩罚', P.ul), pcd(P.ul + ' #' + (P.ulRedo || 0), totSecs(P.ul), Infinity) || '',
       h('div', {class: 'prow'}, h('button', {class: 'btn dgo', text: '✅ 撑住了 → 接着严厉惩罚', onclick: backSevere}),
         h('button', {class: 'btn dfail', text: '❌ 又破了规则 → 从头再来', onclick: () => { S.cd = null; P.ulRedo = (P.ulRedo || 0) + 1; haptic(); render(); }})),
-      h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '😣 坚持不住 → 换一张大大惩罚', onclick: () => { ulNew(); haptic(); render(); }}),
+      h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '😣 坚持不住 → 换一张大大惩罚', onclick: () => { ulNew(true); haptic(); render(); }}),
       h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '🔥 直接强制高潮', onclick: () => { S.cd = null; P.sevPause = null; P.stage = 'ultcum'; haptic(); render(); }}),
       h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '💦 ' + come + '了 → 继续强制高潮', onclick: () => { S.cd = null; P.sevPause = null; P.cum = true; P.kind = 'over'; P.forced = ' 在大大惩罚里' + come + '了'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); }}));
   } else if (P.stage === 'ultcum'){
