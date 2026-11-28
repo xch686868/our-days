@@ -370,6 +370,7 @@ svg{display:block}
 .phard .pen span{flex:1}
 .phard .pen button{flex:none;background:#fff;color:#ff3b5c;border:0;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:800;cursor:pointer}
 .phard .bdn{display:flex;align-items:center;gap:8px}.phard .bdn span{flex:1}.phard .bdn button{flex:none;background:rgba(255,255,255,.25);color:#fff;border:1px solid #fff;border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:800;cursor:pointer}
+.phard .bfree{margin-top:2px;font-size:12.5px;opacity:.85}
 .phard .bdd{margin-top:4px;background:rgba(255,255,255,.18);border-radius:10px;padding:6px 8px;font-size:13.5px;font-weight:600;line-height:1.5}
 .phard .pmsg{margin-top:8px;background:#fff;color:#c8102e;border-radius:12px;padding:8px 10px;font-size:14px;font-weight:800;line-height:1.45}
 .phard .pmsg .prow2{display:flex;gap:6px;flex-wrap:wrap}.phard .pmsg .prow2 button.pup{background:#fff;color:#c8102e;border:2px solid #ff3b5c}
@@ -2708,30 +2709,30 @@ const BIND_F0 = [['body', '两只手腕在身后用胶布缠紧，跪趴好，�
 // v165 强制捆绑：绑法 + 要一直撑住的那件事；罚法程序轮着分（男生 15 条、女生 9 条）
 const BIND_M = [
   ['body', '两只手腕用胶布缠在同一边的脚踝上，像青蛙一样仰躺，鸡巴和蛋蛋全摊开露着；膝盖要一直往两边压到贴着床', '膝盖抬起来了', BIND_M0[0][3]],
-  ['body', '大腿和小腿用胶布缠紧，两只手腕缠在一起压在头顶，仰躺，屁股下面垫个枕头把鸡巴顶高；腿要一直张到最开，舌头伸出来哈气', '舌头收回去 / 腿合了', BIND_M0[0][3]],
+  ['body', '两边大腿和小腿各折起来用胶布缠三四层，两只手腕并在一起缠紧压在头顶，仰躺，屁股下面垫个枕头把鸡巴顶高；腿伸不直、手放不下来，膝盖要一直张到最开，舌头伸出来哈气', '舌头收回去 / 腿合了', BIND_M0[0][3]],
   ['body', '仰躺抱着腿，手腕用胶布缠在膝盖下面，腿拉到胸口；屁股要一直抬离床面悬着，后面和蛋蛋全露着', '屁股落了', BIND_M0[0][3]],
   ['body', '跪坐，两只手腕在身后用胶布缠到脚踝上，膝盖分到最开；上身要一直往后仰，把胸和鸡巴挺出来', '上身弯了', BIND_M0[0][3]],
-  ['body', '两只手腕在身后用胶布缠紧，脸和肩膀贴着床趴好，膝盖分到最开；屁股要翘到最高、一直左右摇，鸡巴和蛋蛋从两腿中间垂着晃', '摇停了 / 屁股掉了', BIND_M0[0][3]],
-  ['body', '两只手腕在身后用胶布缠紧，跪直，膝盖分到最开；挺胸把鸡巴挺在她脸前，舌头一直伸出来哈气', '舌头收回去了', BIND_M0[0][3]],
+  ['body', '两只手腕在身后并在一起用胶布缠三四层，两边大腿和小腿各折起来缠紧，脸和肩膀贴着床趴好，膝盖分到最开；起不来、腿伸不直，屁股要翘到最高、一直左右摇，鸡巴和蛋蛋从两腿中间垂着晃', '摇停了 / 屁股掉了', BIND_M0[0][3]],
+  ['body', '两只手腕在身后并在一起用胶布缠三四层，两边大腿和小腿各缠紧，跪直，膝盖分到最开；手拿不到前面、站不起来，只能挺胸把鸡巴挺在她脸前，舌头一直伸出来哈气', '舌头收回去了', BIND_M0[0][3]],
   ['body', '两只手腕用胶布缠在同一边的大腿外侧，跪直；腰要一直往前挺到最多，鸡巴送在她手边', '腰缩了', BIND_M0[0][3]],
-  ['body', '两只手腕用胶布缠在一起举过头顶，跪直，膝盖分开；手要一直举直，乳头和腋下全露着，鸡巴挺着', '手弯下来了', BIND_M0[0][3]],
-  ['body', '两只手腕用胶布缠在一起，膝盖和手肘撑床趴好；腰要一直往下压到最低，屁股翘到最高', '屁股掉了', BIND_M0[0][3]],
-  ['body', '两只手腕用胶布缠在一起，膝盖和手肘撑床趴好；一条腿要一直往旁边抬高，像公狗撒尿，鸡巴和蛋蛋从抬起的腿下面露出来', '腿放下了', BIND_M0[0][3]],
-  ['body', '大腿和小腿用胶布缠紧，仰躺；两只手抓着床单，膝盖往两边张到最开，腰一直往上挺', '手松了 / 腿合了', BIND_M0[0][3]],
-  ['body', '大腿和小腿用胶布缠紧，脸贴着床趴好；屁股要一直翘高，蛋蛋从两腿中间垂着', '屁股掉了', BIND_M0[0][3]],
-  ['body', '两只手腕用胶布缠在一起放在脑后，跪直，膝盖分到最开；手肘要一直往两边张开，挺胸把乳头和鸡巴全挺出来', '手肘夹了', BIND_M0[0][3]],
-  ['body', '两只手腕在身后用胶布缠紧压在身下，仰躺，脚踩着床；屁股要一直往上抬着，把鸡巴挺到最高', '屁股落了', BIND_M0[0][3]],
-  ['body', '两只手腕用胶布缠在一起举过头顶，蹲着，膝盖分到最开；屁股悬空不许坐，鸡巴和蛋蛋垂在两腿中间', '坐下去了', BIND_M0[0][3]]];
+  ['body', '两只手腕并在一起用胶布缠三四层举过头顶，两边大腿和小腿各缠紧，跪直，膝盖分开；站不起来，手要一直举直，乳头和腋下全露着，鸡巴挺着', '手弯下来了', BIND_M0[0][3]],
+  ['body', '两只手腕并在一起用胶布缠三四层，两边大腿和小腿各折起来缠紧，膝盖和手肘撑床趴好；跪着起不来、腿伸不直，腰要一直往下压到最低，屁股翘到最高，鸡巴从两腿中间垂着', '屁股掉了', BIND_M0[0][3]],
+  ['body', '两只手腕并在一起用胶布缠三四层，两边大腿和小腿各折起来缠紧，膝盖和手肘撑床趴好；一条腿要一直往旁边抬高，像公狗撒尿，鸡巴和蛋蛋从抬起的腿下面露出来', '腿放下了', BIND_M0[0][3]],
+  ['body', '两边大腿和小腿各折起来用胶布缠三四层，两只手腕并在一起缠紧压在头顶，仰躺；腿伸不直，膝盖往两边张到最开，腰一直往上挺', '手放下来了 / 腿合了', BIND_M0[0][3]],
+  ['body', '两边大腿和小腿各折起来用胶布缠三四层，两只手腕在身后并在一起缠紧，脸贴着床趴好；起不来，屁股要一直翘高，蛋蛋从两腿中间垂着', '屁股掉了', BIND_M0[0][3]],
+  ['body', '两只手腕并在一起用胶布缠三四层放在脑后，两边大腿和小腿各缠紧，跪直，膝盖分到最开；站不起来，手肘要一直往两边张开，挺胸把乳头和鸡巴全挺出来', '手肘夹了', BIND_M0[0][3]],
+  ['body', '两只手腕在身后并在一起用胶布缠三四层压在身下，两只脚踝也并在一起缠紧，仰躺，脚踩着床；屁股要一直往上抬着，把鸡巴挺到最高', '屁股落了', BIND_M0[0][3]],
+  ['body', '两只手腕并在一起用胶布缠三四层举过头顶，两边大腿和小腿各折起来缠紧，蹲着，膝盖分到最开；站不起来，屁股悬空不许坐，鸡巴和蛋蛋垂在两腿中间', '坐下去了', BIND_M0[0][3]]];
 const BIND_F = [
-  ['body', '两只手腕在身后用胶布缠紧，脸贴着床跪趴；屁股要一直翘高对着爸爸，一直摇着', '屁股落了 / 摇停了', BIND_F0[0][3]],
+  ['body', '两只手腕在身后并在一起用胶布缠三四层，两边大腿和小腿各折起来缠紧，脸贴着床跪趴；起不来，屁股要一直翘高对着爸爸，一直摇着', '屁股落了 / 摇停了', BIND_F0[0][3]],
   ['body', '仰躺抱着腿，手腕用胶布缠在膝盖下面，腿拉到胸口合不上，下面全露给爸爸', '腿掉了', BIND_F0[0][3]],
-  ['body', '大腿和小腿用胶布缠紧，两只手腕缠在一起压在头顶，仰躺；膝盖要一直往两边张到最开', '腿合了', BIND_F0[0][3]],
-  ['body', '两只手腕用胶布缠在一起举过头顶，跪直；手要一直举着，挺胸把乳头送给爸爸', '手放下了', BIND_F0[0][3]],
-  ['body', '两只手腕在身后用胶布缠紧，跪直；膝盖要一直分到最开，腰往前送', '膝盖收了', BIND_F0[0][3]],
+  ['body', '两边大腿和小腿各折起来用胶布缠三四层，两只手腕并在一起缠紧压在头顶，仰躺；腿伸不直、手放不下来，膝盖要一直往两边张到最开', '腿合了', BIND_F0[0][3]],
+  ['body', '两只手腕并在一起用胶布缠三四层举过头顶，两边大腿和小腿各缠紧，跪直；站不起来，手要一直举着，挺胸把乳头送给爸爸', '手放下了', BIND_F0[0][3]],
+  ['body', '两只手腕在身后并在一起用胶布缠三四层，两边大腿和小腿各缠紧，跪直；站不起来，膝盖要一直分到最开，腰往前送', '膝盖收了', BIND_F0[0][3]],
   ['body', '两只手腕用胶布缠在同一边的大腿外侧，仰躺张开腿；屁股要一直往上抬着送给爸爸', '屁股落了', BIND_F0[0][3]],
-  ['body', '两只手腕在身后用胶布缠紧，侧躺；上面那条腿要一直抬高，露出下面', '腿放下了', BIND_F0[0][3]],
-  ['body', '大腿和小腿用胶布缠紧，跪趴；屁股要一直翘高，下面对着爸爸', '屁股落了', BIND_F0[0][3]],
-  ['body', '两只手腕用胶布缠在一起放在脑后，仰躺张开腿；手不许放下来，挺胸把乳头送给爸爸', '手放下了', BIND_F0[0][3]]];
+  ['body', '两只手腕在身后并在一起用胶布缠三四层，下面那条腿大腿和小腿折起来缠紧，侧躺；上面那条腿要一直抬高，露出下面', '腿放下了', BIND_F0[0][3]],
+  ['body', '两边大腿和小腿各折起来用胶布缠三四层，两只手腕在身后并在一起缠紧，跪趴；起不来，屁股要一直翘高，下面对着爸爸', '屁股落了', BIND_F0[0][3]],
+  ['body', '两只手腕并在一起用胶布缠三四层放在脑后，两边大腿和小腿各折起来缠紧，仰躺，膝盖往两边张开；手不许放下来，挺胸把乳头送给爸爸', '手放下了', BIND_F0[0][3]]];
 // v165 后面几关的规则，固定几格：①【强制捆绑】②小规则 ③叫声（女生说话）④其他（严厉、大大才有）
 // 一条：[类, 文字, 怎样算破了, 不用, 格子, 卡上要有的, 和哪种捆绑不配, 伸着舌头的]；罚法程序轮着分
 const LATE = {
@@ -2872,12 +2873,47 @@ function firstFix(R, t, m, skip){ t = t || ''; const sk = skip || [], P0 = LATE[
   const extra = R.filter(r => r[4] && !PO.includes(r) && !P0.small.includes(r) && !P0.voice.includes(r) && !(P0.tongue || []).includes(r) && lateOk(r, t, pose, false));
   R.length = 0; [pose, small, voice, ...extra].forEach(x => { if (x && !R.includes(x)) R.push(x); }); }
 const lateOk = (r, t, bind, need) => !ruleClash(r, t) && (!need || !t || !r[5] || r[5].test(t)) && !(bind && r[6] && r[6].test(bind[1]));
+// v170 小规则分四档：一档第一张、二档二次和大惩罚、三档严厉、四档大大；每条只管一个时候、一两个地方
+LATE.m[2].small = [['body', '拍蛋蛋的时候屁股不许动，挨完要自己把蛋蛋送回她手下', '动了 / 没送', undefined, 'small', null, null],
+        ['body', '她撸到最快的时候，腰不许往上顶', '顶了', undefined, 'small', null, null],
+        ['body', '被停在边缘的时候，大腿不许夹，要张着让鸡巴自己跳', '夹了', undefined, 'small', /快射|快到|寸止|停/, null],
+        ['body', '磨龟头的时候肚子要绷着，屁股不许往后缩', '缩了', undefined, 'small', null, null],
+        ['body', '刷马眼的时候腿不许抖', '抖了', undefined, 'small', null, null],
+        ['body', '她握住根部停手的时候，屁股要撅着不许落', '落了', undefined, 'small', /快射|快到|寸止|停/, /仰躺|跪直|跪坐|蹲|侧躺/]];
+LATE.m[3].small = [['body', '每次停在边缘，她数到 10，腰和屁股都不许动', '动了', undefined, 'small', /快射|快到|寸止|停/, null],
+        ['body', '拍蛋蛋的时候屁股不许动，拍几下就要自己把腿再张开一点', '动了 / 没张', undefined, 'small', null, null],
+        ['body', '被撸到快射的时候，大腿不许抖', '抖了', undefined, 'small', null, null],
+        ['body', '拧乳头的时候胸要挺着，肩膀不许往回缩', '缩了', undefined, 'small', null, null],
+        ['body', '磨龟头的时候腰要往她手里送，往后躲一下就算破', '躲了', undefined, 'small', null, null],
+        ['body', '主人没说「可以射」之前，漏出一滴就算破', '漏了', undefined, 'small', null, null]];
+LATE.m[4] = {small: [['body', '每次停在边缘，她数到 20，越数越慢，腰、屁股、大腿都不许动', '动了', undefined, 'small', /快射|快到|寸止|停/, null],
+        ['body', '拍蛋蛋的时候屁股和大腿都不许动，挨完要马上把蛋蛋送回去', '动了 / 送慢了', undefined, 'small', null, null],
+        ['body', '被撸到最快的时候，腰不许顶、腿不许收，哪个动了都算破', '动了', undefined, 'small', null, null],
+        ['body', '刷马眼、磨龟头的时候，鸡巴要挺着送上去，往回缩一下就算破', '缩了', undefined, 'small', null, null],
+        ['body', '被撸到流水也不许夹腿，水流到蛋蛋上也只能让它流', '夹腿了', undefined, 'small', null, null],
+        ['body', '快射的时候只能硬憋，漏出一滴就算破', '漏了', undefined, 'small', null, null]], voice: LATE.m[3].voice, tongue: LATE.m[3].tongue, other: LATE.m[3].other};
+LATE.f[2].small = [['body', '拍阴蒂的时候屁股不许动，挨完要自己把腿张回去', '动了 / 没张', undefined, 'small', null, null],
+        ['body', '玩具贴着的时候，腰不许往后躲', '躲了', undefined, 'small', /玩具/, null],
+        ['body', '被停在边缘的时候，大腿不许夹', '夹了', undefined, 'small', /快射|快到|寸止|停/, null],
+        ['body', '手指在里面的时候要一直夹着，屁股不许往后缩', '缩了', undefined, 'small', /手指/, null],
+        ['body', '捏乳头的时候胸要挺着送上去', '缩了', undefined, 'small', null, null]];
+LATE.f[3].small = [['body', '每次停在边缘，他数到 10，腰和屁股都不许动', '动了', undefined, 'small', /快射|快到|寸止|停/, null],
+        ['body', '快到的时候，大腿不许抖', '抖了', undefined, 'small', null, null],
+        ['body', '拍阴蒂的时候屁股不许动，拍几下腿就再张开一点', '动了 / 没张', undefined, 'small', null, null],
+        ['body', '他停下的时候，腰要往他那边送着讨', '没送', undefined, 'small', /快射|快到|寸止|停/, null],
+        ['body', '爸爸没说「可以」之前，漏出一点就算破', '偷偷到了', undefined, 'small', null, null]];
+LATE.f[4] = {small: [['body', '每次停在边缘，他数到 20，越数越慢，腰、屁股、大腿都不许动', '动了', undefined, 'small', /快射|快到|寸止|停/, null],
+        ['body', '拍阴蒂、拍下面的时候，屁股和腿都不许动', '动了', undefined, 'small', null, null],
+        ['body', '被弄到最快的时候，腿不许收、腰不许躲', '动了', undefined, 'small', null, null],
+        ['body', '被弄到流水也不许夹腿，水流下来也只能让它流', '夹腿了', undefined, 'small', null, null],
+        ['body', '快到也只能硬忍，漏出一点就算破', '偷偷到了', undefined, 'small', null, null]], voice: LATE.f[3].voice, other: LATE.f[3].other};
 const LATE_ORDER = {small: 1, voice: 2, other: 3};
 // 按格子补齐、换掉和这张卡不配的；R 原地改，返回换掉的那几条
-function lateFix(R, t, sev, m, skip){
-  t = t || ''; const P0 = LATE[m ? 'm' : 'f'][sev ? 3 : 2], gone = [], sk = skip || [], B = m ? BIND_M : BIND_F;
+function lateFix(R, t, sev, m, skip, want){
+  t = t || ''; const P0 = LATE[m ? 'm' : 'f'][sev === 4 ? 4 : sev ? 3 : 2], gone = [], sk = skip || [], B = m ? BIND_M : BIND_F;
   const pick = (list, ok) => { for (const need of [true, false]){ let c = list.filter(x => ok(x, need) && !sk.includes(x[1])); if (!c.length) c = list.filter(x => ok(x, need)); if (c.length) return c[Math.floor(Math.random() * c.length)]; } return null; };
   let bi = R.findIndex(isBind);
+  if (want && !ruleClash(want, t)){ if (bi < 0){ R.unshift(want); bi = 0; } else R[bi] = want; }
   if (bi < 0 || ruleClash(R[bi], t)){ const x = pick(B, b => !ruleClash(b, t)) || B[Math.floor(Math.random() * B.length)];
     if (bi >= 0){ gone.push(R[bi][1]); R[bi] = x; } else R.unshift(x); }
   for (let j = R.length - 1; j >= 0; j--) if (!isBind(R[j]) && isPose(R[j])) R.splice(j, 1);
@@ -2893,7 +2929,7 @@ function lateFix(R, t, sev, m, skip){
   const ord = r => isBind(r) ? 0 : LATE_ORDER[r[4]] || 9; R.sort((a, b) => ord(a) - ord(b));
   return gone; }
 // 后面几关临时多加的规则（安全词作废、强制高潮再罚一张）：从小规则、其他里抽
-const lateMore = m => { const g = LATE[m ? 'm' : 'f']; return [...g[2].small, ...g[3].small, ...g[3].other]; };
+const lateMore = m => { const g = LATE[m ? 'm' : 'f']; return [...g[2].small, ...g[3].small, ...g[4].small, ...g[3].other]; };
 const BIND_NAME = new Map([...BIND_M.map((r, i) => [r[1], ['青蛙绑', '仰躺大张腿', '抱腿悬臀', '跪坐后仰', '背手撅臀摇', '背手跪直哈气', '跪直挺腰', '举手跪直', '塌腰撅臀', '公狗抬腿', '绑腿仰躺挺腰', '绑腿趴撅', '抱头跪直', '背手抬臀', '举手蹲'][i]]),
   ...BIND_F.map((r, i) => [r[1], ['背手跪趴摇', '抱腿', '绑腿仰躺', '举手跪直', '背手跪直', '侧绑抬臀', '侧躺抬腿', '绑腿跪趴', '抱头仰躺'][i]])]);
 const BIND_SET = new Set([...BIND_M, ...BIND_F].map(r => r[1])), isBind = r => !!r && BIND_SET.has(r[1]);
@@ -3395,6 +3431,8 @@ function punView(box, res, lv, why){
   // 惩罚里的计时：离开这张卡就停
   const cdSeen = []; const pcd = (t, f, m) => { cdSeen.push(t); return cdBtn(t, f, m); };
   let P = S.pun && S.pun.key === res.key ? S.pun : null;
+  // 一局只绑一次：二次绑好以后，大惩罚、严厉、大大、强制高潮都用同一个
+  const lf = (R, t, sev) => { const g = lateFix(R, t, sev, pup, P.swGone, P.bind); P.bind = R.find(isBind) || P.bind; return g; };
   if (!P){ P = S.pun = {key: res.key, stage: why ? 'dare' : 'ready', rules: res.rules, graced: !!(res.ch && res.ch.graced), toHard: !!(res.ch && res.ch.hard), swGone: res.ch && res.ch.gone ? res.ch.gone.slice() : []}; if (res.cum){ P.stage = 'choose'; P.cum = true; P.why = why; } if (res.ch && res.ch.sev) P.sevInit = true; }
   if (!S.punSec) S.punSec = [30, 60, 60, 90][lv - 1];
   const wrap = h('div', {class: 'pun'});
@@ -3402,7 +3440,7 @@ function punView(box, res, lv, why){
   const pick3 = list => { const used = P.used || (P.used = []), shown = P.opts || [];  // 这一局做过的、刚换掉的先不出
     let c = list.filter(t => !diceHide().has(t)); const fresh = c.filter(t => !used.includes(t) && !shown.includes(t));
     if (fresh.length >= 3) c = fresh; else { const f2 = c.filter(t => !used.slice(-3).includes(t)); if (f2.length >= 3) c = f2; } if (c.length < 3) c = list.slice();
-    if (lv >= 4){ const bf = c.filter(t => (pup ? BIND_M : BIND_F).some(b => !ruleClash(b, t.replace(/\{w\}/g, Wn)))); if (bf.length >= 3) c = bf; }  // 配不上任何强制捆绑的卡不出
+    if (lv >= 4){ const bf = c.filter(t => (P.bind ? [P.bind] : pup ? BIND_M : BIND_F).some(b => !ruleClash(b, t.replace(/\{w\}/g, Wn)))); if (bf.length >= 3) c = bf; }  // 配不上任何强制捆绑的卡不出
     const cf = c.filter(t => fits(t)); if (cf.length >= 3) c = cf; const pf = playFilter(c, pup ? 'm' : 'f'); if (pf.length >= 3) c = pf;
     if (pup && P.kind === 'nip' && lv >= 4) return playSpread(wShuf(c, liteW));
     for (let i = c.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [c[i], c[j]] = [c[j], c[i]]; } return playSpread(c); };
@@ -3415,7 +3453,7 @@ function punView(box, res, lv, why){
   // 二次规则平时固定；哪条跟这张卡真撞上了，就自动换成一条不冲突的同类规则（不再划横线）
   const fits = t => !P.hard || !(P.rules || []).some(r => clash(r, t));
   const fixRules = t => { const R = P.rules; if (!R) return;
-    if (P.hard){ const g = lateFix(R, t, false, pup, P.swGone); if (g.length && t) P.swap = {t, gone: g}; return; }
+    if (P.hard){ const g = lf(R, t, false); if (g.length && t) P.swap = {t, gone: g}; return; }
     if (!t) return; const all = HARD_RULE[pup ? 'm' : 'f'].filter(x => notGone(x) && !isPose(x)), gone = [];
     R.forEach((r, i) => { if (!clash(r, t) || (pup && isPose(r))) return;
       const ok = x => !R.some(y => y[1] === x[1]) && !clash(x, t) && slotFree(x, R, i) && !(x[0] === 'body' && /舌头/.test(x[1]) && R.some(y => y[0] !== 'body'));
@@ -3438,8 +3476,10 @@ function punView(box, res, lv, why){
     const tie = isBind(r), bn = tie ? BIND_NAME.get(r[1]) : poseName(r), op = bn && P.bdOpen;
     return h('li', {}, bn ? h('div', {class: 'bdn'}, h('span', {text: (tie ? '【强制捆绑】' : '【强制姿势】') + bn}), h('button', {text: op ? '收起' : '详细', onclick: () => { P.bdOpen = !op; render(); }})) : h('div', {text: ruleTxt(r).replace(r[1], penStrip(r[1]))}),
       op ? h('div', {class: 'bdd', text: r[1]}) : '',
-      h('div', {class: 'pen'}, h('span', {text: '破了（' + r[2] + '）→ ' + act}),
-        h('button', {text: n ? '破了 ×' + n : '破了', onclick: () => { m.n[r[1]] = n + 1; P.penMsg = {k: penKey(), t: '⚡ ' + L + ' 破了「' + r[2] + '」：' + Wn + ' 现在' + act + '。受罚的时候不许动、不许躲' + (pup ? '、不许夹腿' : '、不许并腿') + (n ? '（这条已经破了 ' + (n + 1) + ' 次）' : '')}; haptic(); render(); }}))); };
+      h('div', {class: 'pen'}, h('span', {text: (tie ? '挣扎了（' + r[2] + '）→ ' + act + '，再缠一圈' : '破了（' + r[2] + '）→ ' + act)}),
+        h('button', {text: n ? '破了 ×' + n : '破了', onclick: () => { m.n[r[1]] = n + 1; const tot = Object.values(m.n).reduce((a, b) => a + b, 0), wrap3 = !tie && P.hard && tot % 3 === 0;
+          P.penMsg = {k: penKey(), t: '⚡ ' + L + (tie ? ' 挣扎了「' : ' 破了「') + r[2] + '」：' + Wn + ' 现在' + act + (tie ? '，罚完在胶布外面再缠一圈' : '') + '。受罚的时候不许动、不许躲' + (pup ? '、不许夹腿' : '、不许并腿') + (n ? '（这条已经破了 ' + (n + 1) + ' 次）' : '') + (wrap3 ? '。这张卡破了 ' + tot + ' 次了，罚完再缠一圈' : '')}; haptic(); render(); }})),
+      tie ? h('div', {class: 'bfree', text: '挣开了：手脚全绑，各缠各的'}) : ''); };
   const penMsg = () => P.penMsg && P.penMsg.k === penKey() ? h('div', {class: 'pmsg'}, h('div', {text: P.penMsg.t}), h('div', {class: 'prow2'}, h('button', {text: '✅ 老实受完了，接着这张', onclick: () => { P.penMsg = null; haptic(); render(); }}),
       h('button', {class: 'pup', text: '❌ 动了 → ' + upNext(), onclick: () => { moveUp(); haptic(); render(); }}))) : '';
   const first = () => lv >= 4 && P.stage === 'dare' && !P.hard;
@@ -3497,7 +3537,7 @@ function punView(box, res, lv, why){
       h('div', {class: 'hf', text: '安全词随时有效，喊了就真的停'})); };
   const unhappy = () => { goHard(); P.doubled = true; P.card = hardCard(); P.stage = 'dare'; };
   const hardFail = () => { P.why = ' 二次惩罚没让人满意'; P.kind = 'climax'; P.forced = ' 二次惩罚还是没让' + (pup ? '主人' : Wn + ' ') + '满意'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; };
-  const goHard = () => { if (!P.hard){ P.hard = true; P.rules = []; lateFix(P.rules, '', false, pup, P.swGone); (P.voidAdd || []).forEach(x => { if (!P.rules.some(y => y[1] === x[1]) && P.rules.length < RULE_MAX) P.rules.push(x); }); if (navigator.vibrate) try { navigator.vibrate([80, 60, 80, 60, 220]); } catch {} } };
+  const goHard = () => { if (!P.hard){ P.hard = true; P.rules = []; lf(P.rules, '', false); (P.voidAdd || []).forEach(x => { if (!P.rules.some(y => y[1] === x[1]) && P.rules.length < RULE_MAX) P.rules.push(x); }); if (navigator.vibrate) try { navigator.vibrate([80, 60, 80, 60, 220]); } catch {} } };
   const breakRule = () => { P.why = ' 在二次惩罚里破了规则'; P.kind = P.kind === 'over' || P.cum ? 'over' : 'climax'; P.forced = ' 破了规则'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); };
   // 二次惩罚或强制高潮里破了规则 → 大惩罚，罚完接着刚才那张；破得越多时间越长
   // 进大惩罚：原卡正在计时就先暂停，罚完回去接着剩下的时间；上一张大惩罚的计时直接作废
@@ -3574,7 +3614,7 @@ function punView(box, res, lv, why){
     return out; };
   const sevPools = () => [SEVERE_RULE[pup ? 'm' : 'f'], HARD_RULE[pup ? 'm' : 'f']];
   // keep：换卡时规则留着（换规则多出来的、安全词作废加的都不丢），只把和新卡冲突的换掉
-  const sevNew = keep => { S.cd = null; P.sev = sevCard(); const k = keep && P.sevRules && P.sevRules.length; if (!k) P.sevRules = []; const g = lateFix(P.sevRules, P.sev, true, pup, P.swGone); P.sevSw = k ? {t: P.sev, gone: g} : null; P.sevN = (P.sevN || 0) + 1; };
+  const sevNew = keep => { S.cd = null; P.sev = sevCard(); const k = keep && P.sevRules && P.sevRules.length; if (!k) P.sevRules = []; const g = lf(P.sevRules, P.sev, true); P.sevSw = k ? {t: P.sev, gone: g} : null; P.sevN = (P.sevN || 0) + 1; };
   // 严厉 / 大大的规则框：冲突又换不掉的灰掉，这张先不算
   const sevBox = (R, t, sw, head, foot) => { const pm = penOf(R || [], t); return h('div', {class: 'phard prules'}, h('div', {class: 'ht', text: head}),
     h('ol', {}, ...(R || []).map(r => ruleClash(r, t) ? h('li', {class: 'off', text: r[1] + '（这张卡先不算）'}) : penRow(r, pm))),
@@ -3583,7 +3623,7 @@ function punView(box, res, lv, why){
   if (P.sevInit){ P.sevInit = false; sevNew(); P.stage = 'severe'; }
   const ulCard = () => { const all = ULTRA[pup ? 'm' : 'f'], used = P.ulUsed || (P.ulUsed = []); let c = all.filter(t => !used.includes(t)); if (!c.length) c = all; c = playFilter(c, pup ? 'm' : 'f');
     const t = wShuf(c, x => lateW(x, pup))[0]; used.push(t); playNote(pup ? 'm' : 'f', t); return t.replace(/\{w\}/g, Wn); };
-  const ulNew = keep => { S.cd = null; P.ul = ulCard(); const k = keep && P.ulRules && P.ulRules.length; if (!k) P.ulRules = []; const g = lateFix(P.ulRules, P.ul, true, pup, P.swGone); P.ulSw = k ? {t: P.ul, gone: g} : null; P.ulRedo = 0; };
+  const ulNew = keep => { S.cd = null; P.ul = ulCard(); const k = keep && P.ulRules && P.ulRules.length; if (!k) P.ulRules = []; const g = lf(P.ulRules, P.ul, 4); P.ulSw = k ? {t: P.ul, gone: g} : null; P.ulRedo = 0; };
   const toUltra = () => { const c = S.cd; P.sevPause = c && c.key === P.sev && !c.done && c.end > Date.now() ? {left: c.end - Date.now(), add: c.add || 0} : null;
     P.ulN = (P.ulN || 0) + 1; ulNew(); P.stage = 'ultra'; haptic(); render(); };
   const backSevere = () => { S.cd = null; if (P.sevPause){ S.cd = {key: P.sev, end: Date.now() + P.sevPause.left, done: false, add: P.sevPause.add}; cdTick(); } P.sevPause = null; P.stage = 'severe'; haptic(); render(); };
@@ -3721,7 +3761,7 @@ function punView(box, res, lv, why){
   } else if (P.stage === 'beg'){
     const f = (P.beg || {}).from || 'dare';
     wrap.append(h('div', {class: 'pl', text: '😣 ' + L + ' 想求饶换卡'}),
-      card('😣 求饶', (pup ? '你要「汪」着求十声「主人饶了小狗」，一声都不能少' : '你要说十遍「爸爸饶了骚母狗」，一遍都不能少') + '。求完了 ' + Wn + ' 点头才换；换了就升一级：' + begNext(f) + '。' + Wn + ' 不点头，就接着做刚才那张'),
+      card('😣 求饶', (pup ? '你要「汪」着求十声「主人饶了小狗」，一声都不能少' : '你要说十遍「爸爸饶了骚母狗」，一遍都不能少') + '。求完了 ' + Wn + ' 点头才换；换了就升一级：' + begNext(f) + (P.hard ? '。换卡之前先给' + (pup ? '他' : '她') + '多绑一处：手没绑就绑手，腿没绑就绑腿，都绑了就再缠一圈' : '') + '。' + Wn + ' 不点头，就接着做刚才那张'),
       h('div', {class: 'prow'},
         h('button', {class: 'btn dfail', text: '✅ ' + Wn + ' 点头了，换卡', onclick: begGo}),
         h('button', {class: 'btn dgo', text: '❌ 不点头，接着这张', onclick: begBack})));
