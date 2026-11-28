@@ -1660,7 +1660,8 @@ const DICE_CMD = [
 function diceCmds(lv, n, loser){
   // 只写了男生（或女生）一边的命令：另一边输了不抽，不然会显示 undefined
   const gk = loser === diceMale() ? 'm' : 'f';
-  let all = DICE_CMD.filter(x => x[1] === lv && (typeof x[0] !== 'object' || x[0][gk])).map(x => x[0]);
+  // v175 限制级比大小：三张都从挑战卡那 24 张快速撸 / 快速弄里抽
+  let all = (lv >= 4 ? DICE_DARE : DICE_CMD).filter(x => x[1] === lv && (typeof x[0] !== 'object' || x[0][gk])).map(x => x[0]);
   const keep = all.filter(t => !diceHide().has(hkey(t, loser)));
   if (keep.length >= n) all = keep;
   if (gk === 'm' && lv >= 4) return wShuf(all, liteW).slice(0, n);
@@ -1668,7 +1669,7 @@ function diceCmds(lv, n, loser){
   return all.slice(0, n);
 }
 // 比大小：男生输的时候先定好这一局的强制姿势，三张卡只给对得上的
-const duelPose = (lv, loser) => { if (lv < 4 || loser !== diceMale()) return null; const R = []; poseForce(R, '', [CHAL_RULE.m], []); return R[0] || null; };
+const duelPose = (lv, loser) => { if (lv < 4 || loser !== diceMale()) return null; const C4 = DICE_DARE.filter(x => x[1] === 4 && x[0].m).map(x => x[0].m.replace(/\{w\}/g, '她')); const PO = fposeList(true).filter(p => C4.filter(t => !ruleClash(p, t)).length >= 3); return PO[Math.floor(Math.random() * PO.length)] || null; };
 const duelOpts = (lv, loser, pose, n = 3) => { if (!pose) return diceCmds(lv, n, loser); const W = nameOf(other(loser));
   const ok = diceCmds(lv, 999, loser).filter(t => !ruleClash(pose, noTot(gtext(t, loser).replace(/\{w\}/g, W)))); return ok.length >= Math.min(n, 3) ? ok.slice(0, n) : diceCmds(lv, n, loser); };
 function duelView(lv){
@@ -3080,10 +3081,10 @@ const CHAL4_RULE = {
     ]
   }
 };
-function chal4Rules(pup, text, skip){
+function chal4Rules(pup, text, skip, want){
   const t = text || '', sk = skip || [], g = CHAL4_RULE[pup ? 'm' : 'f'], PO = fposeList(pup);
   const pick = list => { let c = list.filter(x => !sk.includes(x[1]) && !ruleClash(x, t)); if (!c.length) c = list.filter(x => !ruleClash(x, t)); return c.length ? c[Math.floor(Math.random() * c.length)] : list[0]; };
-  const pose = pick(PO), tongue = /舌头/.test(pose[1]);
+  const pose = want && PO.includes(want) ? want : pick(PO), tongue = /舌头/.test(pose[1]);
   const sensPool = tongue ? g.sens.filter(x => x[0] === 'body') : g.sens.filter(x => !(x[3] && x[3].test(pose[1])));
   const sens = pick(sensPool.length ? sensPool : g.sens);
   const mouth = pick(tongue ? g.tongue : g.mouth);
@@ -3352,8 +3353,8 @@ function chalView(box, c, lv, o){
   const fmt = n => n >= 60 ? Math.floor(n / 60) + ' 分' + (n % 60 ? ' ' + (n % 60) + ' 秒' : '钟') : n + ' 秒';
   const secs = pup ? [120, 180, 240, 300] : [120, 180, 240];  // 她 2-4 分钟，他 2-5 分钟，随机
   if (!c.sec) c.sec = secs[Math.floor(Math.random() * secs.length)];
-  const chal4 = lv >= 4 && !o.duel;
-  if (!c.rules){ if (chal4) c.rules = chal4Rules(pup, o.text, c.gone);
+  const chal4 = lv >= 4;  // v175 比大小也一样
+  if (!c.rules){ if (chal4) c.rules = chal4Rules(pup, o.text, c.gone, c.pre);
     else { c.rules = chalRules(o.loser, o.text); if (pup){ if (c.pre) c.rules = c.rules.filter(r => !isPose(r)); poseForce(c.rules, o.text, [CHAL_RULE.m], c.gone, c.pre); }
       else if (lv >= 4){ girlForce(c.rules, o.text, [CHAL_RULE.f], c.gone); if (o.duel) c.rules = c.rules.slice(0, 2); }
       if (o.duel && pup){ const rest = c.rules.filter(r => !isPose(r) && !RULE_PLAY.test(r[1])); c.rules = c.rules.filter(isPose).concat(rest.slice(0, 1));
