@@ -366,6 +366,11 @@ svg{display:block}
 .phard li{font-size:15.5px;font-weight:700;line-height:1.5;margin:4px 0}
 .phard .hsw{margin-top:6px;font-size:12.5px;font-weight:600;opacity:.9;line-height:1.4}
 .phard .hf{margin-top:8px;padding-top:7px;border-top:1px dashed rgba(255,255,255,.7);font-size:14.5px;font-weight:800;text-align:center}
+.phard .pen{display:flex;align-items:center;gap:8px;margin-top:3px;font-size:13px;font-weight:600;line-height:1.4}
+.phard .pen span{flex:1}
+.phard .pen button{flex:none;background:#fff;color:#ff3b5c;border:0;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:800;cursor:pointer}
+.phard .pmsg{margin-top:8px;background:#fff;color:#c8102e;border-radius:12px;padding:8px 10px;font-size:14px;font-weight:800;line-height:1.45}
+.phard .pmsg button{display:block;margin-top:6px;background:#ff3b5c;color:#fff;border:0;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:800;cursor:pointer}
 .phard-mini{text-align:center;font-size:14px;font-weight:800;color:#fff;background:#ff3b5c;border-radius:12px;padding:7px 10px;margin:0 0 10px}
 
 .rlist{text-align:left;font-size:14px;line-height:1.55;background:rgba(255,255,255,.16);border:1px dashed rgba(255,255,255,.6);border-radius:12px;padding:8px 11px;margin:0 0 10px}.rlist .ri{margin:4px 0}.rlist .ri b{font-weight:700}.rlist .rs{font-size:12.5px;opacity:.85;margin-left:1.4em}.rlist details{margin-left:1.4em;font-size:12.5px;opacity:.85}.rlist summary{cursor:pointer}.rnote{font-size:12px;opacity:.8;text-align:center;margin:8px 0 0;line-height:1.5}
@@ -2948,6 +2953,15 @@ const BIND_F = [['body', '两只手腕在身后用绷带缠紧，跪趴好，脸
 const BIND_SET = new Set([...BIND_M, ...BIND_F].map(r => r[1])), isBind = r => !!r && BIND_SET.has(r[1]);
 const BIND_SHORT = [['两只手腕用绷带缠紧在同一边的', '青蛙绑', '指腹刷马眼十下'], ['大腿和小腿用绷带缠紧，两只手', '折腿 + 举手', '掌心包住龟头转十圈'], ['仰躺抱着腿，手腕用绷带缠紧在', '抱腿绑', '拇指按住马眼转十圈'], ['跪坐，两只手腕在身后用绷带缠', '跪坐背绑', '捏住龟头揉十下'], ['两只手腕在身后用绷带缠紧，脸', '背手贴床', '握住龟头磨十圈'], ['两只手腕在身后用绷带缠紧，跪', '背手跪直', '指腹刷马眼十下'], ['两只手腕用绷带缠紧在同一边的', '手贴腿', '捏住龟头揉十下'], ['两只手腕用绷带缠在一起举过头', '举手跪直', '掌心磨龟头十圈'], ['两只手腕用绷带缠在一起，膝盖', '缠手趴好', '握住龟头磨十圈'], ['侧躺，两只手腕在身后用绷带缠', '蜷着侧躺', '指腹刷马眼十下']].concat([['两只手腕在身后用绷带缠紧，跪', '背手跪趴', '拍一下阴蒂'], ['仰躺抱着腿，手腕用绷带缠紧在', '抱腿绑', '拍一下阴蒂'], ['大腿和小腿用绷带缠紧，两只手', '折腿 + 举手', '拍一下阴蒂'], ['两只手腕用绷带缠在一起举过头', '举手跪直', '拍一下阴蒂、捏一下乳头'], ['两只手腕在身后用绷带缠紧，跪', '背手跪直', '拍一下阴蒂'], ['两只手腕用绷带缠紧在同一边的', '手贴腿', '拍一下阴蒂'], ['侧躺，两只手腕在身后用绷带缠', '侧躺背绑', '拍一下阴蒂']]);
 const GIRL_SET = new Set(GIRL_RULE.map(r => r[1]).concat(BIND_F.map(r => r[1]))), isGirlF = r => !!r && GIRL_SET.has(r[1]);
+// 后面几关：每条规则破了当场罚，罚的部位程序轮着分，同一张卡里不重复；规则上原来写的罚法去掉，换成分到的
+const PEN_SITE = /马眼|龟头|系带|冠状沟|蛋蛋|乳头|寸止|阴蒂|下面/;
+const penStrip = t => { let m = t.match(/；([^；]*)$/), s = null;
+  if (m && /(她|他|主人)就/.test(m[1]) && PEN_SITE.test(m[1].split(/(?:她|他|主人)就/).pop())) s = t.slice(0, m.index);
+  else if ((m = t.match(/，([^，；]{0,12}(一次|一下)，?(她|他|主人)就[^；]*)$/)) && PEN_SITE.test(m[1])) s = t.slice(0, m.index);
+  return s && s.length >= 12 && !/(的时候|一笔)$/.test(s) ? s : t; };
+const PEN = {m: [['马眼', '用指腹刷你的马眼{a}下'], ['龟头', '用掌心包住你的龟头磨{a}圈'], ['系带', '用指尖在你的系带上来回刮{a}下'], ['冠状沟', '捏着你的冠状沟揉{a}下'], ['蛋蛋', '拍你的蛋蛋{b}下'], ['乳头', '拧着你的乳头数到 {c}，越数越慢'], ['寸止', '多寸止你{d}次']],
+  f: [['阴蒂', '拍你的阴蒂{e}（或者用玩具最高档压着阴蒂 {s} 秒）'], ['乳头', '拧着你的乳头数到 {c}，越数越慢'], ['下面', '用手掌盖住你下面拍{b}下'], ['寸止', '多寸止你{d}次']]};
+const penFill = (t, big) => t.replace(/\{(\w)\}/g, (x, k) => (big ? {a: '十五', b: '五', c: '40', d: '两', e: '两下', s: '15'} : {a: '十', b: '三', c: '30', d: '一', e: '一下', s: '10'})[k]);
 const ruleTxt = r => (isBind(r) ? '【强制捆绑】' : isPose(r) || isGirlF(r) ? '【强制】' : '') + r[1];
 // 强制姿势的短说法：怎么做 / 做不到会怎样，原文点「细节」才看
 const POSE_SHORT = [
@@ -3631,16 +3645,28 @@ function punView(box, res, lv, why){
     return (P.rules || []).filter(r => !ruleClash(r, t) && !(talk && r[0] !== 'body' && !isGirlF(r))).map(r => r[1]); };
   const rl = () => rlR().map(ruleTxt).join('；同时');
   const rlR = () => { const x = rlist(); return (P.rules || []).filter(r => x.includes(r[1])); };
-  const tail = extra => extra + DISOBEY[pup ? 'm' : 'f'] + '；' + (pup ? '🐶 小狗' : '') + '求饶、反抗都不算数；只有喊安全词才真的停';
+  const tail = extra => extra + DISOBEY[pup ? 'm' : 'f'] + '；' + (P.hard && P.stage === 'dare' ? '想换卡只能照规矩求饶，' + Wn + ' 点头才换，换了更严；反抗不算数' : (pup ? '🐶 小狗' : '') + '求饶、反抗都不算数') + '；只有喊安全词才真的停';
+  // 破了规则：当场罚分到的那一样，罚完接着这张卡；部位按这张卡轮着分，换卡重新分
+  const penKey = () => P.stage + '|' + (P.stage === 'big' ? P.big : P.stage === 'severe' ? P.sev : P.stage === 'ultra' ? P.ul : P.card || '');
+  const penOf = (R, t) => { const k = penKey(), M = P.pen || (P.pen = {}), all = PEN[pup ? 'm' : 'f'].filter(x => !(P.stage === 'final' && x[0] === '寸止')), m = M[k] || (M[k] = {site: {}, n: {}});
+    const live = R.filter(r => !ruleClash(r, t)), used = live.filter(r => r[1] in m.site).map(r => m.site[r[1]]);  // 只躲开这张卡上现在还在的规则分到的部位
+    live.filter(r => !(r[1] in m.site)).forEach(r => { let free = all.map(x => x[0]).filter(x => !used.includes(x)); if (!free.length) free = all.map(x => x[0]);
+      const x = free[Math.floor(Math.random() * free.length)]; m.site[r[1]] = x; used.push(x); }); return m; };
+  const penRow = (r, m) => { const site = PEN[pup ? 'm' : 'f'].find(x => x[0] === m.site[r[1]]) || PEN[pup ? 'm' : 'f'][0], act = penFill(site[1], P.stage === 'ultra'), n = m.n[r[1]] || 0;
+    return h('li', {}, h('div', {text: ruleTxt(r).replace(r[1], penStrip(r[1]))}),
+      h('div', {class: 'pen'}, h('span', {text: '破了（' + r[2] + '）→ ' + act}),
+        h('button', {text: n ? '破了 ×' + n : '破了', onclick: () => { m.n[r[1]] = n + 1; P.penMsg = {k: penKey(), t: '⚡ ' + L + ' 破了「' + r[2] + '」：' + Wn + ' 现在' + act + '。罚完接着这张卡' + (n ? '（这条已经破了 ' + (n + 1) + ' 次）' : '')}; haptic(); render(); }}))); };
+  const penMsg = () => P.penMsg && P.penMsg.k === penKey() ? h('div', {class: 'pmsg'}, h('div', {text: P.penMsg.t}), h('button', {text: '✅ 罚完了，接着这张', onclick: () => { P.penMsg = null; haptic(); render(); }})) : '';
+  const PEN_FOOT = '破了哪条，就点那条后面的「破了」，当场罚完接着这张卡', BEG_FOOT = PEN_FOOT + '；想换卡只能求饶，换了更严';
   // 二次惩罚的规则换一次就固定，后面换卡也不变；跟这张卡冲突的那条灰掉、这张先不算
-  const hardBox = (t0, head, foot) => { const t = t0 || P.card || ''; fixRules(t); const R = P.rules || []; if (!R.length) return '';
-    const sw = P.swap && P.swap.t === t ? P.swap.gone : [];
+  const hardBox = (t0, head, foot, pen) => { const t = t0 || P.card || ''; fixRules(t); const R = P.rules || []; if (!R.length) return '';
+    const sw = P.swap && P.swap.t === t ? P.swap.gone : [], pm = pen ? penOf(R, t) : null;
     return h('div', {class: 'phard'}, h('div', {class: 'ht', text: head || '⚠️ 规则换了！二次惩罚更严、更色'}),
-      h('ol', {}, ...R.map(r => clash(r, t) ? h('li', {class: 'off', text: r[1] + '（这张卡先不算）'}) : h('li', {text: ruleTxt(r)}))),
+      h('ol', {}, ...R.map(r => clash(r, t) ? h('li', {class: 'off', text: r[1] + '（这张卡先不算）'}) : pm ? penRow(r, pm) : h('li', {text: ruleTxt(r)}))),
       sw.length ? h('div', {class: 'hsw', text: '🔄 有 ' + sw.length + ' 条和这张卡冲突，已自动换掉（原来是：' + sw.join('；') + '）'}) : '',
-      h('div', {class: 'hf', text: foot || '破了任何一条 → 大惩罚（罚完接着这张）'})); };
+      pen ? penMsg() : '', h('div', {class: 'hf', text: foot || '破了任何一条 → 大惩罚（罚完接着这张）'})); };
   const banner = extra => lv < 4 ? '' : P.hard
-    ? h('div', {}, upLine(P.card), hardBox(), swapUI((P.rules || []).filter(r => !clash(r, P.card || ''))), h('div', {class: 'prule sm', text: tail(extra)}))
+    ? h('div', {}, upLine(P.card), hardBox('', '', P.stage === 'dare' ? BEG_FOOT : PEN_FOOT, true), h('div', {class: 'prule sm', text: tail(extra)}))
     : h('div', {}, h('div', {class: 'prule', text: '📌 规则：' + (rl() ? rl() + '（惩罚时照样要守）；' : '') + tail(extra)}), swapUI(rlR()));
   // 强制高潮里「再罚一张」层层加码：一张比一张狠，每张再加一样色的加料；他比她更狠
   // 不设张数上限：寸止每张多一次（他最多 10 次、她最多 6 次），时间倍数一直涨（不封顶）；规则他最多 4 条、她最多 3 条，满了就换掉最早的一条
@@ -3658,7 +3684,7 @@ function punView(box, res, lv, why){
   // 规则没满就加一条；满了就把最早的一条换成一条这一局还没出过的；新规则的部位不能和别的规则撞
   const addRule = () => { const R = P.rules || (P.rules = []), all = HARD_RULE[pup ? 'm' : 'f'].filter(notGone), seen = P.ruleSeen || (P.ruleSeen = R.map(r => r[1]));
     let gone = null; if (R.length >= UP.max){ let i = R.findIndex(r => r[0] === 'body' && !isPose(r)); if (i < 0) i = R.findIndex(r => !isPose(r)); gone = R.splice(i < 0 ? 0 : i, 1)[0]; }
-    const base = x => x[0] === 'body' && !(pup && isPose(x)) && (!gone || x[1] !== gone[1]) && slotFree(x, R) && !(P.card && ruleClash(x, P.card));
+    const base = x => x[0] === 'body' && !(pup && isPose(x)) && !R.some(y => y[1] === x[1]) && (!gone || x[1] !== gone[1]) && slotFree(x, R) && !(P.card && ruleClash(x, P.card));
     let c = all.filter(x => base(x) && !seen.includes(x[1])); if (!c.length) c = all.filter(base);
     if (c.length){ const x = c[Math.floor(Math.random() * c.length)]; R.push(x); seen.push(x[1]); P.ruleLog = gone ? {gone: gone[1], add: x[1]} : {add: x[1]}; }
     else { if (gone) R.push(gone); P.ruleLog = null; } };
@@ -3689,7 +3715,19 @@ function punView(box, res, lv, why){
       return !(P.rules || []).some(r => ruleClash(r, x, true) || (pose && ruleSlots(r).some(v => v === 'pose' || v === 'hand'))); };
     let c = all.filter(t => !used.includes(t) && ok(t)); if (!c.length) c = all.filter(ok); if (!c.length) c = all; c = playFilter(c, pup ? 'm' : 'f');
     const t = wShuf(c, x => lateW(x, pup))[0]; used.push(t); playNote(pup ? 'm' : 'f', t); if (again !== 'swap') P.breaks = (P.breaks || 0) + 1;
-    P.bigAdd = 0; P.big = t.replace(/\{w\}/g, Wn) + (pup ? '。不许躲、不许射，躲了或射了就再来一张大惩罚' : '。不许躲、不许到，躲了或到了就再来一张大惩罚'); P.stage = 'big'; haptic(); render(); };
+    P.bigAdd = 0; P.breaks = 1; P.big = t.replace(/\{w\}/g, Wn) + (pup ? '。不许躲、不许射' : '。不许躲、不许到'); P.stage = 'big'; haptic(); render(); };
+  // 求饶换卡：男生「汪」着求十声、女生说十遍，对方点头才换；换了升一级：二次 → 大惩罚 → 严厉 → 大大；大大再求饶就再换一张大大，时间和次数 ×1.5
+  const begNext = s => s === 'dare' ? '大惩罚' : s === 'big' ? '严厉惩罚' : s === 'severe' ? '大大惩罚' : '另一张大大惩罚，时间和次数 ×1.5';
+  const begBtn = () => h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '😣 求饶换卡 → ' + begNext(P.stage), onclick: () => { const c = S.cd;
+    P.beg = {from: P.stage, cd: c && !c.done && c.end > Date.now() ? {key: c.key, left: c.end - Date.now(), add: c.add || 0} : null}; S.cd = null; P.stage = 'beg'; haptic(); render(); }});
+  const begBack = () => { const b = P.beg || {from: 'dare'}; P.beg = null; P.stage = b.from; if (b.cd){ S.cd = {key: b.cd.key, end: Date.now() + b.cd.left, done: false, add: b.cd.add}; cdTick(); } haptic(); render(); };
+  const begGo = () => { const f = (P.beg || {}).from || 'dare', was = '😣 ' + L + ' 求饶了，' + Wn + ' 点头，换卡升一级：'; P.beg = null; P.penMsg = null; S.cd = null; P.stage = f;
+    if (f === 'dare'){ bigBreak('beg'); upTag(P.big, was + '大惩罚'); }
+    else if (f === 'big'){ P.cdPause = null; sevNew(); P.stage = 'severe'; upTag(P.sev, was + '严厉惩罚'); }
+    else if (f === 'severe'){ P.sevPause = null; P.ulN = (P.ulN || 0) + 1; P.ulBeg = 0; ulNew(); P.stage = 'ultra'; upTag(P.ul, was + '大大惩罚'); }
+    else { P.ulBeg = (P.ulBeg || 0) + 1; ulNew(true); P.ul = mul15(P.ul); P.stage = 'ultra';
+      upTag(P.ul, '😣 ' + L + ' 在大大惩罚里又求饶了，' + Wn + ' 点头，再换一张大大惩罚，卡上的时间和次数 ×1.5' + (P.ulBeg > 1 ? '（这是第 ' + P.ulBeg + ' 次）' : '')); }
+    haptic(); render(); };
   const bigBtn = () => h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '❌ 破了规则 → 大惩罚（罚完接着这张）', onclick: () => bigBreak()});
   const breakBtn = () => P.hard ? bigBtn() : '';
   const cumBtn = () => P.kind === 'nip' ? h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '💦 罚的时候' + come + '了 → 继续强制高潮', onclick: () => { P.cum = true; P.kind = 'over'; P.forced = ' 在' + nipName + '里' + come + '了'; P.again = 0; P.opts = pick3(listOf()); P.card = null; haptic(); render(); }}) : '';
@@ -3738,10 +3776,10 @@ function punView(box, res, lv, why){
   // keep：换卡时规则留着（换规则多出来的、安全词作废加的都不丢），只把和新卡冲突的换掉
   const sevNew = keep => { S.cd = null; P.sev = sevCard(); if (keep && P.sevRules && P.sevRules.length) P.sevSw = {t: P.sev, gone: ruleFix(P.sevRules, P.sev, sevPools(), P.swGone)}; else { P.sevRules = sevRules(P.sev); P.sevSw = null; } if (pup) poseForce(P.sevRules, P.sev, sevPools(), P.swGone); else girlForce(P.sevRules, P.sev, sevPools(), P.swGone); P.sevN = (P.sevN || 0) + 1; };
   // 严厉 / 大大的规则框：冲突又换不掉的灰掉，这张先不算
-  const sevBox = (R, t, sw, head, foot) => h('div', {class: 'phard'}, h('div', {class: 'ht', text: head}),
-    h('ol', {}, ...(R || []).map(r => ruleClash(r, t) ? h('li', {class: 'off', text: r[1] + '（这张卡先不算）'}) : h('li', {text: ruleTxt(r)}))),
+  const sevBox = (R, t, sw, head, foot) => { const pm = penOf(R || [], t); return h('div', {class: 'phard'}, h('div', {class: 'ht', text: head}),
+    h('ol', {}, ...(R || []).map(r => ruleClash(r, t) ? h('li', {class: 'off', text: r[1] + '（这张卡先不算）'}) : penRow(r, pm))),
     sw && sw.t === t && sw.gone.length ? h('div', {class: 'hsw', text: '🔄 有 ' + sw.gone.length + ' 条和这张卡冲突，已自动换掉（原来是：' + sw.gone.join('；') + '）'}) : '',
-    h('div', {class: 'hf', text: foot}));
+    penMsg(), h('div', {class: 'hf', text: foot})); };
   if (P.sevInit){ P.sevInit = false; sevNew(); P.stage = 'severe'; }
   const ulCard = () => { const all = ULTRA[pup ? 'm' : 'f'], used = P.ulUsed || (P.ulUsed = []); let c = all.filter(t => !used.includes(t)); if (!c.length) c = all; c = playFilter(c, pup ? 'm' : 'f');
     const t = wShuf(c, x => lateW(x, pup))[0]; used.push(t); playNote(pup ? 'm' : 'f', t); return t.replace(/\{w\}/g, Wn); };
@@ -3820,19 +3858,19 @@ function punView(box, res, lv, why){
       banner(P.hard ? '这一张不许' + come + '，' + come + '了直接继续强制高潮。' : '这一张不许' + come + '，' + come + '了就由 ' + Wn + ' 选继续强制高潮还是' + nipName + '。'),
       card(P.doubled ? '🔥 二次惩罚' : Wn + ' 罚 ' + L, P.card), pcd(P.card, lv >= 4 ? totSecs(P.card) : null) || '',
       lv >= 4 ? h('div', {class: 'prow'},
-          h('button', {class: 'btn dgo', text: '✅ 罚完了，没' + come, onclick: () => { P.stage = 'judge'; haptic(); render(); }}),
+          h('button', {class: 'btn dgo', text: '✅ 罚完了，没' + come, onclick: () => { P.held = ''; P.stage = 'judge'; haptic(); render(); }}),
           h('button', {class: 'btn dfail', text: '💦 ' + come + '了', onclick: () => { P.cum = true; if (P.hard){ P.kind = 'over'; P.forced = ' 在二次惩罚里' + come + '了'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; } else { P.stage = 'choose'; P.why = ' 在惩罚里' + come + '了'; } haptic(); render(); }}))
         : h('div', {class: 'prow'},
           h('button', {class: 'btn dgo', text: '✅ ' + L + ' 撑住了', onclick: () => { P.stage = 'passed'; haptic(); render(); }}),
           h('button', {class: 'btn dfail', text: '❌ 又没撑住', onclick: next})),
-      lv >= 4 ? (P.hard ? breakBtn() : rl() ? h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: P.graced ? '❌ 破了规则 → 直接二次惩罚' : '❌ 破了规则（先小惩罚）', onclick: () => { if (!P.graced){ P.graced = true; P.stage = 'mini'; } else { P.why = ' 在惩罚里破了规则'; P.broke = true; unhappy(); } haptic(); render(); }}) : '') : '',
+      lv >= 4 ? (P.hard ? begBtn() : rl() ? h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: P.graced ? '❌ 破了规则 → 直接二次惩罚' : '❌ 破了规则（先小惩罚）', onclick: () => { if (!P.graced){ P.graced = true; P.stage = 'mini'; } else { P.why = ' 在惩罚里破了规则'; P.broke = true; unhappy(); } haptic(); render(); }}) : '') : '',
       hideBtn(() => { diceHideAdd(hkey(P.raw, loser)); P.card = P.doubled ? hardCard() : punCard(lv); render(); }));
   } else if (P.stage === 'mini'){
     wrap.append(miniBox(pup, Wn, L, () => { P.stage = 'dare'; haptic(); render(); },
       () => { P.why = ' 在小惩罚里躲了'; P.broke = P.dodge = true; unhappy(); haptic(); render(); }, P));
   } else if (P.stage === 'judge'){
     const two = P.doubled;
-    wrap.append(h('div', {class: 'pl', text: (two ? '二次惩罚罚完了。' : '') + (pup ? '🐶 ' + L + ' 这只小狗乖不乖？' + Wn + ' 主人满意吗？' : '🌸 ' + L + ' 刚才乖不乖？' + Wn + ' 满意吗？')}),
+    wrap.append(h('div', {class: 'pl', text: (two ? (P.held || '二次惩罚') + '罚完了。' : '') + (pup ? '🐶 ' + L + ' 这只小狗乖不乖？' + Wn + ' 主人满意吗？' : '🌸 ' + L + ' 刚才乖不乖？' + Wn + ' 满意吗？')}),
       h('div', {class: 'prow'},
         h('button', {class: 'btn dgo', text: two ? '😊 满意，去照顾' + pron(loser) : pup ? '😊 满意，放过小狗' : '😊 满意，放过' + pron(loser), onclick: () => { two ? toCare() : toPraise(); haptic(); render(); }}),
         h('button', {class: 'btn dfail', text: two ? '😤 不满意 → 强制高潮' : '😤 不满意 → 二次惩罚', onclick: () => {
@@ -3854,7 +3892,7 @@ function punView(box, res, lv, why){
     const what = P.kind === 'nip' ? nipName : (P.kind === 'over' ? '继续' : '') + (pup ? '强制小狗高潮' : '强制高潮');
     wrap.append(h('div', {class: 'pl', text: (P.forced && !P.again ? L + P.forced + '，直接' : P.again ? (pup ? '主人' : Wn + ' ') + '还不满意！再来一张' : P.cum ? L + ' ' + come + '了，' + Wn + ' 选了' : L + ' 接受') + what + '！' + Wn + ' 从三个里挑一个：'}));
     if (lv >= 4) goHard();
-    wrap.append(upBox(), lv >= 4 ? hardBox() : '', lv >= 4 ? swapUI(P.rules || []) : '');
+    wrap.append(upBox(), lv >= 4 ? hardBox() : '');
     P.opts.forEach(t => wrap.append(h('button', {class: 'dopt', text: t, onclick: () => { P.card = t; (P.used || (P.used = [])).push(t); playNote(pup ? 'm' : 'f', t); haptic(); render(); }})));
     wrap.append(h('button', {class: 'dskip', text: '三个都不想要，换三个', onclick: () => { P.opts = pick3(listOf()); haptic(); render(); }}));
   } else if (P.stage === 'final'){
@@ -3867,52 +3905,39 @@ function punView(box, res, lv, why){
           h('button', {class: 'btn dgo', text: '😊 满意，去照顾' + pron(loser), onclick: () => { toCare(); haptic(); render(); }}),
           h('button', {class: 'btn dfail', text: '😤 不满意，再罚一张', onclick: () => { P.card = null; P.again = (P.again || 0) + 1; P.ruleLog = null; if (P.again >= 2) addRule(); P.extra = pickExtra(''); P.exFor = null; P.opts = pick3(listOf()); haptic(); render(); }}))
         : h('button', {class: 'btn block dgo', text: '结束这一局', onclick: () => { P.stage = 'over'; haptic(); render(); }}),
-      lv >= 4 ? cumBtn() : '', lv >= 4 ? bigBtn() : '',
+      lv >= 4 ? cumBtn() : '',
       hideBtn(() => { if (lv >= 4){ diceHideAdd(P.card); P.card = null; P.opts = pick3(listOf()); } else { diceHideAdd(hkey(P.raw, loser)); P.card = punCard(lv + 1); } render(); }));
   } else if (P.stage === 'big'){
-    // 大惩罚：没写次数的 1 分钟、有次数的不计时；破得越多越重：第 N 次时间或次数 ×(1 + 0.5 × (N - 1))，不封顶；卡面直接写乘完的数
-    const n = P.breaks || 1, mul = 1 + 0.5 * (n - 1), base = totSecs(P.big), secs = base ? Math.round(base * mul) : 0;
-    const tf = x => x % 60 ? (x >= 60 ? Math.floor(x / 60) + ' 分 ' : '') + x % 60 + ' 秒' : x / 60 + ' 分钟';
-    const bigT = mul === 1 ? P.big : base ? P.big.replace(/1 分钟/, tf(secs)) : P.big.replace(/(\d+) 下/g, (x, v) => Math.round(+v * mul) + ' 下');
-    wrap.append(upLine(P.big), h('div', {class: 'pl', text: upOn(P.big) ? '💥 大惩罚（这一局第 ' + n + ' 张）：' + Wn + ' 来做，' + L + ' 受着' : '💥 ' + L + ' 破了规则！这一局第 ' + n + ' 次，来一张大惩罚（比小惩罚更狠）：'}),
-      n >= 2 ? h('div', {class: 'phard'}, h('div', {class: 'ht', text: '🔥 破得越多罚得越重：这次' + (base ? '时间' : '次数') + ' ×' + mul + '，卡上已经算好了'})) : '',
-      hardBox(P.big, '💥 大惩罚里规则照样要守', '破了任何一条 → 再来一张大惩罚；只有喊安全词才真的停'),
-      swapUI((P.rules || []).filter(r => !ruleClash(r, P.big))),
-      card('💥 大惩罚', bigT), secs ? pcd(P.big + ' #' + n, secs, Infinity) :
+    // 大惩罚：二次惩罚里求饶换来的；没写次数的 1 分钟，有次数的不计时
+    const secs = totSecs(P.big);
+    wrap.append(upLine(P.big), h('div', {class: 'pl', text: '💥 大惩罚：' + Wn + ' 来做，' + L + ' 受着'}),
+      hardBox(P.big, '💥 大惩罚里规则照样要守', BEG_FOOT, true),
+      card('💥 大惩罚', P.big), secs ? pcd(P.big + ' #1', secs, Infinity) :
         h('button', {class: 'btn block dadd', text: '➕ 不听话 +10 下' + (P.bigAdd ? '（已经加了 ' + P.bigAdd + ' 下）' : ''), onclick: () => { P.bigAdd = (P.bigAdd || 0) + 10; haptic(); render(); }}),
       h('div', {class: 'prow'},
-        h('button', {class: 'btn dgo', text: P.cumBig ? '✅ 罚完了 → 继续强制高潮' : '✅ 罚完了，接着刚才那张', onclick: () => { S.cd = null; backFinal(); haptic(); render(); }}),
-        h('button', {class: 'btn dfail', text: '❌ 又破了 → 再来一张', onclick: () => bigBreak()})),
-      P.cumBig ? '' : h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '💦 罚的时候' + come + '了 → 再来一张，罚完继续强制高潮', onclick: () => { P.cum = true; P.cumBig = true; bigBreak(); }}),
-      h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '😣 坚持不住了 → ' + Wn + ' 来选', onclick: () => { P.stage = 'bigdeal'; haptic(); render(); }}));
-  } else if (P.stage === 'bigdeal'){
-    const toClimax = () => { S.cd = null; if (P.bigFrom === 'dare' && !P.cumBig){ P.cdPause = null; P.why = ' 大惩罚坚持不住'; P.kind = P.cum ? 'over' : 'climax'; P.forced = ' 大惩罚坚持不住'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; } else backFinal(); haptic(); render(); };
-    wrap.append(h('div', {class: 'pl', text: '😣 ' + L + ' 坚持不住了，' + Wn + ' 选一个：'}),
-      h('button', {class: 'btn block dfail', text: '🔄 换一张大惩罚', onclick: () => bigBreak('swap')}),
-      h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '🔥 直接强制高潮', onclick: toClimax}),
-      h('button', {class: 'btn block dgo', style: {marginTop: '8px'}, text: '🤝 ' + Wn + ' 提一个条件', onclick: () => { P.stage = 'bigcond'; haptic(); render(); }}),
-      h('button', {class: 'btn block', style: {marginTop: '8px'}, text: '↩️ 算了，接着做完这张大惩罚', onclick: () => { P.stage = 'big'; haptic(); render(); }}));
-  } else if (P.stage === 'bigcond'){
-    wrap.append(h('div', {class: 'pl', text: '😣 ' + L + ' 坚持不住了'}),
-      card('🤝 ' + Wn + ' 提条件', Wn + ' 现在当场说一个条件，想怎么罚、想让' + pron(loser) + '做什么都行。' + L + ' 必须答应并且做到；不答应，就回去接着做完这张大惩罚'),
+        h('button', {class: 'btn dgo', text: '✅ 罚完了，没' + come, onclick: () => { S.cd = null; P.held = '大惩罚'; P.stage = 'judge'; haptic(); render(); }}),
+        h('button', {class: 'btn dfail', text: '💦 ' + come + '了 → 继续强制高潮', onclick: () => { S.cd = null; P.cum = true; P.kind = 'over'; P.forced = ' 在大惩罚里' + come + '了'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); }})),
+      begBtn());
+  } else if (P.stage === 'beg'){
+    const f = (P.beg || {}).from || 'dare';
+    wrap.append(h('div', {class: 'pl', text: '😣 ' + L + ' 想求饶换卡'}),
+      card('😣 求饶', (pup ? '你要「汪」着求十声「主人饶了小狗」，一声都不能少' : '你要说十遍「爸爸饶了骚母狗」，一遍都不能少') + '。求完了 ' + Wn + ' 点头才换；换了就升一级：' + begNext(f) + '。' + Wn + ' 不点头，就接着做刚才那张'),
       h('div', {class: 'prow'},
-        h('button', {class: 'btn dgo', text: P.cumBig ? '✅ 答应了，做完继续强制高潮' : '✅ 答应了，做完接着刚才那张', onclick: () => { S.cd = null; backFinal(); haptic(); render(); }}),
-        h('button', {class: 'btn dfail', text: '❌ 不答应 → 继续大惩罚', onclick: () => { P.stage = 'big'; haptic(); render(); }})));
+        h('button', {class: 'btn dfail', text: '✅ ' + Wn + ' 点头了，换卡', onclick: begGo}),
+        h('button', {class: 'btn dgo', text: '❌ 不点头，接着这张', onclick: begBack})));
   } else if (P.stage === 'severe'){
     wrap.append(upLine(P.sev), h('div', {class: 'pl', text: '🔥 ' + (upOn(P.sev) ? '' : L + ' 安全词说错了！') + '严厉惩罚' + (P.sevN > 1 ? '（第 ' + P.sevN + ' 张）' : '') + '：' + Wn + ' 来做，' + L + ' 受着'}),
-      sevBox(P.sevRules, P.sev, P.sevSw, '⚠️ 严厉规则：最严、最难撑', '破了任何一条 → 大大惩罚（罚完接着这张）'), swapUI((P.sevRules || []).filter(r => !ruleClash(r, P.sev))),
+      sevBox(P.sevRules, P.sev, P.sevSw, '⚠️ 严厉规则：最严、最难撑', BEG_FOOT),
       card('🔥 严厉惩罚', P.sev), pcd(P.sev, totSecs(P.sev), Infinity) || '',
-      h('div', {class: 'prow'}, h('button', {class: 'btn dgo', text: '✅ 撑住了', onclick: () => { S.cd = null; P.stage = 'sevjudge'; haptic(); render(); }}),
-        h('button', {class: 'btn dfail', text: '❌ 没撑住 → 再来一张', onclick: () => { sevNew(true); haptic(); render(); }})),
-      h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '⚠️ 破了规则 → 大大惩罚（罚完接着这张）', onclick: toUltra}),
+      h('button', {class: 'btn block dgo', text: '✅ 撑住了', onclick: () => { S.cd = null; P.held = '严厉惩罚'; P.stage = 'sevjudge'; haptic(); render(); }}),
+      begBtn(),
       h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '💦 ' + come + '了 → 继续强制高潮', onclick: () => { S.cd = null; P.cum = true; P.kind = 'over'; P.forced = ' 在严厉惩罚里' + come + '了'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); }}));
   } else if (P.stage === 'ultra'){
-    wrap.append(upLine(P.ul), h('div', {class: 'pl', text: '💀 ' + (upOn(P.ul) ? '' : L + ' 在严厉惩罚里破了规则！') + '大大惩罚' + (P.ulRedo ? '（从头再来，第 ' + (P.ulRedo + 1) + ' 遍）' : '') + '：' + Wn + ' 来做，' + L + ' 受着'}),
-      sevBox(P.ulRules, P.ul, P.ulSw, '☠️ 大大惩罚规则：比严厉还狠', '破了规则 → 这张从头再来；撑住了 → 回去接着做完严厉惩罚'), swapUI((P.ulRules || []).filter(r => !ruleClash(r, P.ul))),
+    wrap.append(upLine(P.ul), h('div', {class: 'pl', text: '💀 ' + (upOn(P.ul) ? '' : L + ' 求饶了！') + '大大惩罚：' + Wn + ' 来做，' + L + ' 受着'}),
+      sevBox(P.ulRules, P.ul, P.ulSw, '☠️ 大大惩罚规则：比严厉还狠', BEG_FOOT),
       card('💀 大大惩罚', P.ul), pcd(P.ul + ' #' + (P.ulRedo || 0), totSecs(P.ul), Infinity) || '',
-      h('div', {class: 'prow'}, h('button', {class: 'btn dgo', text: '✅ 撑住了 → 接着严厉惩罚', onclick: backSevere}),
-        h('button', {class: 'btn dfail', text: '❌ 又破了规则 → 从头再来', onclick: () => { S.cd = null; P.ulRedo = (P.ulRedo || 0) + 1; haptic(); render(); }})),
-      h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '😣 坚持不住 → 换一张大大惩罚', onclick: () => { ulNew(true); haptic(); render(); }}),
+      h('button', {class: 'btn block dgo', text: '✅ 撑住了', onclick: () => { S.cd = null; P.sevPause = null; P.held = '大大惩罚'; P.stage = 'sevjudge'; haptic(); render(); }}),
+      begBtn(),
       h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '🔥 直接强制高潮', onclick: () => { S.cd = null; P.sevPause = null; P.stage = 'ultcum'; haptic(); render(); }}),
       h('button', {class: 'btn block dfail', style: {marginTop: '8px'}, text: '💦 ' + come + '了 → 继续强制高潮', onclick: () => { S.cd = null; P.sevPause = null; P.cum = true; P.kind = 'over'; P.forced = ' 在大大惩罚里' + come + '了'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); }}));
   } else if (P.stage === 'ultcum'){
@@ -3920,7 +3945,7 @@ function punView(box, res, lv, why){
       card('🔥 强制高潮', ULT_CUM[pup ? 'm' : 'f'].replace(/\{w\}/g, Wn)),
       h('button', {class: 'btn block dgo', text: '✅ 做完了，去照顾' + pron(loser), onclick: () => { toCare(); haptic(); render(); }}));
   } else if (P.stage === 'sevjudge'){
-    wrap.append(h('div', {class: 'pl', text: '严厉惩罚撑住了。' + (pup ? '主人' : Wn + ' ') + '决定：'}),
+    wrap.append(h('div', {class: 'pl', text: (P.held || '严厉惩罚') + '撑住了。' + (pup ? '主人' : Wn + ' ') + '决定：'}),
       h('div', {class: 'prow'}, h('button', {class: 'btn dgo', text: '💗 放过' + pron(loser) + '，去照顾', onclick: () => { toCare(); haptic(); render(); }}),
         h('button', {class: 'btn dfail', text: '🔥 继续强制高潮', onclick: () => { P.kind = 'climax'; P.forced = ' 严厉惩罚罚完了'; P.again = 0; P.opts = pick3(listOf()); P.card = null; P.stage = 'final'; haptic(); render(); }})));
   } else if (P.stage === 'care'){
@@ -3934,7 +3959,7 @@ function punView(box, res, lv, why){
   box.append(wrap);
   const ks = P.cdKeys || (P.cdKeys = []); cdSeen.forEach(k => { if (!ks.includes(k)) ks.push(k); });
   if (S.cd && ks.includes(S.cd.key) && !cdSeen.includes(S.cd.key)) S.cd = null;
-  return !!P.sv || ['run', 'mini', 'dare', 'judge', 'choose', 'final', 'care', 'big', 'bigdeal', 'bigcond', 'severe', 'sevjudge', 'ultra', 'ultcum'].includes(P.stage) || (lv >= 4 && P.stage === 'good');
+  return !!P.sv || ['run', 'mini', 'dare', 'judge', 'choose', 'final', 'care', 'big', 'bigdeal', 'bigcond', 'beg', 'severe', 'sevjudge', 'ultra', 'ultcum'].includes(P.stage) || (lv >= 4 && P.stage === 'good');
 }
 
 function diceView(p){
