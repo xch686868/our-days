@@ -15,7 +15,7 @@
 <link rel="icon" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,500;1,9..144,600&family=Noto+Serif+SC:wght@600;700&family=Ma+Shan+Zheng&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,500;1,9..144,600&family=Noto+Serif+SC:wght@600;700&family=Ma+Shan+Zheng&display=swap" media="print" onload="this.media='all'">
 <script src="config.js"></script>
 <style>
 /* 设计：像 iPhone 原生 App —— 大标题、毛玻璃底部导航、底部弹出面板；玫瑰色点缀，合照做首页主角。 */
@@ -369,6 +369,8 @@ svg{display:block}
 .phard .pen{display:flex;align-items:center;gap:8px;margin-top:3px;font-size:13px;font-weight:600;line-height:1.4}
 .phard .pen span{flex:1}
 .phard .pen button{flex:none;background:#fff;color:#ff3b5c;border:0;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:800;cursor:pointer}
+.phard .bdn{display:flex;align-items:center;gap:8px}.phard .bdn span{flex:1}.phard .bdn button{flex:none;background:rgba(255,255,255,.25);color:#fff;border:1px solid #fff;border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:800;cursor:pointer}
+.phard .bdd{margin-top:4px;background:rgba(255,255,255,.18);border-radius:10px;padding:6px 8px;font-size:13.5px;font-weight:600;line-height:1.5}
 .phard .pmsg{margin-top:8px;background:#fff;color:#c8102e;border-radius:12px;padding:8px 10px;font-size:14px;font-weight:800;line-height:1.45}
 .phard .pmsg button{display:block;margin-top:6px;background:#ff3b5c;color:#fff;border:0;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:800;cursor:pointer}
 /* 后面几关排紧一点：卡放在最上面，规则和按钮字小一点，一屏能看完玩法和规则 */
@@ -823,13 +825,12 @@ function render(){
   root.append(el); ljTip(root);
 }
 // 屏幕上出现「活结」时，在第一次出现的地方下面加一行小字说明
-const LJ_TIP = '活结：用丝袜在蛋蛋根部绕一圈，打个一拉就紧的结，她攥着另一头；「拽一下」就是往外拉紧一下。系松一点，发紫、发凉、发麻就马上解开';
 const DISOBEY = {m: '躲一下、推一下，她就马上刷你的马眼、磨你的龟头 10 秒', f: '躲一下、合一下腿、推一下，他就马上拍一下你的阴蒂'};
 function tipAt(root, re, tip){ if (!re.test(root.textContent)) return;
   const e = [...root.querySelectorAll('div,li,button,span,p')].find(x => !x.classList.contains('ljtip') && re.test(x.textContent) && ![...x.children].some(c => re.test(c.textContent))); if (!e) return;
   const at = e.tagName === 'LI' ? (e.closest('ol,ul') || e) : e;
   at.after(h('div', {class: 'ljtip', style: {fontSize: '12px', opacity: '.7', margin: '6px 2px 0', lineHeight: '1.5'}, text: tip})); }
-function ljTip(root){ tipAt(root, /活结/, LJ_TIP); }
+function ljTip(){}
 // 正在打字时不刷新页面，等输入框失去焦点再刷新
 function typingInPage(){ const a = document.activeElement; return a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA') && $('#root').contains(a); }
 Store.listeners.push(() => { if (typingInPage() || S.busy){ S.dirty = true; renderTabs(); } else render(); });
@@ -3064,6 +3065,8 @@ function lateFix(R, t, sev, m, skip){
   return gone; }
 // 后面几关临时多加的规则（安全词作废、强制高潮再罚一张）：从小规则、其他里抽
 const lateMore = m => { const g = LATE[m ? 'm' : 'f']; return [...g[2].small, ...g[3].small, ...g[3].other]; };
+const BIND_NAME = new Map([...BIND_M.map((r, i) => [r[1], ['青蛙绑', '仰躺大张腿', '抱腿悬臀', '跪坐后仰', '背手撅臀摇', '背手跪直哈气', '跪直挺腰', '举手跪直', '塌腰撅臀', '公狗抬腿', '绑腿仰躺挺腰', '绑腿趴撅', '抱头跪直', '背手抬臀', '举手蹲'][i]]),
+  ...BIND_F.map((r, i) => [r[1], ['背手跪趴摇', '抱腿', '绑腿仰躺', '举手跪直', '背手跪直', '侧绑抬臀', '侧躺抬腿', '绑腿跪趴', '抱头仰躺'][i]])]);
 const BIND_SET = new Set([...BIND_M, ...BIND_F].map(r => r[1])), isBind = r => !!r && BIND_SET.has(r[1]);
 const BIND_SHORT = [['两只手腕用绷带缠紧在同一边的', '青蛙绑', '指腹刷马眼十下'], ['大腿和小腿用绷带缠紧，两只手', '折腿 + 举手', '掌心包住龟头转十圈'], ['仰躺抱着腿，手腕用绷带缠紧在', '抱腿绑', '拇指按住马眼转十圈'], ['跪坐，两只手腕在身后用绷带缠', '跪坐背绑', '捏住龟头揉十下'], ['两只手腕在身后用绷带缠紧，脸', '背手贴床', '握住龟头磨十圈'], ['两只手腕在身后用绷带缠紧，跪', '背手跪直', '指腹刷马眼十下'], ['两只手腕用绷带缠紧在同一边的', '手贴腿', '捏住龟头揉十下'], ['两只手腕用绷带缠在一起举过头', '举手跪直', '掌心磨龟头十圈'], ['两只手腕用绷带缠在一起，膝盖', '缠手趴好', '握住龟头磨十圈'], ['侧躺，两只手腕在身后用绷带缠', '蜷着侧躺', '指腹刷马眼十下']].concat([['两只手腕在身后用绷带缠紧，跪', '背手跪趴', '拍一下阴蒂'], ['仰躺抱着腿，手腕用绷带缠紧在', '抱腿绑', '拍一下阴蒂'], ['大腿和小腿用绷带缠紧，两只手', '折腿 + 举手', '拍一下阴蒂'], ['两只手腕用绷带缠在一起举过头', '举手跪直', '拍一下阴蒂、捏一下乳头'], ['两只手腕在身后用绷带缠紧，跪', '背手跪直', '拍一下阴蒂'], ['两只手腕用绷带缠紧在同一边的', '手贴腿', '拍一下阴蒂'], ['侧躺，两只手腕在身后用绷带缠', '侧躺背绑', '拍一下阴蒂']]);
 const GIRL_SET = new Set(GIRL_RULE.map(r => r[1]).concat(BIND_F.map(r => r[1]))), isGirlF = r => !!r && GIRL_SET.has(r[1]);
@@ -3147,6 +3150,7 @@ const mul15 = t => t.replace(/(?<!最多加到\s?|每[^，；。\d]{0,2}\s?)(\d+
 // 换规则的框：先点开，再点要换的那条，再确认
 function swapBox(st, R, what, go){
   if (!R || !R.length) return '';
+  if (st.swPick != null && !R[st.swPick]) st.swPick = null;  // 换了卡、规则变少了，选中的那条已经没了
   if (st.swOpen == null) return h('button', {class: 'swbtn', text: '🔄 不喜欢哪条规则？换掉它（惩罚升一级）', onclick: () => { st.swOpen = true; st.swPick = null; haptic(); render(); }});
   const box = h('div', {class: 'swbox'});
   if (st.swPick == null){
@@ -3675,7 +3679,9 @@ function punView(box, res, lv, why){
     live.filter(r => !(r[1] in m.site)).forEach(r => { let free = all.map(x => x[0]).filter(x => !used.includes(x)); if (!free.length) free = all.map(x => x[0]);
       const x = free[Math.floor(Math.random() * free.length)]; m.site[r[1]] = x; used.push(x); }); return m; };
   const penRow = (r, m) => { const site = PEN[pup ? 'm' : 'f'].find(x => x[0] === m.site[r[1]]) || PEN[pup ? 'm' : 'f'][0], act = penFill(site[1], P.stage === 'ultra'), n = m.n[r[1]] || 0;
-    return h('li', {}, h('div', {text: ruleTxt(r).replace(r[1], penStrip(r[1]))}),
+    const bn = isBind(r) && BIND_NAME.get(r[1]), op = bn && P.bdOpen;
+    return h('li', {}, bn ? h('div', {class: 'bdn'}, h('span', {text: '【强制捆绑】' + bn}), h('button', {text: op ? '收起' : '详细', onclick: () => { P.bdOpen = !op; render(); }})) : h('div', {text: ruleTxt(r).replace(r[1], penStrip(r[1]))}),
+      op ? h('div', {class: 'bdd', text: r[1]}) : '',
       h('div', {class: 'pen'}, h('span', {text: '破了（' + r[2] + '）→ ' + act}),
         h('button', {text: n ? '破了 ×' + n : '破了', onclick: () => { m.n[r[1]] = n + 1; P.penMsg = {k: penKey(), t: '⚡ ' + L + ' 破了「' + r[2] + '」：' + Wn + ' 现在' + act + '。罚完接着这张卡' + (n ? '（这条已经破了 ' + (n + 1) + ' 次）' : '')}; haptic(); render(); }}))); };
   const penMsg = () => P.penMsg && P.penMsg.k === penKey() ? h('div', {class: 'pmsg'}, h('div', {text: P.penMsg.t}), h('button', {text: '✅ 罚完了，接着这张', onclick: () => { P.penMsg = null; haptic(); render(); }})) : '';
