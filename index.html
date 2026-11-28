@@ -825,12 +825,11 @@ function render(){
 // 屏幕上出现「活结」时，在第一次出现的地方下面加一行小字说明
 const LJ_TIP = '活结：用丝袜在蛋蛋根部绕一圈，打个一拉就紧的结，她攥着另一头；「拽一下」就是往外拉紧一下。系松一点，发紫、发凉、发麻就马上解开';
 const DISOBEY = {m: '躲一下、推一下，她就马上刷你的马眼、磨你的龟头 10 秒', f: '躲一下、合一下腿、推一下，他就马上拍一下你的阴蒂'};
-const BD_TIP = '绷带：缠两三圈就够，要能塞进一根手指；手脚发麻、发凉、变色马上解开；不绕脖子；剪刀放在手边';
 function tipAt(root, re, tip){ if (!re.test(root.textContent)) return;
   const e = [...root.querySelectorAll('div,li,button,span,p')].find(x => !x.classList.contains('ljtip') && re.test(x.textContent) && ![...x.children].some(c => re.test(c.textContent))); if (!e) return;
   const at = e.tagName === 'LI' ? (e.closest('ol,ul') || e) : e;
   at.after(h('div', {class: 'ljtip', style: {fontSize: '12px', opacity: '.7', margin: '6px 2px 0', lineHeight: '1.5'}, text: tip})); }
-function ljTip(root){ tipAt(root, /活结/, LJ_TIP); tipAt(root, /绷带|绑|缠好|缠在|缠到/, BD_TIP); }
+function ljTip(root){ tipAt(root, /活结/, LJ_TIP); }
 // 正在打字时不刷新页面，等输入框失去焦点再刷新
 function typingInPage(){ const a = document.activeElement; return a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA') && $('#root').contains(a); }
 Store.listeners.push(() => { if (typingInPage() || S.busy){ S.dirty = true; renderTabs(); } else render(); });
